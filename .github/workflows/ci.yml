@@ -5,6 +5,9 @@ on:
     branches: [main]
 
 jobs:
+  backend:
+    uses: ./.github/workflows/backend.yml
+
   lint-and-build:
     runs-on: ubuntu-latest
     defaults:
@@ -70,7 +73,7 @@ jobs:
         working-directory: .
         run: >
           docker compose -f .github/workflows/e2e-tests/docker-compose.yml
-          exec -T wordpress wp clog seed --allow-root
+          exec -T wordpress wp clog seed --user=testadmin --allow-root
 
       - uses: actions/setup-node@v4
         with:

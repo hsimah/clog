@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Location/LocationVerifiers.php
- * digest: sha256:4c6d039dbb01ea9c5fa8d39f1a2ff50e4e258858c1d37389ec59784e060d0f05
+ * digest: sha256:413878231e7a1254ec780696b6fe4ce9aab3e00132106baee7b265f877213f90
  */
 
 namespace Clog\Entity\Location;
@@ -23,20 +23,22 @@ use Eleph\Runtime\Verification\Verification;
  */
 final readonly class LocationVerifiers implements EntityVerifiers
 {
-    public function __construct()
-    {
+    public function __construct() {
+
     }
 
     /**
      * @return list<string>
      */
-    public function verifiedFields(): array
-    {
+    public function verifiedFields(): array {
         return [];
     }
 
-    public function verify(string $field, mixed $value, MutationContext $context): Verification
-    {
+    public function verify(
+        string $field,
+        mixed $value,
+        MutationContext $context,
+    ): Verification {
         return Verification::ok();
     }
 }

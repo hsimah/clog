@@ -3,7 +3,7 @@
  * WP-CLI commands for the Elephentity runtime.
  *
  * Usage:
- *   wp clog install          create any missing entity tables
+ *   wp clog install          apply safe additive schema changes
  *   wp clog status           report table state and what the runtime can see
  *   wp clog entity <cmd>     exercise the gateway: list, create, get, delete
  */
@@ -24,7 +24,7 @@ WP_CLI::add_command( 'clog status', 'clog_cli_status' );
 WP_CLI::add_command( 'clog entity', 'clog_cli_entity' );
 
 /**
- * Create any missing entity tables.
+ * Apply safe additive schema changes; refuse destructive upgrades.
  *
  * ## EXAMPLES
  *
@@ -33,18 +33,23 @@ WP_CLI::add_command( 'clog entity', 'clog_cli_entity' );
  * @when after_wp_load
  */
 function clog_cli_install(): void {
-	$created = clog_install_tables();
+	try {
+		$created = clog_install_tables();
+	} catch ( RuntimeException $failure ) {
+		WP_CLI::error( $failure->getMessage() );
+		return;
+	}
 
 	if ( [] === $created ) {
-		WP_CLI::success( 'All entity tables already present.' );
+		WP_CLI::success( 'Entity schema is up to date.' );
 		return;
 	}
 
 	foreach ( $created as $table ) {
-		WP_CLI::log( "Created {$table}" );
+		WP_CLI::log( "Applied: {$table}" );
 	}
 
-	WP_CLI::success( sprintf( 'Created %d table(s).', count( $created ) ) );
+	WP_CLI::success( sprintf( 'Applied %d schema statement(s).', count( $created ) ) );
 }
 
 /**
@@ -52,7 +57,7 @@ function clog_cli_install(): void {
  *
  * ## EXAMPLES
  *
- *     wp clog status
+ *     wp clog status --user=admin
  *
  * @when after_wp_load
  */
@@ -64,6 +69,13 @@ function clog_cli_status(): void {
 
 	if ( [] !== $missing ) {
 		WP_CLI::warning( 'Run `wp clog install`.' );
+		return;
+	}
+
+	try {
+		$clog->tables()->requireReady();
+	} catch ( RuntimeException $failure ) {
+		WP_CLI::warning( $failure->getMessage() );
 		return;
 	}
 
@@ -99,10 +111,10 @@ function clog_cli_status(): void {
  *
  * ## EXAMPLES
  *
- *     wp clog entity list Location
- *     wp clog entity create Location --name="Pantry"
- *     wp clog entity get Location 1
- *     wp clog entity delete Location 1
+ *     wp clog entity list Location --user=admin
+ *     wp clog entity create Location --name="Pantry" --user=admin
+ *     wp clog entity get Location 1 --user=admin
+ *     wp clog entity delete Location 1 --user=admin
  *
  * @when after_wp_load
  */
@@ -133,7 +145,7 @@ function clog_cli_entity( array $args, array $assoc ): void {
 			return;
 
 		case 'create':
-			$id = $gateway->create( $entity, clog_cli_coerce( $assoc ) );
+			$id = $gateway->create( $entity, clog_cli_coerce( $assoc ) )->id;
 			WP_CLI::success( sprintf( 'Created %s %s.', $entity, $id ) );
 			return;
 

@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   graphql-manifest.php
- * digest: sha256:f82f5ac2f091ab8cc756ca78eb8bbdf44a9ce3fbc2d7c5a3400b82febb231637
+ * digest: sha256:c730f9819ff2029f35afe9482058202b03ccdadc567dfb7d2b41f9375ff7ffa5
  */
 
 namespace Eleph\WPGraphQL\Manifest;
@@ -26,26 +26,27 @@ return new Manifest(
             'ClogInventory',
             'Inventory',
             [
-                'id' => new FieldEntry('id', new GraphQLType('ID', true, false), 'getId', null, FieldEncoding::Value, null),
+                'id' => new FieldEntry('id', new GraphQLType('ID', true, false), 'getId', 'The globally unique identifier, opaque and safe to use as a cache key.', FieldEncoding::GlobalId, null),
+                'databaseId' => new FieldEntry('databaseId', new GraphQLType('ID', true, false), 'getId', 'The row as storage knows it, unique within its table rather than the schema.', FieldEncoding::Id, null),
                 'createdAt' => new FieldEntry('createdAt', new GraphQLType('String', true, false), 'getCreatedAt', null, FieldEncoding::Datetime, null),
-                'updatedAt' => new FieldEntry('updatedAt', new GraphQLType('String', false, false), 'getUpdatedAt', null, FieldEncoding::Datetime, null),
-                'postId' => new FieldEntry('postId', new GraphQLType('Int', true, false), 'getPostId', 'The wp_posts row this entity projects to.', FieldEncoding::Value, null),
-                'name' => new FieldEntry('name', new GraphQLType('String', true, false), 'getName', 'Projected to post_title, so the admin list has something to show.', FieldEncoding::Value, null),
+                'updatedAt' => new FieldEntry('updatedAt', new GraphQLType('String', true, false), 'getUpdatedAt', null, FieldEncoding::Datetime, null),
+                'name' => new FieldEntry('name', new GraphQLType('String', true, false), 'getName', 'Display label derived from the item and location before writing.', FieldEncoding::Value, null),
                 'dateAdded' => new FieldEntry('dateAdded', new GraphQLType('String', true, false), 'getDateAdded', 'When this instance entered inventory.', FieldEncoding::Datetime, null),
                 'item' => new FieldEntry('item', new GraphQLType('ClogItem', false, false), 'getItem', 'What this entry is an instance of.', FieldEncoding::Value, null),
                 'location' => new FieldEntry('location', new GraphQLType('ClogLocation', false, false), 'getLocation', 'Where it is kept.', FieldEncoding::Value, null),
             ],
             [],
             'One stocked instance of an item, in a location.',
+            ['Node'],
         ),
         'ClogItem' => new ObjectTypeEntry(
             'ClogItem',
             'Item',
             [
-                'id' => new FieldEntry('id', new GraphQLType('ID', true, false), 'getId', null, FieldEncoding::Value, null),
+                'id' => new FieldEntry('id', new GraphQLType('ID', true, false), 'getId', 'The globally unique identifier, opaque and safe to use as a cache key.', FieldEncoding::GlobalId, null),
+                'databaseId' => new FieldEntry('databaseId', new GraphQLType('ID', true, false), 'getId', 'The row as storage knows it, unique within its table rather than the schema.', FieldEncoding::Id, null),
                 'createdAt' => new FieldEntry('createdAt', new GraphQLType('String', true, false), 'getCreatedAt', null, FieldEncoding::Datetime, null),
-                'updatedAt' => new FieldEntry('updatedAt', new GraphQLType('String', false, false), 'getUpdatedAt', null, FieldEncoding::Datetime, null),
-                'postId' => new FieldEntry('postId', new GraphQLType('Int', true, false), 'getPostId', 'The wp_posts row this entity projects to.', FieldEncoding::Value, null),
+                'updatedAt' => new FieldEntry('updatedAt', new GraphQLType('String', true, false), 'getUpdatedAt', null, FieldEncoding::Datetime, null),
                 'name' => new FieldEntry('name', new GraphQLType('String', true, false), 'getName', 'What the item is called. Projected to post_title.', FieldEncoding::Value, null),
                 'barcode' => new FieldEntry('barcode', new GraphQLType('String', false, false), 'getBarcode', 'The barcode that identifies this item. One per item: a serialized list could not be indexed, and scanning a barcode to find an item is the query this data exists to serve.
 ', FieldEncoding::Value, null),
@@ -54,21 +55,23 @@ return new Manifest(
                 'inventoryEntries' => new ConnectionEntry('inventoryEntries', 'ClogItem', 'ClogInventory', 'inventoryEntries', 'item', 'The Inventory pointing here through "item".'),
             ],
             'A thing that can be stocked, identified by its barcode.',
+            ['Node'],
         ),
         'ClogLocation' => new ObjectTypeEntry(
             'ClogLocation',
             'Location',
             [
-                'id' => new FieldEntry('id', new GraphQLType('ID', true, false), 'getId', null, FieldEncoding::Value, null),
+                'id' => new FieldEntry('id', new GraphQLType('ID', true, false), 'getId', 'The globally unique identifier, opaque and safe to use as a cache key.', FieldEncoding::GlobalId, null),
+                'databaseId' => new FieldEntry('databaseId', new GraphQLType('ID', true, false), 'getId', 'The row as storage knows it, unique within its table rather than the schema.', FieldEncoding::Id, null),
                 'createdAt' => new FieldEntry('createdAt', new GraphQLType('String', true, false), 'getCreatedAt', null, FieldEncoding::Datetime, null),
-                'updatedAt' => new FieldEntry('updatedAt', new GraphQLType('String', false, false), 'getUpdatedAt', null, FieldEncoding::Datetime, null),
-                'postId' => new FieldEntry('postId', new GraphQLType('Int', true, false), 'getPostId', 'The wp_posts row this entity projects to.', FieldEncoding::Value, null),
+                'updatedAt' => new FieldEntry('updatedAt', new GraphQLType('String', true, false), 'getUpdatedAt', null, FieldEncoding::Datetime, null),
                 'name' => new FieldEntry('name', new GraphQLType('String', true, false), 'getName', 'What the location is called. Projected to post_title.', FieldEncoding::Value, null),
             ],
             [
                 'inventoryEntries' => new ConnectionEntry('inventoryEntries', 'ClogLocation', 'ClogInventory', 'inventoryEntries', 'location', 'The Inventory pointing here through "location".'),
             ],
             'Somewhere inventory can be kept.',
+            ['Node'],
         ),
     ],
     enums: [
@@ -80,10 +83,7 @@ return new Manifest(
             'create',
             'Inventory',
             [
-                'createdAt' => new GraphQLType('String', true, false),
-                'updatedAt' => new GraphQLType('String', false, false),
-                'postId' => new GraphQLType('Int', false, false),
-                'name' => new GraphQLType('String', true, false),
+                'name' => new GraphQLType('String', false, false),
                 'dateAdded' => new GraphQLType('String', true, false),
                 'item' => new GraphQLType('ID', false, false),
                 'location' => new GraphQLType('ID', false, false),
@@ -96,9 +96,6 @@ return new Manifest(
             'create',
             'Item',
             [
-                'createdAt' => new GraphQLType('String', true, false),
-                'updatedAt' => new GraphQLType('String', false, false),
-                'postId' => new GraphQLType('Int', false, false),
                 'name' => new GraphQLType('String', true, false),
                 'barcode' => new GraphQLType('String', false, false),
             ],
@@ -110,9 +107,6 @@ return new Manifest(
             'create',
             'Location',
             [
-                'createdAt' => new GraphQLType('String', true, false),
-                'updatedAt' => new GraphQLType('String', false, false),
-                'postId' => new GraphQLType('Int', false, false),
                 'name' => new GraphQLType('String', true, false),
             ],
             null,
@@ -124,8 +118,6 @@ return new Manifest(
             'Inventory',
             [
                 'id' => new GraphQLType('ID', true, false),
-                'updatedAt' => new GraphQLType('String', false, false),
-                'postId' => new GraphQLType('Int', false, false),
                 'name' => new GraphQLType('String', false, false),
                 'dateAdded' => new GraphQLType('String', false, false),
                 'item' => new GraphQLType('ID', false, false),
@@ -140,8 +132,6 @@ return new Manifest(
             'Item',
             [
                 'id' => new GraphQLType('ID', true, false),
-                'updatedAt' => new GraphQLType('String', false, false),
-                'postId' => new GraphQLType('Int', false, false),
                 'name' => new GraphQLType('String', false, false),
                 'barcode' => new GraphQLType('String', false, false),
             ],
@@ -154,8 +144,6 @@ return new Manifest(
             'Location',
             [
                 'id' => new GraphQLType('ID', true, false),
-                'updatedAt' => new GraphQLType('String', false, false),
-                'postId' => new GraphQLType('Int', false, false),
                 'name' => new GraphQLType('String', false, false),
             ],
             null,

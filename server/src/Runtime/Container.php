@@ -11,21 +11,9 @@ use ReflectionNamedType;
 use RuntimeException;
 
 /**
- * The container the generated Catalogue resolves its classes through.
- *
- * Elephentity auto-discovers nothing: the Catalogue asks for a hydrator, verifiers,
- * triggers and an input applier per entity by class name, and something has to build
- * them. Clog has no DI container of its own and a WordPress plugin is a poor place to
- * introduce one, so this is the smallest thing that satisfies the contract.
- *
- * Construction is by reflection over the constructor's parameter types, resolved from
- * a small set of shared singletons. That is deliberately narrow — it is autowiring for
- * a closed set of generated classes, not a general-purpose container — and anything it
- * cannot resolve throws by name rather than guessing.
- *
- * Instances are shared. Every generated class here is stateless: hydrators and input
- * appliers hold only a ValueDecoder, and the verifier and trigger bridges hold nothing
- * at all.
+ * Shared generated services with explicit application-contract bindings.
+ * Constructor autowiring is limited to class-typed dependencies; policies and
+ * side effects are supplied by RuntimeFactory before the generated boot check.
  */
 final class Container implements ContainerInterface
 {
@@ -47,6 +35,11 @@ final class Container implements ContainerInterface
         return isset($this->instances[$id])
             || isset($this->shared[$id])
             || (class_exists($id) && $this->isConstructible($id));
+    }
+
+    public function set(string $id, object $instance): void
+    {
+        $this->instances[$id] = $instance;
     }
 
     public function get(string $id): object

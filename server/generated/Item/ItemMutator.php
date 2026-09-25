@@ -9,12 +9,12 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Item/ItemMutator.php
- * digest: sha256:c3e355af2391c80fa5ec826f49a665ea76ea6f6d95e87707fa10d1b845e03639
+ * digest: sha256:8d5642d4a6dc3881b2a964c47a2e42f936c77c21d734895483a865fe5ec2c26d
  */
 
 namespace Clog\Entity\Item;
 
-use DateTimeImmutable;
+use Clog\Entity\Pattern\ClogPost\ClogPostMutatorTrait;
 use Eleph\Runtime\Mutation\MutationBuffer;
 
 /**
@@ -22,36 +22,27 @@ use Eleph\Runtime\Mutation\MutationBuffer;
  */
 final class ItemMutator
 {
+    use ClogPostMutatorTrait;
+
     public function __construct(
         private readonly MutationBuffer $buffer,
     ) {
+
     }
 
-    public function setUpdatedAt(?DateTimeImmutable $updatedAt): self
-    {
-        $this->buffer->set('updatedAt', $updatedAt);
-
-        return $this;
-    }
-
-    public function setPostId(int $postId): self
-    {
-        $this->buffer->set('postId', $postId);
-
-        return $this;
-    }
-
-    public function setName(string $name): self
-    {
+    public function setName(
+        string $name,
+    ): self {
         $this->buffer->set('name', $name);
-
+        
         return $this;
     }
 
-    public function setBarcode(?string $barcode): self
-    {
+    public function setBarcode(
+        ?string $barcode,
+    ): self {
         $this->buffer->set('barcode', $barcode);
-
+        
         return $this;
     }
 }

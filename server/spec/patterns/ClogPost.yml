@@ -1,7 +1,7 @@
 pattern: ClogPost
 description: >
-  Participation in the WordPress post ecosystem, which every Clog type needs: the
-  admin UI lists them, and existing data lives in wp_posts.
+  Shared admin presentation and timestamps for authoritative inventory entities.
+  The historical pattern name is retained; records do not require linked posts.
 requires:
   driver: wordpress
 config:
@@ -35,9 +35,10 @@ config:
     nullable: true
 use:
   - Timestamps
-fields:
-  postId:
-    type: int
-    description: The wp_posts row this entity projects to.
-    unique: true
-    indexed: true
+readPolicies:
+  signedIn:
+    handler: true
+writePolicies:
+  staff:
+    handler: true
+interface: true

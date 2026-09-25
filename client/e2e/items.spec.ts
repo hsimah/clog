@@ -37,12 +37,12 @@ test.describe('Items', () => {
     await page.goto('/clog/items/new');
     await waitForData(page);
 
-    await page.getByLabel('Name').fill('Canned Beans');
+    await page.getByLabel('Name').fill('Clog E2E Canned Beans');
     await page.getByRole('button', { name: 'Create' }).click();
 
-    // Should redirect to the new item detail page (numeric WordPress ID)
-    await expect(page).toHaveURL(/\/clog\/items\/\d+$/);
-    await expect(page.getByRole('heading', { name: 'Canned Beans' })).toBeVisible();
+    // Should redirect to the new item detail page (opaque GraphQL ID)
+    await expect(page).toHaveURL(/\/clog\/items\/[^/]+$/);
+    await expect(page.getByRole('heading', { name: 'Clog E2E Canned Beans' })).toBeVisible();
   });
 
   test('creates a new item with a barcode', async ({ page, waitForData, authenticate }) => {
@@ -50,13 +50,13 @@ test.describe('Items', () => {
     await page.goto('/clog/items/new');
     await waitForData(page);
 
-    await page.getByLabel('Name').fill('Milk');
+    await page.getByLabel('Name').fill('Clog E2E Milk');
     await page.getByPlaceholder('Enter barcode').fill('1234567890');
 
     await page.getByRole('button', { name: 'Create' }).click();
 
-    await expect(page).toHaveURL(/\/clog\/items\/\d+$/);
-    await expect(page.getByRole('heading', { name: 'Milk' })).toBeVisible();
+    await expect(page).toHaveURL(/\/clog\/items\/[^/]+$/);
+    await expect(page.getByRole('heading', { name: 'Clog E2E Milk' })).toBeVisible();
     await expect(page.getByRole('complementary').getByText('1234567890')).toBeVisible();
   });
 
@@ -67,7 +67,7 @@ test.describe('Items', () => {
 
     await page.getByRole('link', { name: 'Heinz Ketchup' }).click();
 
-    await expect(page).toHaveURL(/\/clog\/items\/\d+$/);
+    await expect(page).toHaveURL(/\/clog\/items\/[^/]+$/);
     await expect(page.getByRole('heading', { name: 'Heinz Ketchup' })).toBeVisible();
   });
 });

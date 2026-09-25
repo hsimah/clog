@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Inventory/InventoryDeleter.php
- * digest: sha256:750a391abd5697afb742505d30bf93185ce9ca19942a8b0e58f1b3ceb8a097dd
+ * digest: sha256:f4a661a111fb03ba37d94a7b2f1de87a355ed5023edabddf2f2214ddbe1f5f88
  */
 
 namespace Clog\Entity\Inventory;
@@ -27,21 +27,22 @@ final class InventoryDeleter
     public function __construct(
         private readonly UnitOfWork $work,
     ) {
+
     }
 
     /**
      * Registers the removal. Nothing happens until the unit of work commits.
      */
-    public function delete(EntityId $id): void
-    {
+    public function delete(
+        EntityId $id,
+    ): void {
         $this->work->delete(new Deletion('Inventory', $id));
     }
 
     /**
      * @return list<DeletionRule>
      */
-    public static function rules(): array
-    {
+    public static function rules(): array {
         return [];
     }
 }

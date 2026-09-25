@@ -6,64 +6,60 @@ namespace Clog\Runtime;
 
 use Eleph\WordPress\Database\Database;
 use Eleph\WordPress\Manifest\StorageManifest;
-use Eleph\WordPress\Sql\DdlCompiler;
+use Eleph\WordPress\Migration\MigrationPlan;
+use Eleph\WordPress\Migration\SchemaInstaller;
+use RuntimeException;
 
-/**
- * Creates the entity tables from the compiled storage manifest.
- *
- * Elephentity stores entities in real tables with typed columns rather than in
- * postmeta, and ships no command to create them — `eleph` has validate, generate, fmt
- * and check, and the MigrationPlanner in the WordPress package is not exposed by any
- * of them. So the plugin installs its own schema on activation.
- *
- * Creation only. An existing table is left exactly as it is: comparing a live table
- * against the manifest and working out a safe ALTER is what the migration planner is
- * for, and half-doing it here would produce a tool that silently diverges from the
- * spec on the changes it cannot handle.
- */
+/** Never infer a destructive upgrade from a changed generated manifest. */
 final readonly class Tables
 {
-    public function __construct(
-        private Database $database,
-        private StorageManifest $manifest,
-        private DdlCompiler $ddl = new DdlCompiler(),
-    ) {
+    private SchemaInstaller $installer;
+
+    public function __construct(private Database $database, StorageManifest $manifest)
+    {
+        $this->installer = new SchemaInstaller($database, $manifest);
     }
 
-    /**
-     * @return list<string> The tables created, in the order they were created.
-     */
+    public function plan(): MigrationPlan
+    {
+        return $this->installer->plan();
+    }
+
+    /** @return list<string> Applied SQL statements. */
     public function install(): array
     {
-        $created = [];
-
-        foreach ($this->manifest->withPrefix($this->database->prefix())->tables as $table) {
-            if ([] !== $this->database->describeTable($table->name)) {
-                continue;
-            }
-
-            $this->database->execute($this->ddl->createTable($table));
-            $created[] = $table->name;
+        $plan = $this->installer->install();
+        if (!$plan->isSafe()) {
+            throw new RuntimeException($this->describe($plan));
         }
 
-        return $created;
+        return $plan->statements;
     }
 
-    /**
-     * Which manifest tables are missing, without creating anything.
-     *
-     * @return list<string>
-     */
+    public function requireReady(): void
+    {
+        $plan = $this->plan();
+        if (!$plan->isEmpty()) {
+            throw new RuntimeException($this->describe($plan));
+        }
+    }
+
+    /** @return list<string> */
     public function missing(): array
     {
-        $missing = [];
+        return array_keys(array_filter(
+            $this->installer->tables(),
+            fn ($table): bool => [] === $this->database->describeTable($table->name),
+        ));
+    }
 
-        foreach ($this->manifest->withPrefix($this->database->prefix())->tables as $table) {
-            if ([] === $this->database->describeTable($table->name)) {
-                $missing[] = $table->name;
-            }
+    private function describe(MigrationPlan $plan): string
+    {
+        if (!$plan->isSafe()) {
+            return 'Clog requires an explicit data migration; no schema changes were applied. '
+                . implode('; ', array_map(static fn ($refusal): string => $refusal->describe(), $plan->refusals));
         }
 
-        return $missing;
+        return 'Clog schema is not installed or is out of date. Run wp clog install.';
     }
 }

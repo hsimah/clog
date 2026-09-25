@@ -9,12 +9,13 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Location/Location.php
- * digest: sha256:2f1f527ab19b6c6c586f31bc6e5366e6901ef5ea4da78f4c59b476ee81d26206
+ * digest: sha256:ffd36810384423142bf3c51e6f6d078d084239875d0286e0a06432311b654f90
  */
 
 namespace Clog\Entity\Location;
 
 use Clog\Entity\Inventory\Inventory;
+use Clog\Entity\Pattern\ClogPost\ClogPost;
 use DateTimeImmutable;
 use Eleph\Runtime\Identity\EntityId;
 use Eleph\Runtime\Query\EdgeLoader;
@@ -23,46 +24,34 @@ use Eleph\Runtime\Query\EntityQuery;
 /**
  * Somewhere inventory can be kept.
  */
-final class Location
+final class Location implements ClogPost
 {
     private function __construct(
         private readonly EntityId $id,
         private readonly EdgeLoader $edges,
         private readonly DateTimeImmutable $createdAt,
-        private readonly ?DateTimeImmutable $updatedAt,
-        private readonly int $postId,
+        private readonly DateTimeImmutable $updatedAt,
         private readonly string $name,
     ) {
+
     }
 
-    public function getId(): EntityId
-    {
+    public function getId(): EntityId {
         return $this->id;
     }
 
-    public function getCreatedAt(): DateTimeImmutable
-    {
+    public function getCreatedAt(): DateTimeImmutable {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): ?DateTimeImmutable
-    {
+    public function getUpdatedAt(): DateTimeImmutable {
         return $this->updatedAt;
-    }
-
-    /**
-     * The wp_posts row this entity projects to.
-     */
-    public function getPostId(): int
-    {
-        return $this->postId;
     }
 
     /**
      * What the location is called. Projected to post_title.
      */
-    public function getName(): string
-    {
+    public function getName(): string {
         return $this->name;
     }
 
@@ -71,11 +60,10 @@ final class Location
      *
      * @return EntityQuery<Inventory>
      */
-    public function inventoryEntries(): EntityQuery
-    {
+    public function inventoryEntries(): EntityQuery {
         /** @var EntityQuery<Inventory> $related */
         $related = $this->edges->inverseToMany('Inventory', 'location', $this->id);
-
+        
         return $related;
     }
 
@@ -83,10 +71,9 @@ final class Location
         EntityId $id,
         EdgeLoader $edges,
         DateTimeImmutable $createdAt,
-        ?DateTimeImmutable $updatedAt,
-        int $postId,
+        DateTimeImmutable $updatedAt,
         string $name,
     ): self {
-        return new self($id, $edges, $createdAt, $updatedAt, $postId, $name);
+        return new self($id, $edges, $createdAt, $updatedAt, $name);
     }
 }

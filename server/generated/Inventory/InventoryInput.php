@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Inventory/InventoryInput.php
- * digest: sha256:4768f6e0b61459494f4e93d2f9fd5c7fe391809fcb48dfa52443753c87b1080a
+ * digest: sha256:0fdd967f6f3cd254402fe15767375f2036da67c8d619c303d5678debca384ca0
  */
 
 namespace Clog\Entity\Inventory;
@@ -28,74 +28,52 @@ final readonly class InventoryInput
     public function __construct(
         private ValueDecoder $decode,
     ) {
+
     }
 
-    private function createdAt(mixed $value): ?DateTimeImmutable
-    {
+    private function name(
+        mixed $value,
+    ): ?string {
         if (null === $value) {
             return null;
         }
-
-        return $this->decode->datetime($value, 'Inventory.createdAt');
-    }
-
-    private function updatedAt(mixed $value): ?DateTimeImmutable
-    {
-        if (null === $value) {
-            return null;
-        }
-
-        return $this->decode->datetime($value, 'Inventory.updatedAt');
-    }
-
-    private function postId(mixed $value): ?int
-    {
-        if (null === $value) {
-            return null;
-        }
-
-        return $this->decode->int($value, 'Inventory.postId');
-    }
-
-    private function name(mixed $value): ?string
-    {
-        if (null === $value) {
-            return null;
-        }
-
+        
         return $this->decode->string($value, 'Inventory.name');
     }
 
-    private function dateAdded(mixed $value): ?DateTimeImmutable
-    {
+    private function dateAdded(
+        mixed $value,
+    ): ?DateTimeImmutable {
         if (null === $value) {
             return null;
         }
-
+        
         return $this->decode->datetime($value, 'Inventory.dateAdded');
     }
 
     /**
      * @return list<Identifier>
      */
-    private function item(mixed $value): array
-    {
+    private function item(
+        mixed $value,
+    ): array {
         if (null === $value) {
             return [];
         }
-
+        
         return [$this->decode->id($value, 'Inventory.item')];
     }
 
     /**
      * @return list<Identifier>
      */
-    private function location(mixed $value): array
-    {
+    private function location(
+        mixed $value,
+    ): array {
         if (null === $value) {
             return [];
         }
-
+        
         return [$this->decode->id($value, 'Inventory.location')];
     }
 
@@ -105,34 +83,38 @@ final readonly class InventoryInput
      *
      * @param array<string, mixed> $input
      */
-    public function apply(MutationBuffer $buffer, array $input): void
-    {
-        if (array_key_exists('createdAt', $input)) {
-            $buffer->set('createdAt', $this->createdAt($input['createdAt']));
-        }
-
-        if (array_key_exists('updatedAt', $input)) {
-            $buffer->set('updatedAt', $this->updatedAt($input['updatedAt']));
-        }
-
-        if (array_key_exists('postId', $input)) {
-            $buffer->set('postId', $this->postId($input['postId']));
-        }
-
+    public function apply(
+        MutationBuffer $buffer,
+        array $input,
+    ): void {
         if (array_key_exists('name', $input)) {
             $buffer->set('name', $this->name($input['name']));
         }
-
+        
         if (array_key_exists('dateAdded', $input)) {
             $buffer->set('dateAdded', $this->dateAdded($input['dateAdded']));
         }
-
+        
         if (array_key_exists('item', $input)) {
             $buffer->edge('item')->set($this->item($input['item']));
         }
-
+        
         if (array_key_exists('location', $input)) {
             $buffer->edge('location')->set($this->location($input['location']));
         }
+    }
+
+    /**
+     * @param array<string, mixed> $args
+     * @return array<string, mixed>
+     */
+    public function decodeAction(
+        string $action,
+        array $args,
+    ): array {
+        return match ($action) {
+        
+            default => throw new InvalidArgumentException(sprintf('Unknown action %s.', $action)),
+        };
     }
 }

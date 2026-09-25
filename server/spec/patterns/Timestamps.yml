@@ -3,8 +3,7 @@ description: Creation and modification stamps.
 fields:
   createdAt:
     type: datetime
-    required: true
-    immutable: true
+    managed: created
   updatedAt:
     type: datetime
-    nullable: true
+    managed: modified

@@ -43,6 +43,10 @@ function clog_seed_data( array $args, array $assoc ): void {
 		return;
 	}
 
+	if ( ! current_user_can( 'edit_posts' ) ) {
+		WP_CLI::error( 'Seeding requires an authorized WordPress user. Pass --user=<login>.' );
+	}
+
 	$gateway = $clog->gateway();
 
 	if ( $gateway->all( 'Item' )->count() > 0 && ! isset( $assoc['force'] ) ) {
@@ -63,7 +67,7 @@ function clog_seed_data( array $args, array $assoc ): void {
 		$item_ids[] = $gateway->create( 'Item', [
 			'name'    => $name,
 			'barcode' => $barcode,
-		] );
+		] )->id;
 
 		WP_CLI::log( "Created item: {$name}" );
 	}
@@ -73,7 +77,7 @@ function clog_seed_data( array $args, array $assoc ): void {
 	$location_ids = [];
 
 	foreach ( $locations as $name ) {
-		$location_ids[] = $gateway->create( 'Location', [ 'name' => $name ] );
+		$location_ids[] = $gateway->create( 'Location', [ 'name' => $name ] )->id;
 
 		WP_CLI::log( "Created location: {$name}" );
 	}
@@ -96,15 +100,12 @@ function clog_seed_data( array $args, array $assoc ): void {
 		[ 2, 1, '2025-01-24 10:35:00' ],
 	];
 
-	$item_names = array_keys( $items );
-
 	foreach ( $entries as $index => [ $item, $location, $added ] ) {
 		$gateway->create( 'Inventory', [
-			'name'      => sprintf( '%s @ %s', $item_names[ $item ], $locations[ $location ] ),
 			'dateAdded' => $added,
 			'item'      => $item_ids[ $item ]->raw(),
 			'location'  => $location_ids[ $location ]->raw(),
-		] );
+		] )->id;
 
 		WP_CLI::log( sprintf( 'Created inventory entry #%d', $index + 1 ) );
 	}

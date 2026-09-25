@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Clog\Runtime\Clog;
 use Eleph\WPGraphQL\Plugin as ElephGraphQL;
+use Eleph\Runtime\Type\NullProcessorRegistry;
 
 /**
  * Register the generated GraphQL surface.
@@ -26,22 +27,24 @@ function clog_boot_graphql(): void {
 
 	$clog = Clog::instance();
 
-	// A missing table means activation has not run — most likely a bind-mounted
-	// checkout in a container that was already installed. Registering the schema
-	// anyway would produce a GraphQL surface whose every resolver hits a table that
-	// is not there, so say so once and stay out of the way.
-	if ( [] !== $clog->tables()->missing() ) {
-		error_log( '[clog] entity tables are missing; run `wp clog install`. GraphQL not registered.' );
-		return;
+	try {
+		ElephGraphQL::fromManifest(
+			$clog->graphqlManifestPath(), $clog->gateway(), new NullProcessorRegistry()
+		)->boot();
+	} catch ( RuntimeException $failure ) {
+		error_log( '[clog] ' . $failure->getMessage() );
+		add_action( 'admin_notices', static function () use ( $failure ): void {
+			if ( current_user_can( 'manage_options' ) ) {
+				echo '<div class="notice notice-error"><p>' . esc_html( $failure->getMessage() ) . '</p></div>';
+			}
+		} );
 	}
-
-	ElephGraphQL::fromManifest( $clog->graphqlManifestPath(), $clog->gateway() )->boot();
 }
 
 /**
  * Create the entity tables. Called on activation and by `wp clog install`.
  *
- * @return list<string> Tables created.
+ * @return list<string> Schema statements applied.
  */
 function clog_install_tables(): array {
 	return Clog::instance()->tables()->install();

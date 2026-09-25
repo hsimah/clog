@@ -9,11 +9,12 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Inventory/InventoryMutator.php
- * digest: sha256:48827f37413938332219684ea1585b79adf63f55a2622eba4f44ef99fc382ddf
+ * digest: sha256:9c96345fb9e2c279b8d73e0c799bd3fd62ec01e2697ae717cfcfc2ad8ae584b7
  */
 
 namespace Clog\Entity\Inventory;
 
+use Clog\Entity\Pattern\ClogPost\ClogPostMutatorTrait;
 use DateTimeImmutable;
 use Eleph\Runtime\Identity\Identifier;
 use Eleph\Runtime\Mutation\MutationBuffer;
@@ -23,56 +24,49 @@ use Eleph\Runtime\Mutation\MutationBuffer;
  */
 final class InventoryMutator
 {
+    use ClogPostMutatorTrait;
+
     public function __construct(
         private readonly MutationBuffer $buffer,
     ) {
+
     }
 
-    public function setUpdatedAt(?DateTimeImmutable $updatedAt): self
-    {
-        $this->buffer->set('updatedAt', $updatedAt);
-
-        return $this;
-    }
-
-    public function setPostId(int $postId): self
-    {
-        $this->buffer->set('postId', $postId);
-
-        return $this;
-    }
-
-    public function setName(string $name): self
-    {
+    public function setName(
+        string $name,
+    ): self {
         $this->buffer->set('name', $name);
-
+        
         return $this;
     }
 
-    public function setDateAdded(DateTimeImmutable $dateAdded): self
-    {
+    public function setDateAdded(
+        DateTimeImmutable $dateAdded,
+    ): self {
         $this->buffer->set('dateAdded', $dateAdded);
-
+        
         return $this;
     }
 
     /**
      * Point this at one Item, or at nothing.
      */
-    public function setItem(?Identifier $item): self
-    {
+    public function setItem(
+        ?Identifier $item,
+    ): self {
         $this->buffer->edge('item')->set(null === $item ? [] : [$item]);
-
+        
         return $this;
     }
 
     /**
      * Point this at one Location, or at nothing.
      */
-    public function setLocation(?Identifier $location): self
-    {
+    public function setLocation(
+        ?Identifier $location,
+    ): self {
         $this->buffer->edge('location')->set(null === $location ? [] : [$location]);
-
+        
         return $this;
     }
 }

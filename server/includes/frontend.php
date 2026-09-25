@@ -79,8 +79,12 @@ function clog_activate() {
 	clog_clear_legacy_snapshot_events();
 
 	// The entity tables are the storage; without them every resolver hits a table
-	// that is not there. Creation only — an existing table is left alone.
-	clog_install_tables();
+	// that is not there. Unsafe upgrades are refused before any DDL is applied.
+	try {
+		clog_install_tables();
+	} catch ( RuntimeException $failure ) {
+		wp_die( esc_html( $failure->getMessage() ) );
+	}
 }
 
 /**

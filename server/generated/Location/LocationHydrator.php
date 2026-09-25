@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Location/LocationHydrator.php
- * digest: sha256:5c717fed8c3c618a7b0bc8024ea5a17cb32a050a20c5c9ba962f097fe2ac1328
+ * digest: sha256:fb0258aa253ef394a83905fa34f0cb2dd0df2397148044c96e600cdbc55e1247
  */
 
 namespace Clog\Entity\Location;
@@ -30,45 +30,43 @@ final readonly class LocationHydrator implements Hydrator
     public function __construct(
         private ValueDecoder $decode,
     ) {
+
     }
 
-    public function hydrate(Record $record, EdgeLoader $edges): Location
-    {
+    public function hydrate(
+        Record $record,
+        EdgeLoader $edges,
+    ): Location {
         return Location::of(
             $record->id,
             $edges,
             $this->createdAt($record),
             $this->updatedAt($record),
-            $this->postId($record),
             $this->name($record),
         );
     }
 
-    private function createdAt(Record $record): DateTimeImmutable
-    {
+    private function createdAt(
+        Record $record,
+    ): DateTimeImmutable {
         $value = $record->value('createdAt');
-
+        
         return $this->decode->datetime($value, 'Location.createdAt');
     }
 
-    private function updatedAt(Record $record): ?DateTimeImmutable
-    {
+    private function updatedAt(
+        Record $record,
+    ): DateTimeImmutable {
         $value = $record->value('updatedAt');
-
-        return null === $value ? null : $this->decode->datetime($value, 'Location.updatedAt');
+        
+        return $this->decode->datetime($value, 'Location.updatedAt');
     }
 
-    private function postId(Record $record): int
-    {
-        $value = $record->value('postId');
-
-        return $this->decode->int($value, 'Location.postId');
-    }
-
-    private function name(Record $record): string
-    {
+    private function name(
+        Record $record,
+    ): string {
         $value = $record->value('name');
-
+        
         return $this->decode->string($value, 'Location.name');
     }
 }

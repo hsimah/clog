@@ -9,14 +9,14 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Item/ItemInput.php
- * digest: sha256:ed7e5bcdf248ea74551bea109877975d535b4e0689ca721b807d6847185dca5d
+ * digest: sha256:3221369e117f7345599be8d4da0b11aa176cb360f42b7f6a2c56a308b275f116
  */
 
 namespace Clog\Entity\Item;
 
-use DateTimeImmutable;
 use Eleph\Runtime\Mutation\MutationBuffer;
 use Eleph\Runtime\Query\ValueDecoder;
+use InvalidArgumentException;
 
 /**
  * Turns raw input into pending Item changes.
@@ -26,50 +26,26 @@ final readonly class ItemInput
     public function __construct(
         private ValueDecoder $decode,
     ) {
+
     }
 
-    private function createdAt(mixed $value): ?DateTimeImmutable
-    {
+    private function name(
+        mixed $value,
+    ): ?string {
         if (null === $value) {
             return null;
         }
-
-        return $this->decode->datetime($value, 'Item.createdAt');
-    }
-
-    private function updatedAt(mixed $value): ?DateTimeImmutable
-    {
-        if (null === $value) {
-            return null;
-        }
-
-        return $this->decode->datetime($value, 'Item.updatedAt');
-    }
-
-    private function postId(mixed $value): ?int
-    {
-        if (null === $value) {
-            return null;
-        }
-
-        return $this->decode->int($value, 'Item.postId');
-    }
-
-    private function name(mixed $value): ?string
-    {
-        if (null === $value) {
-            return null;
-        }
-
+        
         return $this->decode->string($value, 'Item.name');
     }
 
-    private function barcode(mixed $value): ?string
-    {
+    private function barcode(
+        mixed $value,
+    ): ?string {
         if (null === $value) {
             return null;
         }
-
+        
         return $this->decode->string($value, 'Item.barcode');
     }
 
@@ -79,26 +55,30 @@ final readonly class ItemInput
      *
      * @param array<string, mixed> $input
      */
-    public function apply(MutationBuffer $buffer, array $input): void
-    {
-        if (array_key_exists('createdAt', $input)) {
-            $buffer->set('createdAt', $this->createdAt($input['createdAt']));
-        }
-
-        if (array_key_exists('updatedAt', $input)) {
-            $buffer->set('updatedAt', $this->updatedAt($input['updatedAt']));
-        }
-
-        if (array_key_exists('postId', $input)) {
-            $buffer->set('postId', $this->postId($input['postId']));
-        }
-
+    public function apply(
+        MutationBuffer $buffer,
+        array $input,
+    ): void {
         if (array_key_exists('name', $input)) {
             $buffer->set('name', $this->name($input['name']));
         }
-
+        
         if (array_key_exists('barcode', $input)) {
             $buffer->set('barcode', $this->barcode($input['barcode']));
         }
+    }
+
+    /**
+     * @param array<string, mixed> $args
+     * @return array<string, mixed>
+     */
+    public function decodeAction(
+        string $action,
+        array $args,
+    ): array {
+        return match ($action) {
+        
+            default => throw new InvalidArgumentException(sprintf('Unknown action %s.', $action)),
+        };
     }
 }

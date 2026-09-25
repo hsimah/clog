@@ -185,3 +185,19 @@ Use JavaScript `Date` objects throughout the app:
 - Store as ISO strings in seed data
 - Parse to Date on context initialization
 - Format with `.toLocaleDateString()` for display
+
+## Elephentity runtime foundation
+
+- The current backend uses explicit runtime/WordPress/WPGraphQL packages, managed
+  timestamps, generated edge writes, and entity-only storage (no new post projections).
+- Specs and generated files are authoritative. Run `scripts/php.sh composer
+  build-generators` after installing/updating generator dependencies, then generate
+  and run `composer check-generated` through the same wrapper.
+- Read policies require login; writes require `edit_posts`. CLI commands need an
+  explicit `--user=<login>`; do not bypass policies just because WP_CLI is defined.
+- Inventory labels are derived on the server. Do not send managed timestamps.
+- Run `scripts/php.sh composer test` and `scripts/test-backend.sh` for backend changes.
+  The latter uses disposable MySQL/WordPress containers with no exposed ports.
+- Existing databases require the explicit #33 migration before this foundation can
+  be deployed. Never bypass a schema refusal or delete old projections to make boot pass.
+- Apollo/Tailwind remain transitional until the separate Relay/Astryx/StyleX issues land.

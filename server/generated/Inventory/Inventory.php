@@ -9,13 +9,14 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Inventory/Inventory.php
- * digest: sha256:cc2b5cefdffbe0915e015d42c975a4b3ed455613083ebb708110b1f5ff39c7fe
+ * digest: sha256:db670d13066c6b24e0ea6919dffd494ace69f754a381f240b5afdd802924ebf2
  */
 
 namespace Clog\Entity\Inventory;
 
 use Clog\Entity\Item\Item;
 use Clog\Entity\Location\Location;
+use Clog\Entity\Pattern\ClogPost\ClogPost;
 use DateTimeImmutable;
 use Eleph\Runtime\Identity\EntityId;
 use Eleph\Runtime\Query\EdgeLoader;
@@ -23,77 +24,62 @@ use Eleph\Runtime\Query\EdgeLoader;
 /**
  * One stocked instance of an item, in a location.
  */
-final class Inventory
+final class Inventory implements ClogPost
 {
     private function __construct(
         private readonly EntityId $id,
         private readonly EdgeLoader $edges,
         private readonly DateTimeImmutable $createdAt,
-        private readonly ?DateTimeImmutable $updatedAt,
-        private readonly int $postId,
+        private readonly DateTimeImmutable $updatedAt,
         private readonly string $name,
         private readonly DateTimeImmutable $dateAdded,
     ) {
+
     }
 
-    public function getId(): EntityId
-    {
+    public function getId(): EntityId {
         return $this->id;
     }
 
-    public function getCreatedAt(): DateTimeImmutable
-    {
+    public function getCreatedAt(): DateTimeImmutable {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): ?DateTimeImmutable
-    {
+    public function getUpdatedAt(): DateTimeImmutable {
         return $this->updatedAt;
     }
 
     /**
-     * The wp_posts row this entity projects to.
+     * Display label derived from the item and location before writing.
      */
-    public function getPostId(): int
-    {
-        return $this->postId;
-    }
-
-    /**
-     * Projected to post_title, so the admin list has something to show.
-     */
-    public function getName(): string
-    {
+    public function getName(): string {
         return $this->name;
     }
 
     /**
      * When this instance entered inventory.
      */
-    public function getDateAdded(): DateTimeImmutable
-    {
+    public function getDateAdded(): DateTimeImmutable {
         return $this->dateAdded;
     }
 
     /**
      * @return Item|null
      */
-    public function getItem(): ?Item
-    {
+    public function getItem(): ?Item {
         $related = $this->edges->toOne('Inventory', $this->id, 'item');
         assert(null === $related || $related instanceof Item);
-
+        
         return $related;
     }
 
     /**
      * @return Location|null
      */
-    public function getLocation(): ?Location
-    {
+    public function getLocation(): ?Location {
         $related = $this->edges->toOne('Inventory', $this->id, 'location');
         assert(null === $related || $related instanceof Location);
-
+        
         return $related;
     }
 
@@ -101,11 +87,10 @@ final class Inventory
         EntityId $id,
         EdgeLoader $edges,
         DateTimeImmutable $createdAt,
-        ?DateTimeImmutable $updatedAt,
-        int $postId,
+        DateTimeImmutable $updatedAt,
         string $name,
         DateTimeImmutable $dateAdded,
     ): self {
-        return new self($id, $edges, $createdAt, $updatedAt, $postId, $name, $dateAdded);
+        return new self($id, $edges, $createdAt, $updatedAt, $name, $dateAdded);
     }
 }

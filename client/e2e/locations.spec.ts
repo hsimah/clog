@@ -39,12 +39,12 @@ test.describe('Locations', () => {
     await page.goto('/clog/locations/new');
     await waitForData(page);
 
-    await page.getByLabel('Name').fill('Basement Shelf');
+    await page.getByLabel('Name').fill('Clog E2E Basement Shelf');
     await page.getByRole('button', { name: 'Create' }).click();
 
-    // Should redirect to the new location detail page (numeric WordPress ID)
-    await expect(page).toHaveURL(/\/clog\/locations\/\d+$/);
-    await expect(page.getByRole('heading', { name: 'Basement Shelf' })).toBeVisible();
+    // Should redirect to the new location detail page (opaque GraphQL ID)
+    await expect(page).toHaveURL(/\/clog\/locations\/[^/]+$/);
+    await expect(page.getByRole('heading', { name: 'Clog E2E Basement Shelf' })).toBeVisible();
   });
 
   test('navigates to location detail page', async ({ page, waitForData, authenticate }) => {
@@ -54,7 +54,7 @@ test.describe('Locations', () => {
 
     await page.getByRole('link', { name: 'Garage Shelves' }).click();
 
-    await expect(page).toHaveURL(/\/clog\/locations\/\d+$/);
+    await expect(page).toHaveURL(/\/clog\/locations\/[^/]+$/);
     await expect(page.getByRole('heading', { name: 'Garage Shelves' })).toBeVisible();
   });
 });

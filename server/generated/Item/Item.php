@@ -9,12 +9,13 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Item/Item.php
- * digest: sha256:d876539297ab8e81e40d10b10c22020c52de43ebec83fcf18708efbb34e70515
+ * digest: sha256:5edbb490678aa006156f0551384ee68859b7c6cd54db4a17c96d3b1fcc012382
  */
 
 namespace Clog\Entity\Item;
 
 use Clog\Entity\Inventory\Inventory;
+use Clog\Entity\Pattern\ClogPost\ClogPost;
 use DateTimeImmutable;
 use Eleph\Runtime\Identity\EntityId;
 use Eleph\Runtime\Query\EdgeLoader;
@@ -23,55 +24,42 @@ use Eleph\Runtime\Query\EntityQuery;
 /**
  * A thing that can be stocked, identified by its barcode.
  */
-final class Item
+final class Item implements ClogPost
 {
     private function __construct(
         private readonly EntityId $id,
         private readonly EdgeLoader $edges,
         private readonly DateTimeImmutable $createdAt,
-        private readonly ?DateTimeImmutable $updatedAt,
-        private readonly int $postId,
+        private readonly DateTimeImmutable $updatedAt,
         private readonly string $name,
         private readonly ?string $barcode,
     ) {
+
     }
 
-    public function getId(): EntityId
-    {
+    public function getId(): EntityId {
         return $this->id;
     }
 
-    public function getCreatedAt(): DateTimeImmutable
-    {
+    public function getCreatedAt(): DateTimeImmutable {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): ?DateTimeImmutable
-    {
+    public function getUpdatedAt(): DateTimeImmutable {
         return $this->updatedAt;
-    }
-
-    /**
-     * The wp_posts row this entity projects to.
-     */
-    public function getPostId(): int
-    {
-        return $this->postId;
     }
 
     /**
      * What the item is called. Projected to post_title.
      */
-    public function getName(): string
-    {
+    public function getName(): string {
         return $this->name;
     }
 
     /**
      * The barcode that identifies this item. One per item: a serialized list could not be indexed, and scanning a barcode to find an item is the query this data exists to serve.
      */
-    public function getBarcode(): ?string
-    {
+    public function getBarcode(): ?string {
         return $this->barcode;
     }
 
@@ -80,11 +68,10 @@ final class Item
      *
      * @return EntityQuery<Inventory>
      */
-    public function inventoryEntries(): EntityQuery
-    {
+    public function inventoryEntries(): EntityQuery {
         /** @var EntityQuery<Inventory> $related */
         $related = $this->edges->inverseToMany('Inventory', 'item', $this->id);
-
+        
         return $related;
     }
 
@@ -92,11 +79,10 @@ final class Item
         EntityId $id,
         EdgeLoader $edges,
         DateTimeImmutable $createdAt,
-        ?DateTimeImmutable $updatedAt,
-        int $postId,
+        DateTimeImmutable $updatedAt,
         string $name,
         ?string $barcode,
     ): self {
-        return new self($id, $edges, $createdAt, $updatedAt, $postId, $name, $barcode);
+        return new self($id, $edges, $createdAt, $updatedAt, $name, $barcode);
     }
 }

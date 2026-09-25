@@ -5,12 +5,28 @@
     "license": "MIT",
     "require": {
         "php": ">=8.3",
-        "elephentity/elephentity": "^0.1.0",
+        "elephentity/runtime": "^0.10.0",
+        "elephentity/wordpress": "^0.2.3",
+        "elephentity/wpgraphql": "^0.2.0",
         "yahnis-elsts/plugin-update-checker": "^5.4"
     },
     "require-dev": {
-        "elephentity/codegen": "^0.1.0",
-        "elephentity/codegen-php": "^0.1.0"
+        "elephentity/cli": "^0.11.0",
+        "elephentity/codegen": "^0.6.0",
+        "elephentity/codegen-php": "^0.6.0",
+        "elephentity/codegen-wordpress": "^0.4.0",
+        "elephentity/codegen-wpgraphql": "^0.3.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "scripts": {
+        "build-generators": "sh ../scripts/build-generators.sh",
+        "test": "phpunit",
+        "check-generated": [
+            "eleph fmt",
+            "eleph validate",
+            "eleph generate --check",
+            "eleph check"
+        ]
     },
     "minimum-stability": "stable",
     "prefer-stable": true,

@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Item/ItemHydrator.php
- * digest: sha256:2ae618c75ddb66ba017e7060c25811a0eedb12b52da2a15efacb1e916afbfbc8
+ * digest: sha256:f1c115b0615614979754f1e36fa8a8d1699ab4576a59a4c3ed5d8d70e53cea64
  */
 
 namespace Clog\Entity\Item;
@@ -30,53 +30,52 @@ final readonly class ItemHydrator implements Hydrator
     public function __construct(
         private ValueDecoder $decode,
     ) {
+
     }
 
-    public function hydrate(Record $record, EdgeLoader $edges): Item
-    {
+    public function hydrate(
+        Record $record,
+        EdgeLoader $edges,
+    ): Item {
         return Item::of(
             $record->id,
             $edges,
             $this->createdAt($record),
             $this->updatedAt($record),
-            $this->postId($record),
             $this->name($record),
             $this->barcode($record),
         );
     }
 
-    private function createdAt(Record $record): DateTimeImmutable
-    {
+    private function createdAt(
+        Record $record,
+    ): DateTimeImmutable {
         $value = $record->value('createdAt');
-
+        
         return $this->decode->datetime($value, 'Item.createdAt');
     }
 
-    private function updatedAt(Record $record): ?DateTimeImmutable
-    {
+    private function updatedAt(
+        Record $record,
+    ): DateTimeImmutable {
         $value = $record->value('updatedAt');
-
-        return null === $value ? null : $this->decode->datetime($value, 'Item.updatedAt');
+        
+        return $this->decode->datetime($value, 'Item.updatedAt');
     }
 
-    private function postId(Record $record): int
-    {
-        $value = $record->value('postId');
-
-        return $this->decode->int($value, 'Item.postId');
-    }
-
-    private function name(Record $record): string
-    {
+    private function name(
+        Record $record,
+    ): string {
         $value = $record->value('name');
-
+        
         return $this->decode->string($value, 'Item.name');
     }
 
-    private function barcode(Record $record): ?string
-    {
+    private function barcode(
+        Record $record,
+    ): ?string {
         $value = $record->value('barcode');
-
+        
         return null === $value ? null : $this->decode->string($value, 'Item.barcode');
     }
 }
