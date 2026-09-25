@@ -19,7 +19,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-IMAGE="clog-php:8.3"
+IMAGE="clog-php:8.3-rust"
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/clog/composer"
 
 if command -v podman >/dev/null 2>&1; then

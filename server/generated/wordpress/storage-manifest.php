@@ -9,15 +9,17 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   storage-manifest.php
- * digest: sha256:2fbc36c545f7a22de542aa600d7922577c284d2df505ed4b9ebbaab62c6ecf65
+ * digest: sha256:85a9b9a6363793627d1921b0ab3ff73bc754b25723ade6d6d14eade1503b5700
  */
 
 namespace Eleph\WordPress\Manifest;
 
+use Eleph\WordPress\Account\AccountFields;
 use Eleph\WordPress\Sql\Column;
 use Eleph\WordPress\Sql\EdgePlacement;
 use Eleph\WordPress\Sql\Index;
 use Eleph\WordPress\Sql\TableSchema;
+use Eleph\WordPress\Taxonomy\TaxonomyPlacement;
 use Eleph\Runtime\Storage\RelationKind;
 
 /**
@@ -33,15 +35,13 @@ return new StorageManifest(
             [
                 'id' => new Column('id', 'BIGINT UNSIGNED', false, true, null),
                 'created_at' => new Column('created_at', 'DATETIME', false, false, null),
-                'updated_at' => new Column('updated_at', 'DATETIME', true, false, null),
-                'post_id' => new Column('post_id', 'BIGINT', false, false, null),
+                'updated_at' => new Column('updated_at', 'DATETIME', false, false, null),
                 'name' => new Column('name', 'VARCHAR(200)', false, false, null),
                 'date_added' => new Column('date_added', 'DATETIME', false, false, null),
                 'item_id' => new Column('item_id', 'BIGINT UNSIGNED', true, false, null),
                 'location_id' => new Column('location_id', 'BIGINT UNSIGNED', true, false, null),
             ],
             [
-                'clog_inventory_post_id_uniq' => new Index('clog_inventory_post_id_uniq', ['post_id'], true),
                 'clog_inventory_item_id_idx' => new Index('clog_inventory_item_id_idx', ['item_id'], false),
                 'clog_inventory_location_id_idx' => new Index('clog_inventory_location_id_idx', ['location_id'], false),
             ],
@@ -52,13 +52,11 @@ return new StorageManifest(
             [
                 'id' => new Column('id', 'BIGINT UNSIGNED', false, true, null),
                 'created_at' => new Column('created_at', 'DATETIME', false, false, null),
-                'updated_at' => new Column('updated_at', 'DATETIME', true, false, null),
-                'post_id' => new Column('post_id', 'BIGINT', false, false, null),
+                'updated_at' => new Column('updated_at', 'DATETIME', false, false, null),
                 'name' => new Column('name', 'VARCHAR(200)', false, false, null),
                 'barcode' => new Column('barcode', 'VARCHAR(64)', true, false, null),
             ],
             [
-                'clog_item_post_id_uniq' => new Index('clog_item_post_id_uniq', ['post_id'], true),
                 'clog_item_name_idx' => new Index('clog_item_name_idx', ['name'], false),
                 'clog_item_barcode_uniq' => new Index('clog_item_barcode_uniq', ['barcode'], true),
             ],
@@ -69,12 +67,10 @@ return new StorageManifest(
             [
                 'id' => new Column('id', 'BIGINT UNSIGNED', false, true, null),
                 'created_at' => new Column('created_at', 'DATETIME', false, false, null),
-                'updated_at' => new Column('updated_at', 'DATETIME', true, false, null),
-                'post_id' => new Column('post_id', 'BIGINT', false, false, null),
+                'updated_at' => new Column('updated_at', 'DATETIME', false, false, null),
                 'name' => new Column('name', 'VARCHAR(200)', false, false, null),
             ],
             [
-                'clog_location_post_id_uniq' => new Index('clog_location_post_id_uniq', ['post_id'], true),
                 'clog_location_name_uniq' => new Index('clog_location_name_uniq', ['name'], true),
             ],
             'id',
@@ -103,11 +99,23 @@ return new StorageManifest(
         ),
     ],
     columns: [
-        'Inventory' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'postId' => 'post_id', 'name' => 'name', 'dateAdded' => 'date_added'],
-        'Item' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'postId' => 'post_id', 'name' => 'name', 'barcode' => 'barcode'],
-        'Location' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'postId' => 'post_id', 'name' => 'name'],
+        'Inventory' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'name' => 'name', 'dateAdded' => 'date_added'],
+        'Item' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'name' => 'name', 'barcode' => 'barcode'],
+        'Location' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'name' => 'name'],
     ],
     joinTables: [
+
+    ],
+    taxonomies: [
+
+    ],
+    taxonomyPlacements: [
+
+    ],
+    accounts: [
+
+    ],
+    posts: [
 
     ],
 );

@@ -1,7 +1,8 @@
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { SEED_ITEM_NAMES, SEED_LOCATION_NAMES } from './seed-data';
+
+const TEST_PREFIX = 'Clog E2E ';
 
 dotenv.config({ path: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.env') });
 
@@ -16,7 +17,11 @@ async function graphql(query: string, variables: Record<string, unknown>, token:
     },
     body: JSON.stringify({ query, variables }),
   });
-  return res.json();
+  const body = await res.json();
+  if (!res.ok || body.errors?.length) {
+    throw new Error(JSON.stringify(body.errors ?? { status: res.status }));
+  }
+  return body;
 }
 
 async function authenticate(): Promise<string> {
@@ -45,14 +50,14 @@ async function authenticate(): Promise<string> {
 }
 
 interface ClogNode {
-  databaseId: number;
-  title: string;
+  id: string;
+  name: string;
 }
 
 interface InventoryNode {
-  databaseId: number;
-  item: { title: string } | null;
-  location: { title: string } | null;
+  id: string;
+  item: { name: string } | null;
+  location: { name: string } | null;
 }
 
 async function globalTeardown() {
@@ -66,10 +71,10 @@ async function globalTeardown() {
 
   // Fetch all data
   const [itemsRes, locationsRes, inventoryRes] = await Promise.all([
-    graphql(`query { clogItems(first: 100) { nodes { databaseId title } } }`, {}, token),
-    graphql(`query { clogLocations(first: 100) { nodes { databaseId title } } }`, {}, token),
+    graphql(`query { clogItems(first: 100) { nodes { id name } } }`, {}, token),
+    graphql(`query { clogLocations(first: 100) { nodes { id name } } }`, {}, token),
     graphql(
-      `query { clogInventoryEntries(first: 100) { nodes { databaseId item { title } location { title } } } }`,
+      `query { clogInventoryEntries(first: 100) { nodes { id item { name } location { name } } } }`,
       {},
       token,
     ),
@@ -79,14 +84,14 @@ async function globalTeardown() {
   const allLocations: ClogNode[] = locationsRes.data?.clogLocations?.nodes ?? [];
   const allInventory: InventoryNode[] = inventoryRes.data?.clogInventoryEntries?.nodes ?? [];
 
-  const testItems = allItems.filter((i) => !SEED_ITEM_NAMES.includes(i.title));
-  const testLocations = allLocations.filter((l) => !SEED_LOCATION_NAMES.includes(l.title));
+  const testItems = allItems.filter((i) => i.name.startsWith(TEST_PREFIX));
+  const testLocations = allLocations.filter((l) => l.name.startsWith(TEST_PREFIX));
 
-  // Inventory entries that reference non-seed items or locations
+  // Only entries owned by this test suite; never remove unrelated inventory
   const testInventory = allInventory.filter(
     (inv) =>
-      (inv.item && !SEED_ITEM_NAMES.includes(inv.item.title)) ||
-      (inv.location && !SEED_LOCATION_NAMES.includes(inv.location.title)),
+      (inv.item && inv.item.name.startsWith(TEST_PREFIX)) ||
+      (inv.location && inv.location.name.startsWith(TEST_PREFIX)),
   );
 
   if (testInventory.length === 0 && testItems.length === 0 && testLocations.length === 0) {
@@ -101,12 +106,12 @@ async function globalTeardown() {
         `mutation DeleteInventory($input: DeleteClogInventoryInput!) {
           deleteClogInventory(input: $input) { deletedId }
         }`,
-        { input: { id: String(inv.databaseId) } },
+        { input: { id: String(inv.id) } },
         token,
       );
-      console.log(`[teardown] Deleted inventory entry ${inv.databaseId}`);
+      console.log(`[teardown] Deleted inventory entry ${inv.id}`);
     } catch (e) {
-      console.log(`[teardown] Failed to delete inventory ${inv.databaseId}: ${(e as Error).message}`);
+      console.log(`[teardown] Failed to delete inventory ${inv.id}: ${(e as Error).message}`);
     }
   }
 
@@ -116,12 +121,12 @@ async function globalTeardown() {
         `mutation DeleteItem($input: DeleteClogItemInput!) {
           deleteClogItem(input: $input) { deletedId }
         }`,
-        { input: { id: String(item.databaseId) } },
+        { input: { id: String(item.id) } },
         token,
       );
-      console.log(`[teardown] Deleted item "${item.title}"`);
+      console.log(`[teardown] Deleted item "${item.name}"`);
     } catch (e) {
-      console.log(`[teardown] Failed to delete item "${item.title}": ${(e as Error).message}`);
+      console.log(`[teardown] Failed to delete item "${item.name}": ${(e as Error).message}`);
     }
   }
 
@@ -131,12 +136,12 @@ async function globalTeardown() {
         `mutation DeleteLocation($input: DeleteClogLocationInput!) {
           deleteClogLocation(input: $input) { deletedId }
         }`,
-        { input: { id: String(loc.databaseId) } },
+        { input: { id: String(loc.id) } },
         token,
       );
-      console.log(`[teardown] Deleted location "${loc.title}"`);
+      console.log(`[teardown] Deleted location "${loc.name}"`);
     } catch (e) {
-      console.log(`[teardown] Failed to delete location "${loc.title}": ${(e as Error).message}`);
+      console.log(`[teardown] Failed to delete location "${loc.name}": ${(e as Error).message}`);
     }
   }
 

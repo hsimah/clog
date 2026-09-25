@@ -1,0 +1,20 @@
+name: Backend checks
+
+on:
+  workflow_call:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install locked PHP dependencies
+        run: scripts/php.sh composer install --no-interaction --prefer-dist
+      - name: Build generators
+        run: scripts/php.sh composer build-generators
+      - name: Verify generated contracts
+        run: scripts/php.sh composer check-generated
+      - name: Test schema guards
+        run: scripts/php.sh composer test
+      - name: Test WordPress runtime and GraphQL
+        run: scripts/test-backend.sh

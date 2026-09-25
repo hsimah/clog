@@ -9,19 +9,9 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   class-map.php
- * digest: sha256:173d95872c765264eacd16985c695049a955dcd340ed4fb6f8db0117be533b3d
+ * digest: sha256:5a2d5e32050c2bef33bcc667cdd3dfc1bec2de6021b86d5a6b6ab3797c0997cc
  */
 
-/**
- * What this tree contains, and where.
- *
- * `entities` maps a spec name to the class representing it; `classes` maps
- * every generated class to its file, relative to this one's directory.
- *
- * Written for tools that did not generate the tree and should not have to
- * know how it was named — `eleph check` resolves a GraphQL type back to a
- * class through here rather than by reimplementing the generator's rules.
- */
 return [
     'entities' => [
         'Inventory' => 'Clog\\Entity\\Inventory\\Inventory',
@@ -30,29 +20,47 @@ return [
     ],
     'classes' => [
         'Clog\\Entity\\Catalogue' => 'Catalogue.php',
+        'Clog\\Entity\\Inventory\\Contract\\InventoryDisplayNameSideEffect' => 'Inventory/Contract/InventoryDisplayNameSideEffect.php',
         'Clog\\Entity\\Inventory\\Inventory' => 'Inventory/Inventory.php',
         'Clog\\Entity\\Inventory\\InventoryDeleter' => 'Inventory/InventoryDeleter.php',
         'Clog\\Entity\\Inventory\\InventoryHydrator' => 'Inventory/InventoryHydrator.php',
         'Clog\\Entity\\Inventory\\InventoryInput' => 'Inventory/InventoryInput.php',
         'Clog\\Entity\\Inventory\\InventoryMutationContext' => 'Inventory/InventoryMutationContext.php',
         'Clog\\Entity\\Inventory\\InventoryMutator' => 'Inventory/InventoryMutator.php',
-        'Clog\\Entity\\Inventory\\InventoryTriggers' => 'Inventory/InventoryTriggers.php',
+        'Clog\\Entity\\Inventory\\InventoryPreCommitContext' => 'Inventory/InventoryPreCommitContext.php',
+        'Clog\\Entity\\Inventory\\InventoryReadPolicies' => 'Inventory/InventoryReadPolicies.php',
+        'Clog\\Entity\\Inventory\\InventorySideEffects' => 'Inventory/InventorySideEffects.php',
         'Clog\\Entity\\Inventory\\InventoryVerifiers' => 'Inventory/InventoryVerifiers.php',
+        'Clog\\Entity\\Inventory\\InventoryWriteContext' => 'Inventory/InventoryWriteContext.php',
+        'Clog\\Entity\\Inventory\\InventoryWritePolicies' => 'Inventory/InventoryWritePolicies.php',
         'Clog\\Entity\\Item\\Item' => 'Item/Item.php',
         'Clog\\Entity\\Item\\ItemDeleter' => 'Item/ItemDeleter.php',
         'Clog\\Entity\\Item\\ItemHydrator' => 'Item/ItemHydrator.php',
         'Clog\\Entity\\Item\\ItemInput' => 'Item/ItemInput.php',
         'Clog\\Entity\\Item\\ItemMutationContext' => 'Item/ItemMutationContext.php',
         'Clog\\Entity\\Item\\ItemMutator' => 'Item/ItemMutator.php',
-        'Clog\\Entity\\Item\\ItemTriggers' => 'Item/ItemTriggers.php',
+        'Clog\\Entity\\Item\\ItemPreCommitContext' => 'Item/ItemPreCommitContext.php',
+        'Clog\\Entity\\Item\\ItemReadPolicies' => 'Item/ItemReadPolicies.php',
+        'Clog\\Entity\\Item\\ItemSideEffects' => 'Item/ItemSideEffects.php',
         'Clog\\Entity\\Item\\ItemVerifiers' => 'Item/ItemVerifiers.php',
+        'Clog\\Entity\\Item\\ItemWriteContext' => 'Item/ItemWriteContext.php',
+        'Clog\\Entity\\Item\\ItemWritePolicies' => 'Item/ItemWritePolicies.php',
         'Clog\\Entity\\Location\\Location' => 'Location/Location.php',
         'Clog\\Entity\\Location\\LocationDeleter' => 'Location/LocationDeleter.php',
         'Clog\\Entity\\Location\\LocationHydrator' => 'Location/LocationHydrator.php',
         'Clog\\Entity\\Location\\LocationInput' => 'Location/LocationInput.php',
         'Clog\\Entity\\Location\\LocationMutationContext' => 'Location/LocationMutationContext.php',
         'Clog\\Entity\\Location\\LocationMutator' => 'Location/LocationMutator.php',
-        'Clog\\Entity\\Location\\LocationTriggers' => 'Location/LocationTriggers.php',
+        'Clog\\Entity\\Location\\LocationPreCommitContext' => 'Location/LocationPreCommitContext.php',
+        'Clog\\Entity\\Location\\LocationReadPolicies' => 'Location/LocationReadPolicies.php',
+        'Clog\\Entity\\Location\\LocationSideEffects' => 'Location/LocationSideEffects.php',
         'Clog\\Entity\\Location\\LocationVerifiers' => 'Location/LocationVerifiers.php',
+        'Clog\\Entity\\Location\\LocationWriteContext' => 'Location/LocationWriteContext.php',
+        'Clog\\Entity\\Location\\LocationWritePolicies' => 'Location/LocationWritePolicies.php',
+        'Clog\\Entity\\Pattern\\ClogPost\\ClogPost' => 'Pattern/ClogPost/ClogPost.php',
+        'Clog\\Entity\\Pattern\\ClogPost\\ClogPostMutatorTrait' => 'Pattern/ClogPost/ClogPostMutatorTrait.php',
+        'Clog\\Entity\\Pattern\\ClogPost\\Contract\\ClogPostSignedInReadPolicy' => 'Pattern/ClogPost/Contract/ClogPostSignedInReadPolicy.php',
+        'Clog\\Entity\\Pattern\\ClogPost\\Contract\\ClogPostStaffWritePolicy' => 'Pattern/ClogPost/Contract/ClogPostStaffWritePolicy.php',
+        'Clog\\Entity\\Wiring' => 'Wiring.php',
     ],
 ];

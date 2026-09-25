@@ -18,8 +18,7 @@ storage:
 fields:
   name:
     type: string
-    description: Projected to post_title, so the admin list has something to show.
-    required: true
+    description: Display label derived from the item and location before writing.
     maxLength: 200
   dateAdded:
     type: datetime
@@ -34,6 +33,7 @@ edges:
       name: inventoryEntries
       unique: false
     onDelete: cascade
+    required: true
   location:
     to: Location
     cardinality: one
@@ -42,3 +42,10 @@ edges:
       name: inventoryEntries
       unique: false
     onDelete: restrict
+    required: true
+sideEffects:
+  displayName:
+    description: Derive the inventory label from its authoritative item and location.
+    on: [create, update]
+    phase: preCommit
+    handler: true

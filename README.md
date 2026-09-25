@@ -18,7 +18,7 @@ Node all run inside containers, so nothing needs to be installed on the host.
   whichever is present and wires up the socket for you.
 - A `.env` file at the project root. `scripts/dev.sh` creates one from
   `.env.example` on first run.
-- **Node.js 18+** is optional, and only needed if you want to run the client build or
+- **Node.js 22+** is optional, and only needed if you want to run the client build or
   the Playwright e2e suite directly on the host rather than in the `client` container.
 
 ---
@@ -114,84 +114,68 @@ Node all run inside containers, so nothing needs to be installed on the host.
 
 ## Server: the entity build loop
 
-`server/` is an [Elephentity](https://github.com/hsimah-services/elephentity) project.
-The entity classes, the storage manifest, the post types and the GraphQL surface under
-`server/generated/` are compiled from the YAML in `server/spec/` — machine-owned,
-signed by digest, committed, and never hand-edited.
-
-Generation needs PHP 8.3 and there is none on the host, so it runs in a throwaway
-container:
+The plugin uses Elephentity runtime 0.10, WordPress 0.2.3 and WPGraphQL 0.2.
+Composer locks the compatible package set; runtime 0.11 is not yet supported by
+these integration releases. CLI/schema and the Rust generators are development
+dependencies, excluded from production installs.
 
 ```bash
 scripts/php.sh composer install
-scripts/php.sh vendor/bin/eleph generate --project .
+scripts/php.sh composer build-generators
+scripts/php.sh vendor/bin/eleph generate
+scripts/php.sh composer check-generated
+scripts/php.sh composer test
+scripts/test-backend.sh
+scripts/test-backend.sh --e2e
 ```
 
-The working directory inside the container is `server/`, so every command in the build
-loop is written as if you were standing there. The container is created per command and
-removed on exit — deliberately not part of `docker-compose.yml`, because generating
-code is a build step and must not need the runtime stack to be up.
+The PHP 8.3 build image includes Rust and builds on first use. The working directory
+is `server/`; generated output under `server/generated/` is committed and must not
+be edited by hand. Change `spec/`, regenerate, and implement new contracts under
+`src/Contract/`. `check-generated` checks canonical specs, validation, generated
+file drift and GraphQL conformance.
 
-The loop is: change `spec/`, regenerate, implement whatever appeared under
-`generated/*/Contract/`. The gates, in the order worth running them:
+Items, locations and individual stock entries live in custom tables. The framework
+owns timestamps and relationship writes. Clog derives inventory display labels in
+a pre-commit contract; clients supply neither creation timestamps nor labels.
+Runtime 0.10's deletion planner reads Clog's dependent edges in the wrong
+direction. A narrow `DependentReadStorage` adapter corrects those reads inside
+the unit of work until upstream fixes it; integration tests protect both cascades
+and unrelated stock. There are no new WordPress post projections. Generated admin lists/details read
+the same entities as GraphQL; the application remains the editing interface.
 
-| Command | Answers |
-|---|---|
-| `scripts/php.sh vendor/bin/eleph-codegen doctor --project .` | are the builders installed and runnable? |
-| `scripts/php.sh vendor/bin/eleph fmt --project .` | is the spec in canonical form? |
-| `scripts/php.sh vendor/bin/eleph validate spec` | is the spec valid? |
-| `scripts/php.sh vendor/bin/eleph generate --project .` | compile it |
-| `scripts/php.sh vendor/bin/eleph generate --check --project .` | is `generated/` what the spec says, byte for byte? |
-| `scripts/php.sh vendor/bin/eleph check --project .` | does every exposed GraphQL field resolve? |
+Signed-in users can read inventory. Writes require `edit_posts`, matching the
+existing Clog menu capability. Generated admin record views require
+`manage_options`. CLI reads and writes use an explicit WordPress account:
 
-`doctor` is the one to run first when anything is confusing: it resolves every
-configured builder and says where it found it, without needing a compiled spec.
-
-Three targets are configured in `server/eleph.json`, one per program that produces
-output — `eleph-gen-php` for the entity classes, `eleph-gen-wordpress` for the storage
-manifest and post types, `eleph-gen-wpgraphql` for the GraphQL manifest. The framework
-itself generates nothing.
-
-### Framework dependencies
-
-The three Elephentity packages come from Packagist: `elephentity/elephentity` is
-the runtime and the WordPress and WPGraphQL adaptors, and `elephentity/codegen`
-and `elephentity/codegen-php` are build-time only, so they are dev dependencies
-and `composer install --no-dev` leaves them out of a deployed plugin.
-
-To develop a framework change against Clog, point `server/composer.json` at a
-local checkout instead:
-
-```json
-"repositories": [
-    { "type": "path", "url": "../../elephentity", "options": { "symlink": false } }
-],
+```bash
+scripts/dev.sh wp clog install
+scripts/dev.sh wp clog status --user=admin
+scripts/dev.sh wp clog seed --user=admin
+scripts/dev.sh wp clog entity list Item --user=admin
 ```
 
-Three things about that, all of which will otherwise cost you an afternoon:
+### Existing installations
 
-- `"symlink": false` is not the default and matters. Composer symlinks path
-  repositories *relatively*, so `server/vendor/elephentity/elephentity` would
-  point at `../../../../elephentity` — which resolves on the host, but inside the
-  WordPress container, where `server` is mounted four levels below `wp-content`,
-  resolves to a path that does not exist. PHP then fatals on the dangling link.
-  Copying instead means framework changes need
-  `scripts/php.sh composer update elephentity/*` to propagate.
-- Composer takes a path repository's version from the *branch*, not the tag, so a
-  checkout sitting on a release tag still reports `dev-main` and
-  `"minimum-stability": "stable"` refuses it. Set it to `dev`, keeping
-  `"prefer-stable": true`.
-- `scripts/php.sh` mounts only this repository, so add a mount for the checkout at
-  the position the relative path expects.
+This branch is the runtime foundation for [#32](https://github.com/hsimah/clog/issues/32).
+Do not deploy it over an existing inventory until the data migration in
+[#33](https://github.com/hsimah/clog/issues/33) is implemented and rehearsed.
+`wp clog install` applies safe additive changes only. An older schema with
+`post_id` or incompatible timestamp columns is refused without applying any of
+the planned changes. Runtime/API boot is guarded too; an admin notice explains
+that an explicit migration is needed. Existing post rows are not swept or deleted.
 
-Revert all of it before pushing, and do not commit the lock file a path
-repository produces — it pins a local commit and is installable on no other
-machine. `.github/workflows/deploy.yml` runs `composer install --no-dev` against
-`server/` alone, and a path repository is exactly what it cannot resolve.
+The isolated integration test uses temporary WordPress/MySQL storage and no host
+ports, so it can run alongside other projects. It covers actual entity CRUD,
+managed timestamps, relationships, failed updates, deletion rules, policies and
+GraphQL Node/mutation identity. Its containers are removed on exit.
 
 ---
 
 ## Running tests
+
+Without host Node, use `scripts/node.sh npm run lint` and
+`scripts/node.sh npm run build`. Backend commands are listed above.
 
 End‑to‑end tests live under `client/e2e` and use Playwright.
 
@@ -250,7 +234,7 @@ plugin directory. If the plugin fails to activate, check the labels with
 
 ## Deployment
 
-Releases are built and published via GitHub Actions on the `space-needle` self‑hosted runner. Tags prefixed with `deploy@pupyrus` trigger the workflow which builds the plugin and deploys it to the `pupyrus` container. See `.github/workflows/deploy.yml` for details.
+Publishing a GitHub release runs backend checks, client build/lint and Playwright on GitHub-hosted runners, then attaches `clog.zip`. The plugin update checker offers that release in WordPress; deploying to pupyrus is a manual **Update Now** action. No workflow automatically updates the production container. See `.github/workflows/deploy.yml`.
 
 ---
 

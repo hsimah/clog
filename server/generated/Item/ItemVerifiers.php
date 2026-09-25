@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Item/ItemVerifiers.php
- * digest: sha256:98d051a5bd23e6576155d513c6c9b2e02cd382e24416d7a7f749fe1bdc661b4f
+ * digest: sha256:e27ec16255312d277b38c9325c82722df2e55ab34c9d68b08a835e9fc088d69e
  */
 
 namespace Clog\Entity\Item;
@@ -23,20 +23,22 @@ use Eleph\Runtime\Verification\Verification;
  */
 final readonly class ItemVerifiers implements EntityVerifiers
 {
-    public function __construct()
-    {
+    public function __construct() {
+
     }
 
     /**
      * @return list<string>
      */
-    public function verifiedFields(): array
-    {
+    public function verifiedFields(): array {
         return [];
     }
 
-    public function verify(string $field, mixed $value, MutationContext $context): Verification
-    {
+    public function verify(
+        string $field,
+        mixed $value,
+        MutationContext $context,
+    ): Verification {
         return Verification::ok();
     }
 }

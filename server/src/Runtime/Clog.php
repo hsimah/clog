@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Clog\Runtime;
 
-use Clog\Entity\Catalogue;
-use Eleph\Runtime\Catalogue\BootCheck;
 use Eleph\Runtime\Gateway\EntityGateway;
-use Eleph\Runtime\Gateway\Runtime;
-use Eleph\Runtime\Gateway\UnitOfWorkFactory;
+use Eleph\WordPress\Admin\Pages;
 use Eleph\WordPress\Database\WpdbDatabase;
 use Eleph\WordPress\Manifest\StorageManifest;
 use Eleph\WordPress\Registration\PostTypeRegistrar;
+use Eleph\WordPress\Viewer\WordPressViewerProvider;
 use Eleph\WordPress\WordPress;
 use Eleph\WordPress\WordPressAdaptor;
 use Psr\Log\LoggerInterface;
@@ -57,7 +55,6 @@ final class Clog
     private function __construct(
         private readonly WpdbDatabase $database,
         private readonly string $generated,
-        private readonly Container $container,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -74,7 +71,6 @@ final class Clog
             self::$instance = new self(
                 new WpdbDatabase($wpdb),
                 CLOG_PLUGIN_DIR . 'generated/',
-                new Container(),
                 new ErrorLogLogger(),
             );
         }
@@ -93,16 +89,11 @@ final class Clog
     public function gateway(): EntityGateway
     {
         if (null === $this->gateway) {
-            $catalogue = new Catalogue($this->container);
-
-            (new BootCheck($catalogue, $this->container))->run();
-
-            $units = new UnitOfWorkFactory($this->adaptor(), $catalogue, new NoProcessors(), $this->logger);
-
-            $this->gateway = new ProjectedGateway(
-                new Runtime($this->adaptor(), $catalogue, $units),
-                $catalogue,
-                $units,
+            $this->tables()->requireReady();
+            $this->gateway = RuntimeFactory::create(
+                $this->adaptor(),
+                new WordPressViewerProvider(),
+                $this->logger,
             );
         }
 
@@ -115,6 +106,11 @@ final class Clog
     public function tables(): Tables
     {
         return new Tables($this->database, $this->manifest());
+    }
+
+    public function adminPages(): Pages
+    {
+        return Pages::fromManifest($this->generated . 'wordpress/admin-pages.php', $this->gateway());
     }
 
     private function adaptor(): WordPressAdaptor

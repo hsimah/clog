@@ -7,11 +7,19 @@
 #
 # Image names are fully qualified: podman refuses to guess a registry for an
 # unqualified name and prompts interactively, which would break unattended builds.
+FROM docker.io/library/rust:1 AS rust
 FROM docker.io/library/php:8.3-cli
+
+COPY --from=rust /usr/local/cargo /usr/local/cargo
+COPY --from=rust /usr/local/rustup /usr/local/rustup
+ENV RUSTUP_HOME=/usr/local/rustup
+ENV PATH="/usr/local/cargo/bin:${PATH}"
+ENV CARGO_HOME=/composer/cargo
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         git \
+        build-essential \
         unzip \
         libonig-dev \
         libzip-dev \

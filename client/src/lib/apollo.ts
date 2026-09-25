@@ -18,9 +18,6 @@ const authLink = setContext((_, { headers }) => {
 
 export const client = new ApolloClient({
   link: ApolloLink.from([authLink, httpLink]),
-  // No typePolicies needed: unlike WPGraphQL's native types, whose stable numeric id
-  // lived at `databaseId` behind an opaque relay `id`, Elephentity's entity types
-  // expose the entity id directly as `id` — which is exactly what Apollo's default
-  // cache normalization already keys on.
+  // Elephentity exposes globally unique Node IDs; Apollo normalizes them directly.
   cache: new InMemoryCache(),
 });

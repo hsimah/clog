@@ -5,8 +5,8 @@
 
 export const SEED_ITEM_NAMES = [
   'Heinz Ketchup',
-  'Dry Dog Food',
-  'Wet Dog Food',
+  'Purina Dry Dog Food',
+  'Pedigree Wet Dog Food',
 ];
 
 export const SEED_LOCATION_NAMES = [

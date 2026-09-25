@@ -130,9 +130,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
         input: {
           name: itemData.name,
           barcode: itemData.barcode,
-          // The schema requires createdAt on every create input even though nothing
-          // else derives it server-side; this is genuinely where it comes from.
-          createdAt: new Date().toISOString(),
         },
       },
     });
@@ -162,7 +159,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
       variables: {
         input: {
           name: locationData.name,
-          createdAt: new Date().toISOString(),
         },
       },
     });
@@ -187,15 +183,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const getLocation = (id: string) => locations.find((location) => location.id === id);
 
   const addInventory = async (inventoryData: Omit<Inventory, 'id' | 'createdAt'>): Promise<Inventory> => {
-    const item = getItem(inventoryData.itemId);
-    const location = getLocation(inventoryData.locationId);
     const { data } = await createInventoryMutation({
       variables: {
         input: {
-          // No trigger derives this server-side (see wp clog seed's convention in
-          // server/includes/seed-data.php) — it is what the admin list shows.
-          name: `${item?.name ?? 'Unknown'} @ ${location?.name ?? 'Unknown'}`,
-          createdAt: new Date().toISOString(),
           dateAdded: inventoryData.dateAdded.toISOString(),
           item: inventoryData.itemId,
           location: inventoryData.locationId,

@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   post-types.php
- * digest: sha256:8a74cb004d6b608ccb03326922f06aed963e024da87a36d95fdb46509ec1253c
+ * digest: sha256:86959b48f18c9cd6d1d3cfb007a87eaa715463c486b939bf111de4e9c5bae118
  */
 
 /**
@@ -19,71 +19,4 @@ declare(strict_types=1);
  * run time meant compiling the spec on every request, which is the cost every
  * manifest here exists to remove.
  */
-return [
-    'clog_inventory' => [
-        'labels' => [
-            'name' => 'Inventory',
-            'singular_name' => 'Inventory Entry',
-            'add_new_item' => 'Add New Inventory Entry',
-            'edit_item' => 'Edit Inventory Entry',
-            'new_item' => 'New Inventory Entry',
-            'view_item' => 'View Inventory Entry',
-            'search_items' => 'Search Inventory',
-            'not_found' => 'No inventory found',
-            'not_found_in_trash' => 'No inventory found in Trash',
-        ],
-        'description' => 'One stocked instance of an item, in a location.',
-        'public' => false,
-        'publicly_queryable' => false,
-        'exclude_from_search' => true,
-        'show_ui' => true,
-        'show_in_menu' => 'clog',
-        'show_in_rest' => false,
-        'capability_type' => 'post',
-        'supports' => [],
-    ],
-    'clog_item' => [
-        'labels' => [
-            'name' => 'Items',
-            'singular_name' => 'Item',
-            'add_new_item' => 'Add New Item',
-            'edit_item' => 'Edit Item',
-            'new_item' => 'New Item',
-            'view_item' => 'View Item',
-            'search_items' => 'Search Items',
-            'not_found' => 'No items found',
-            'not_found_in_trash' => 'No items found in Trash',
-        ],
-        'description' => 'A thing that can be stocked, identified by its barcode.',
-        'public' => false,
-        'publicly_queryable' => false,
-        'exclude_from_search' => true,
-        'show_ui' => true,
-        'show_in_menu' => 'clog',
-        'show_in_rest' => false,
-        'capability_type' => 'post',
-        'supports' => [],
-    ],
-    'clog_location' => [
-        'labels' => [
-            'name' => 'Locations',
-            'singular_name' => 'Location',
-            'add_new_item' => 'Add New Location',
-            'edit_item' => 'Edit Location',
-            'new_item' => 'New Location',
-            'view_item' => 'View Location',
-            'search_items' => 'Search Locations',
-            'not_found' => 'No locations found',
-            'not_found_in_trash' => 'No locations found in Trash',
-        ],
-        'description' => 'Somewhere inventory can be kept.',
-        'public' => false,
-        'publicly_queryable' => false,
-        'exclude_from_search' => true,
-        'show_ui' => true,
-        'show_in_menu' => 'clog',
-        'show_in_rest' => false,
-        'capability_type' => 'post',
-        'supports' => [],
-    ],
-];
+return [];

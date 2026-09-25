@@ -7,6 +7,7 @@
  * Text Domain: clog
  * Requires Plugins: wp-graphql, wp-graphql-jwt-authentication
  * Requires at least: 6.5
+ * Requires PHP: 8.3
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

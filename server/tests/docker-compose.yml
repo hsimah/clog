@@ -1,0 +1,26 @@
+services:
+  db:
+    image: docker.io/library/mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: clog-test
+      MYSQL_DATABASE: clog_test
+    tmpfs:
+      - /var/lib/mysql
+    healthcheck:
+      test: [CMD, mysqladmin, ping, -h, 127.0.0.1, --protocol=TCP, -pclog-test]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+  wordpress:
+    image: docker.io/library/wordpress:cli-php8.3
+    user: "0:0"
+    tmpfs:
+      - /var/www/html
+    environment:
+      WP_CLI_ALLOW_ROOT: "1"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ../:/var/www/html/wp-content/plugins/clog:ro,z
+    entrypoint: [sh, /var/www/html/wp-content/plugins/clog/tests/run-wordpress.sh]
