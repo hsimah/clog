@@ -22,6 +22,59 @@ use Eleph\Runtime\Identity\EntityId;
 WP_CLI::add_command( 'clog install', 'clog_cli_install' );
 WP_CLI::add_command( 'clog status', 'clog_cli_status' );
 WP_CLI::add_command( 'clog entity', 'clog_cli_entity' );
+WP_CLI::add_command( 'clog migration', 'clog_cli_migration' );
+
+/**
+ * Inspect or explicitly apply the versioned storage upgrade.
+ *
+ * ## OPTIONS
+ *
+ * <command>
+ * : status, plan (read-only dry run), or run.
+ *
+ * [--backup-verified]
+ * : Confirm a full external database backup has been verified and retained.
+ *
+ * ## EXAMPLES
+ *
+ *     wp clog migration status --user=admin
+ *     wp clog migration plan --user=admin
+ *     wp clog migration run --backup-verified --user=admin
+ *
+ * @when after_wp_load
+ */
+function clog_cli_migration( array $args, array $assoc ): void {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		WP_CLI::error( 'Migration commands require --user=<administrator>.' );
+	}
+	$migration = Clog::instance()->migration();
+	try {
+		switch ( $args[0] ) {
+			case 'status':
+				WP_CLI::log( wp_json_encode( $migration->status(), JSON_PRETTY_PRINT ) );
+				break;
+			case 'plan':
+				WP_CLI::log( wp_json_encode( $migration->status(), JSON_PRETTY_PRINT ) );
+				foreach ( $migration->plan() as $sql ) {
+					WP_CLI::log( $sql . ';' );
+				}
+				WP_CLI::success( 'Dry run complete. No data changed. Null updated_at values will use created_at; originals and posts will be retained.' );
+				break;
+			case 'run':
+				// Check the file, not wp_is_maintenance_mode(): the latter expires after ten minutes.
+				if ( ! file_exists( ABSPATH . '.maintenance' ) || ! isset( $assoc['backup-verified'] ) ) {
+					throw new RuntimeException( 'Activate maintenance, drain writers, and verify a full database backup first; then pass --backup-verified. See docs/storage-upgrade.md.' );
+				}
+				WP_CLI::log( wp_json_encode( $migration->run(), JSON_PRETTY_PRINT ) );
+				WP_CLI::success( 'Storage upgrade verified. Keep the backup and old plugin for rollback.' );
+				break;
+			default:
+				WP_CLI::error( 'Expected status, plan, or run.' );
+		}
+	} catch ( RuntimeException $failure ) {
+		WP_CLI::error( $failure->getMessage() );
+	}
+}
 
 /**
  * Apply safe additive schema changes; refuse destructive upgrades.

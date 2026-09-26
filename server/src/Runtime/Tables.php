@@ -15,7 +15,7 @@ final readonly class Tables
 {
     private SchemaInstaller $installer;
 
-    public function __construct(private Database $database, StorageManifest $manifest)
+    public function __construct(private Database $database, private StorageManifest $manifest)
     {
         $this->installer = new SchemaInstaller($database, $manifest);
     }
@@ -28,6 +28,11 @@ final readonly class Tables
     /** @return list<string> Applied SQL statements. */
     public function install(): array
     {
+        $status = (new \Clog\Migration\StorageUpgrade($this->database, $this->manifest))->status();
+        if (!in_array($status['state'], ['fresh', 'v2'], true)) {
+            throw new RuntimeException('Clog storage state: ' . $status['state']
+                . '. Run wp clog migration status and wp clog migration plan; see docs/storage-upgrade.md. No changes applied.');
+        }
         $plan = $this->installer->install();
         if (!$plan->isSafe()) {
             throw new RuntimeException($this->describe($plan));
@@ -57,6 +62,7 @@ final readonly class Tables
     {
         if (!$plan->isSafe()) {
             return 'Clog requires an explicit data migration; no schema changes were applied. '
+                . 'Run wp clog migration status and wp clog migration plan. '
                 . implode('; ', array_map(static fn ($refusal): string => $refusal->describe(), $plan->refusals));
         }
 

@@ -157,18 +157,21 @@ scripts/dev.sh wp clog entity list Item --user=admin
 
 ### Existing installations
 
-This branch is the runtime foundation for [#32](https://github.com/hsimah/clog/issues/32).
-Do not deploy it over an existing inventory until the data migration in
-[#33](https://github.com/hsimah/clog/issues/33) is implemented and rehearsed.
-`wp clog install` applies safe additive changes only. An older schema with
-`post_id` or incompatible timestamp columns is refused without applying any of
-the planned changes. Runtime/API boot is guarded too; an admin notice explains
-that an explicit migration is needed. Existing post rows are not swept or deleted.
+The explicit v1-to-v2 migration has read-only `wp clog migration status` and
+`wp clog migration plan` commands, followed by a guarded `run` command. It verifies
+copies before an atomic table exchange and retains the originals and post links.
+Follow the [upgrade and rollback procedure](server/docs/storage-upgrade.md).
+Do not deploy over the garage inventory until its actual database export and
+WordPress update have been rehearsed, as tracked in [#33](https://github.com/hsimah/clog/issues/33).
+`wp clog install` handles fresh installations; it refuses existing or unsupported
+storage upgrades. Normal plugin loading also detects pending upgrades without
+requiring reactivation. Post/postmeta-only deployments require a separate import.
 
 The isolated integration test uses temporary WordPress/MySQL storage and no host
 ports, so it can run alongside other projects. It covers actual entity CRUD,
 managed timestamps, relationships, failed updates, deletion rules, policies and
-GraphQL Node/mutation identity. Its containers are removed on exit.
+GraphQL Node/mutation identity, migration preservation and rollback. Its containers
+are removed on exit.
 
 ---
 
@@ -244,4 +247,3 @@ Publishing a GitHub release runs backend checks, client build/lint and Playwrigh
 - `client/e2e/*` — Playwright tests and setup scripts
 
 This README replaces the generic Vite template with instructions tailored to Clog's codebase and development workflow.
-
