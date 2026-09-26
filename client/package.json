@@ -12,7 +12,8 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "relay:contract": "relay-compiler relay-contract.config.json",
-    "relay:check": "relay-compiler relay-contract.config.json --validate"
+    "relay:check": "relay-compiler relay.config.json --validate && relay-compiler relay-contract.config.json --validate",
+    "relay": "relay-compiler relay.config.json"
   },
   "dependencies": {
     "@apollo/client": "^4.1.4",
@@ -30,7 +31,9 @@
     "lucide-react": "^0.563.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-relay": "^21.0.1",
     "react-router-dom": "^7.13.0",
+    "relay-runtime": "^21.0.1",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18"
   },
@@ -41,7 +44,10 @@
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
+    "@types/react-relay": "^18.2.1",
+    "@types/relay-runtime": "^20.1.1",
     "@vitejs/plugin-react": "^5.1.1",
+    "babel-plugin-relay": "^21.0.1",
     "dotenv": "^17.2.4",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
@@ -51,6 +57,7 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "unplugin-stylex": "^0.6.3",
-    "vite": "^7.2.4"
+    "vite": "^7.2.4",
+    "vite-plugin-relay": "^2.1.0"
   }
 }

@@ -121,7 +121,8 @@ import type { Item } from '@/types';
 
 ## Global State Management
 
-All data operations flow through `DataContext`:
+Locations use Relay route queries and colocated fragments (`client/RELAY.md`).
+Only unmigrated screens still use `DataContext`:
 - Items management
 - Locations management
 - Inventory management
@@ -202,7 +203,8 @@ Use JavaScript `Date` objects throughout the app:
 - Existing databases require the explicit #33 migration and a rehearsal using the
   actual deployment export. Follow `server/docs/storage-upgrade.md`. Never bypass
   a schema refusal or delete old projections to make boot pass.
-- Apollo/Tailwind remain transitional until the separate Relay/Astryx/StyleX issues land.
+- Apollo/Tailwind remain transitional for unmigrated screens; new UI uses Astryx/StyleX
+  and new data flows use Relay. See `client/UI-MIGRATION.md` and `client/RELAY.md`.
 - Browser GraphQL requests use `client/src/lib/session.ts` with same-origin cookies
   and a fresh WordPress GraphQL nonce. Reuse this fetch transport for Relay; wire
   the same session-change cache disposal when replacing Apollo. Do not restore JWT
