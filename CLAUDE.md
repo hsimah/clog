@@ -122,7 +122,7 @@ import type { Item } from '@/types';
 ## Global State Management
 
 Items and locations use Relay route queries and colocated fragments (`client/RELAY.md`).
-Only the inventory workspace and dashboard still use `DataContext`. New and
+Only the inventory workspace still uses `DataContext`. New and
 migrated components must use route-owned Relay queries and mutation hooks.
 
 ## Git Workflow
