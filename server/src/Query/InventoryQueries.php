@@ -17,7 +17,7 @@ final readonly class InventoryQueries
     {
     }
 
-    public function search(string $entity, ?string $term = null, ?EntityId $location = null, ?EntityId $item = null): SqlEntityQuery
+    public function search(string $entity, ?string $term = null, ?EntityId $location = null, ?EntityId $item = null, bool $stockedOnly = false): SqlEntityQuery
     {
         $prefix = $this->db->prefix();
         if (!preg_match('/^[a-zA-Z0-9_]+$/', $prefix)) {
@@ -36,7 +36,22 @@ final readonly class InventoryQueries
         $bindings = [];
         $term = trim($term ?? '');
         $like = '%' . addcslashes(mb_substr($term, 0, 200), '\\%_') . '%';
-        if ('Inventory' === $entity) {
+        if ($stockedOnly && 'Item' !== $entity) {
+            throw new InvalidArgumentException('Only items support stocked-only search.');
+        }
+        if ($stockedOnly) {
+            $stockWhere = ['s.item_id = e.id'];
+            if (null !== $location) {
+                $stockWhere[] = 's.location_id = %s';
+                $bindings[] = (string) $location;
+            }
+            if ('' !== $term) {
+                $stockWhere[] = '(e.name LIKE %s OR e.barcode LIKE %s OR l.name LIKE %s)';
+                array_push($bindings, $like, $like, $like);
+            }
+            $where[] = 'EXISTS (SELECT 1 FROM ' . $tables['Inventory'] . ' s INNER JOIN '
+                . $tables['Location'] . ' l ON s.location_id = l.id WHERE ' . implode(' AND ', $stockWhere) . ')';
+        } elseif ('Inventory' === $entity) {
             $from .= ' INNER JOIN ' . $tables['Item'] . ' i ON e.item_id = i.id'
                 . ' INNER JOIN ' . $tables['Location'] . ' l ON e.location_id = l.id';
             if ('' !== $term) {

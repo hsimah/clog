@@ -22,7 +22,7 @@ const styles = stylex.create({
   withDetail: { gridTemplateColumns: { default: 'minmax(0, 1fr)', '@media (min-width: 1000px)': 'minmax(0, 1fr) minmax(0, 24rem)' } },
   panel: { order: { default: -1, '@media (min-width: 1000px)': 1 }, minWidth: 0, borderTop: '1px solid var(--color-border)', paddingTop: 'var(--spacing-4)' },
 });
-export interface LocationRouteContext { refreshLocations: () => void; onClose: () => void }
+export interface LocationRouteContext { refreshLocations: () => void; onClose: () => void; locationPath?: (id: string, edit?: boolean) => string }
 
 export function LocationsPage() {
   const [term, setTerm] = useState('');

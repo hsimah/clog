@@ -1,7 +1,7 @@
 # Clog Codebase Rules
 
-## Project Overview
-Clog (Cave Log) is a React + TypeScript inventory management system for tracking items, locations, and inventory quantities.
+Clog (Cave Log) tracks items, flat storage locations and individual stocked units.
+The React/TypeScript client lives in `client/`; the WordPress plugin in `server/`.
 
 ## Deployment
 
@@ -9,179 +9,38 @@ Clog (Cave Log) is a React + TypeScript inventory management system for tracking
 - **pupyrus**: The WordPress Docker container running on space-needle
 - Publishing a GitHub release builds the plugin and attaches an installable zip to the release (`.github/workflows/deploy.yml`). Pupyrus is not touched automatically — its WordPress admin (`server/includes/updates.php`, backed by `yahnis-elsts/plugin-update-checker`) polls GitHub releases and shows an "Update available" prompt on the Plugins page; deploying is a manual "Update Now" click there.
 
-## Code Organization
+## Client conventions
 
-### Directory Structure
-- `src/pages/` - Page-level components for routing
-- `src/components/` - Reusable UI and feature components
-  - `ui/` - Base UI components (Button, Input, Card, etc.)
-  - `items/` - Item management components (ItemForm, ItemList, ItemDetails)
-  - `locations/` - Location management components
-  - `inventory/` - Inventory management components
-  - `layout/` - Layout wrapper components
-  - `barcode/` - barcode scanner dialog and hooks
-- `src/context/` - React Context for global state (DataContext)
-- `src/types/` - TypeScript type definitions
-- `src/lib/` - Utility functions
+- Read `client/UI-MIGRATION.md` and `client/RELAY.md` before changing client flows.
+- Use Astryx component props and layout primitives first, then StyleX. Consult
+  `scripts/node.sh npx astryx component <Name>` for the installed API. Do not
+  reintroduce Tailwind utilities or local copies of Astryx components.
+- Compose Astryx Card with Layout header/content/footer slots and its section
+  components. Button takes `label`; controls own accessible labels.
+- Use `@/` imports. Feature components and files use PascalCase; hooks/utilities
+  use camelCase. Import types with `type`; never use `any`.
+- Routes own Relay query references; components read colocated fragments. Generated
+  response types are authoritative. Do not duplicate entity models or load whole
+  collections into global context. Commit generated artifacts with their operations.
+- Preserve distinct loading, empty, missing-record and retryable error states.
+- Forms keep local state, disable pending writes, preserve input after errors, and
+  never automatically replay uncertain mutations. Respect `canWrite`.
+- Stock actions belong in the detail panel. Tables expose expansion and details
+  navigation. Paginate groups and units independently; use server totals.
+- Use outlet contexts for refresh, close and detail paths. Workspace item/location
+  edits must stay inside `/inventory` and retain its search parameters. RouterLink
+  owns `/clog`; do not prepend that basename to app-relative links yourself.
+- Put narrow-screen panels before lists, constrain wide-screen panels, and keep
+  table overflow local. Focus the panel heading or first form field on entry.
+- Store GraphQL dates as ISO strings; format only for presentation. Date-only
+  stock edits preserve the entered calendar date as midnight UTC.
+- Run Relay generation/validation, lint and builds through `scripts/node.sh`.
+  Use `scripts/test-backend.sh --e2e` for meaningful flow changes.
 
-The repository also contains a `server/` directory hosting a WordPress plugin and themes; Docker Compose (`docker-compose.yml`) is used to wire together a local WordPress instance, database, Redis, and the React development server.
-## Naming Conventions
+## Git workflow
 
-### Components
-- **UI Components**: PascalCase filenames (e.g., `Button.tsx`, `Card.tsx`, `Input.tsx`)
-  - Exported as named exports matching the filename
-  - Live in `src/components/ui/`
-- **Feature Components**: PascalCase filenames, should match the feature scope
-  - Example: `ItemForm.tsx`, `LocationDetails.tsx`
-- **Files**: Always PascalCase for components, camelCase for utilities
-
-### Types
-- Type files: `src/types/index.ts` contains all shared types
-- Type suffixes: Use descriptive names (e.g., `Item`, `Location`, `Inventory`, not `ItemType`)
-
-## Component Patterns
-
-### Card Components
-All cards must follow the structured composition pattern:
-```tsx
-<Card
-  header={
-    <CardHeader title={<CardTitle>Title Text</CardTitle>}>
-      {/* Optional children like CardDescription or action buttons */}
-    </CardHeader>
-  }
-  content={
-    <CardContent>
-      {/* Main content goes here */}
-    </CardContent>
-  }
-  footer={/* Optional footer content */}
-/>
-```
-
-Rules:
-- Card accepts three props: `header`, `content`, and `footer`
-- CardHeader requires a `title` prop containing a CardTitle component
-- CardHeader can accept children for additional elements (CardDescription, CloseButton, etc.)
-- Use CardContent to wrap the main content
-- CardFooter is optional
-
-### Form Components
-- Form state managed with `useState` hooks
-- Submit handlers prevent default and navigate on success
-- Use Label components paired with Input/Select for form fields
-- Forms wrapped in a Card with CardHeader containing the form title
-
-### List Components
-- Use the Table component from `src/components/ui/Table.tsx`
-- Include search/filter functionality with Input
-- Use Link components for navigation to detail pages
-- Include action buttons (Edit, Delete) inline in table rows
-
-## Import Conventions
-
-### Absolute Imports
-Always use the `@/` alias for imports:
-```tsx
-// ✅ Correct
-import Button from '@/components/ui/Button';
-import { useData } from '@/context/DataContext';
-import { cn } from '@/lib/utils';
-
-// ❌ Avoid
-import { Button } from '../../../components/ui/Button';
-```
-
-### Import Organization
-1. React and external libraries first
-2. UI components
-3. Feature components
-4. Context/hooks
-5. Types (using `type` keyword)
-6. Utilities
-
-Example:
-```tsx
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Button from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { ItemForm } from '@/components/items/ItemForm';
-import { useData } from '@/context/DataContext';
-import type { Item } from '@/types';
-```
-
-## Type Safety
-
-- All React components should have explicit prop interfaces
-- Props interface extends appropriate React types or define custom properties
-- Use `type` keyword for type definitions
-- Never use `any` type
-- Use `React.ReactNode` for children/content props
-
-## Global State Management
-
-Items and locations use Relay route queries and colocated fragments (`client/RELAY.md`).
-Only the inventory workspace still uses `DataContext`. New and
-migrated components must use route-owned Relay queries and mutation hooks.
-
-## Git Workflow
-
-- Create feature branches for significant changes (e.g., `feature/ui-refactor`, `ui-capitalization`)
-- Write descriptive commit messages with format: `type: description`
-  - Examples: `refactor: restructure Card component`, `feat: add search to items list`
-- Commit messages should explain the "why" not just the "what"
-
-## React Best Practices
-
-- Use functional components with hooks
-- Use `React.forwardRef` for UI components that need ref access
-- Use `displayName` for all forwardRef components
-- Use type-safe event handlers: `React.FormEvent`, `React.ChangeEvent<HTMLInputElement>`
-- Use `useNavigate()` hook from react-router-dom instead of Link when programmatic navigation needed
-- Always handle loading and error states
-- Use useOutletContext for passing data to modal/nested routes
-
-## Styling
-
-- New and migrated UI uses Astryx component props and StyleX; read `client/UI-MIGRATION.md`.
-- Tailwind utilities are transitional only on screens awaiting migration.
-- Use `cn()` utility from `@/lib/utils` for conditional class merging
-- Prefer Astryx spacing props/tokens and layout primitives for migrated UI.
-- Prefer Astryx color tokens in migrated UI; legacy color utilities remain scoped to the old screens.
-
-## Future Improvements
-
-- [ ] Add form validation error handling
-- [ ] Add loading states to async operations
-- [ ] Add confirmation dialogs for destructive actions
-- [ ] Performance optimization with React.memo for list items
-- [ ] Add accessibility attributes (aria-*, role)
-- [ ] Add tests for critical user paths
-
-## Common Patterns
-
-### Handling onClose in Modals
-When components are shown in modals via routes, they receive an `onClose` callback through `useOutletContext`:
-```tsx
-const { onClose } = useOutletContext<{ onClose?: () => void }>();
-if (onClose) {
-  onClose(); // Close the modal after successful action
-}
-```
-
-### Navigation After Action
-Always navigate to appropriate page after successful CRUD operations:
-- After create: navigate to detail page `/items/{id}`
-- After update: navigate to detail page `/items/{id}`
-- After delete: navigate to list page `/items`
-- On cancel: navigate back with `navigate(-1)` or to specific page
-
-### Date Handling
-Use JavaScript `Date` objects throughout the app:
-- Store as ISO strings in seed data
-- Parse to Date on context initialization
-- Format with `.toLocaleDateString()` for display
+Use feature branches and descriptive conventional commits. Keep generated code,
+source and tests together; never hand-edit generated/vendor files.
 
 ## Elephentity runtime foundation
 
@@ -198,11 +57,10 @@ Use JavaScript `Date` objects throughout the app:
 - Existing databases require the explicit #33 migration and a rehearsal using the
   actual deployment export. Follow `server/docs/storage-upgrade.md`. Never bypass
   a schema refusal or delete old projections to make boot pass.
-- Apollo/Tailwind remain transitional for unmigrated screens; new UI uses Astryx/StyleX
-  and new data flows use Relay. See `client/UI-MIGRATION.md` and `client/RELAY.md`.
+- All UI uses Astryx/StyleX and all application data flows use Relay. See `client/UI-MIGRATION.md` and `client/RELAY.md`.
 - Browser GraphQL requests use `client/src/lib/session.ts` with same-origin cookies
   and a fresh WordPress GraphQL nonce. Reuse this fetch transport for Relay; wire
-  the same session-change cache disposal when replacing Apollo. Do not restore JWT
+  session-change cache disposal. Do not restore JWT
   injection/localStorage or automatically retry failed mutations.
 - Use the generated `clog*Search` connections with `where` filters for paginated
   screens, and `stockCount` / `clogSummary` for totals. Never count a loaded page

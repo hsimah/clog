@@ -42,19 +42,23 @@ async function cleanup() {
     return;
   }
 
-  // Fetch all data
-  const [itemsRes, locationsRes, inventoryRes] = await Promise.all([
-    graphql(`query { clogItems(first: 100) { nodes { id name } } }`, {}),
-    graphql(`query { clogLocations(first: 100) { nodes { id name } } }`, {}),
-    graphql(
-      `query { clogInventoryEntries(first: 100) { nodes { id item { name } location { name } } } }`,
-      {},
-    ),
+  // Page before deleting, so offset cursors do not shift during cleanup.
+  async function allNodes<T>(field: string, selection: string): Promise<T[]> {
+    const nodes: T[] = [];
+    let after: string | null = null;
+    do {
+      const result = await graphql(`query($after: String) { ${field}(first: 100, after: $after) { nodes { ${selection} } pageInfo { hasNextPage endCursor } } }`, { after });
+      const connection = result.data[field];
+      nodes.push(...connection.nodes);
+      after = connection.pageInfo.hasNextPage ? connection.pageInfo.endCursor : null;
+    } while (after !== null);
+    return nodes;
+  }
+  const [allItems, allLocations, allInventory] = await Promise.all([
+    allNodes<ClogNode>('clogItemSearch', 'id name'),
+    allNodes<ClogNode>('clogLocationSearch', 'id name'),
+    allNodes<InventoryNode>('clogInventorySearch', 'id item { name } location { name }'),
   ]);
-
-  const allItems: ClogNode[] = itemsRes.data?.clogItems?.nodes ?? [];
-  const allLocations: ClogNode[] = locationsRes.data?.clogLocations?.nodes ?? [];
-  const allInventory: InventoryNode[] = inventoryRes.data?.clogInventoryEntries?.nodes ?? [];
 
   const testItems = allItems.filter((i) => i.name.startsWith(TEST_PREFIX));
   const testLocations = allLocations.filter((l) => l.name.startsWith(TEST_PREFIX));

@@ -1,343 +1,52 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ChevronRight, ChevronDown, Plus, Minus, Info } from 'lucide-react';
-import { Input } from '@/components/ui/Input';
-import Button from '@/components/ui/Button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/Table';
-import { useData } from '@/context/DataContext';
-import type { Inventory } from '@/types';
+import { Fragment, useState } from 'react';
+import { graphql, usePaginationFragment } from 'react-relay';
+import { Button } from '@astryxdesign/core/Button';
+import { Link } from '@astryxdesign/core/Link';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow } from '@astryxdesign/core/Table';
+import { StockLocations } from '@/components/inventory/StockLocations';
+import type { InventoryList_query$key } from './__generated__/InventoryList_query.graphql';
+import type { InventoryListPaginationQuery } from './__generated__/InventoryListPaginationQuery.graphql';
 
-interface GroupEntry {
-  itemId: string;
-  inventoryIds: string[];
-  locationId: string;
-  locationName: string;
-  count: number;
-}
-
-interface ItemGroup {
-  itemId: string;
-  itemName: string;
-  entries: GroupEntry[];
-  totalCount: number;
-}
-
-export function InventoryList() {
-  const { inventory, getItem, getLocation, addInventory, deleteInventory } = useData();
-  const [search, setSearch] = useState('');
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
-
-  const grouped = inventory.reduce<Map<string, ItemGroup>>((map, inv) => {
-    const item = getItem(inv.itemId);
-    const location = getLocation(inv.locationId);
-    const existing = map.get(inv.itemId);
-
-    if (existing) {
-      const existingEntry = existing.entries.find((e) => e.locationId === inv.locationId);
-      if (existingEntry) {
-        existingEntry.inventoryIds.push(inv.id);
-        existingEntry.count += 1;
-      } else {
-        existing.entries.push({
-          itemId: inv.itemId,
-          inventoryIds: [inv.id],
-          locationId: inv.locationId,
-          locationName: location?.name ?? 'Unknown',
-          count: 1,
-        });
+interface Props { queryRef: InventoryList_query$key; location: string | null; inventoryPath: (path: string) => string }
+export function InventoryList({ queryRef, location, inventoryPath }: Props) {
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [error, setError] = useState('');
+  const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment<InventoryListPaginationQuery, InventoryList_query$key>(graphql`
+    fragment InventoryList_query on RootQuery
+    @argumentDefinitions(count: { type: "Int", defaultValue: 25 }, cursor: { type: "String" }, term: { type: "String" }, location: { type: "ID" })
+    @refetchable(queryName: "InventoryListPaginationQuery") {
+      clogStockedItems(first: $count, after: $cursor, where: { term: $term, location: $location })
+      @connection(key: "InventoryList__clogStockedItems", filters: ["where"]) {
+        totalCount edges { node { id name stockCount(location: $location) } }
       }
-      existing.totalCount += 1;
-    } else {
-      map.set(inv.itemId, {
-        itemId: inv.itemId,
-        itemName: item?.name ?? 'Unknown',
-        entries: [
-          {
-            itemId: inv.itemId,
-            inventoryIds: [inv.id],
-            locationId: inv.locationId,
-            locationName: location?.name ?? 'Unknown',
-            count: 1,
-          },
-        ],
-        totalCount: 1,
-      });
     }
-    return map;
-  }, new Map());
-
-  const searchLower = search.toLowerCase();
-  const filteredGroups = Array.from(grouped.values()).filter((group) =>
-    group.itemName.toLowerCase().includes(searchLower) ||
-    group.entries.some((e) => e.locationName.toLowerCase().includes(searchLower))
-  );
-
-  function toggleExpand(itemId: string) {
-    setExpandedItems((prev) => {
-      const next = new Set(prev);
-      if (next.has(itemId)) {
-        next.delete(itemId);
-      } else {
-        next.add(itemId);
-      }
-      return next;
-    });
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <Input
-          placeholder="Search inventory..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm"
-        />
-        <Button asChild>
-          <Link to="/inventory/new">Add Inventory</Link>
-        </Button>
-      </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-8" />
-            <TableHead>Item</TableHead>
-            <TableHead>Locations</TableHead>
-            <TableHead>Total Count</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredGroups.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center text-muted-foreground">
-                No inventory entries found
-              </TableCell>
-            </TableRow>
-          ) : (
-            filteredGroups.map((group) => {
-              const isExpanded = expandedItems.has(group.itemId);
-              return (
-                <InventoryGroupRow
-                  key={group.itemId}
-                  group={group}
-                  isExpanded={isExpanded}
-                  onToggle={() => toggleExpand(group.itemId)}
-                  onIncrement={(entry) => {
-                    addInventory({
-                      itemId: entry.itemId,
-                      locationId: entry.locationId,
-                      dateAdded: new Date(),
-                    });
-                  }}
-                  onDecrement={(entry) => {
-                    if (entry.inventoryIds.length > 0) {
-                      deleteInventory(entry.inventoryIds[entry.inventoryIds.length - 1]);
-                    }
-                  }}
-                  inventoryRecords={inventory.filter((inv) => inv.itemId === group.itemId)}
-                  onDeleteRecord={deleteInventory}
-                />
-              );
-            })
-          )}
-        </TableBody>
-      </Table>
-    </div>
-  );
-}
-
-function InventoryGroupRow({
-  group,
-  isExpanded,
-  onToggle,
-  onIncrement,
-  onDecrement,
-  inventoryRecords,
-  onDeleteRecord,
-}: {
-  group: ItemGroup;
-  isExpanded: boolean;
-  onToggle: () => void;
-  onIncrement: (entry: GroupEntry) => void;
-  onDecrement: (entry: GroupEntry) => void;
-  inventoryRecords: Inventory[];
-  onDeleteRecord: (id: string) => void;
-}) {
-  const [expandedLocations, setExpandedLocations] = useState<Set<string>>(new Set());
-  const ChevronIcon = isExpanded ? ChevronDown : ChevronRight;
-
-  function toggleLocation(locationId: string) {
-    setExpandedLocations((prev) => {
-      const next = new Set(prev);
-      if (next.has(locationId)) {
-        next.delete(locationId);
-      } else {
-        next.add(locationId);
-      }
-      return next;
-    });
-  }
-
-  return (
-    <>
-      <TableRow className="cursor-pointer" onClick={onToggle}>
-        <TableCell className="w-8">
-          <ChevronIcon className="h-4 w-4" />
-        </TableCell>
-        <TableCell>
-          <Link
-            to={`/items/${group.itemId}`}
-            className="text-primary hover:underline"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {group.itemName}
-          </Link>
-        </TableCell>
-        <TableCell>
-          {group.entries.map((entry, i) => (
-            <span key={entry.locationId}>
-              {i > 0 && ', '}
-              <Link
-                to={`/locations/${entry.locationId}`}
-                className="text-primary hover:underline"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {entry.locationName}
-              </Link>
-            </span>
-          ))}
-        </TableCell>
-        <TableCell>{group.totalCount}</TableCell>
-        <TableCell />
-      </TableRow>
-      {isExpanded &&
-        group.entries.map((entry) => {
-          const isLocationExpanded = expandedLocations.has(entry.locationId);
-          return (
-            <LocationEntryRows
-              key={entry.locationId}
-              entry={entry}
-              isLocationExpanded={isLocationExpanded}
-              onToggleLocation={() => toggleLocation(entry.locationId)}
-              onIncrement={onIncrement}
-              onDecrement={onDecrement}
-              inventoryRecords={inventoryRecords.filter((r) => r.locationId === entry.locationId)}
-              onDeleteRecord={onDeleteRecord}
-            />
-          );
-        })}
-    </>
-  );
-}
-
-function LocationEntryRows({
-  entry,
-  isLocationExpanded,
-  onToggleLocation,
-  onIncrement,
-  onDecrement,
-  inventoryRecords,
-  onDeleteRecord,
-}: {
-  entry: GroupEntry;
-  isLocationExpanded: boolean;
-  onToggleLocation: () => void;
-  onIncrement: (entry: GroupEntry) => void;
-  onDecrement: (entry: GroupEntry) => void;
-  inventoryRecords: Inventory[];
-  onDeleteRecord: (id: string) => void;
-}) {
-  const LocationChevron = isLocationExpanded ? ChevronDown : ChevronRight;
-
-  return (
-    <>
-      <TableRow className="bg-muted/50 cursor-pointer" onClick={onToggleLocation}>
-        <TableCell>
-          <LocationChevron className="h-3 w-3 ml-2" />
-        </TableCell>
-        <TableCell />
-        <TableCell className="pl-8">
-          <Link
-            to={`/locations/${entry.locationId}`}
-            className="text-primary hover:underline"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {entry.locationName}
-          </Link>
-        </TableCell>
-        <TableCell>{entry.count}</TableCell>
-        <TableCell>
-          <div className="flex items-center gap-0">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-7 w-7 rounded-r-none"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDecrement(entry);
-              }}
-              disabled={entry.count === 0}
-            >
-              <Minus className="h-3 w-3" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-7 w-7 rounded-l-none border-l-0"
-              onClick={(e) => {
-                e.stopPropagation();
-                onIncrement(entry);
-              }}
-            >
-              <Plus className="h-3 w-3" />
-            </Button>
-          </div>
-        </TableCell>
-      </TableRow>
-      {isLocationExpanded &&
-        inventoryRecords.map((inv) => (
-          <TableRow key={inv.id} className="bg-muted/30">
-            <TableCell />
-            <TableCell />
-            <TableCell className="pl-12 text-sm text-muted-foreground">
-              Added {inv.dateAdded.toLocaleDateString()}
-            </TableCell>
-            <TableCell />
-            <TableCell>
-              <div className="flex items-center gap-0">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-7 w-7 rounded-r-none"
-                  asChild
-                >
-                  <Link to={`/inventory/${inv.id}`} onClick={(e) => e.stopPropagation()}>
-                    <Info className="h-3 w-3" />
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-7 w-7 rounded-l-none border-l-0"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDeleteRecord(inv.id);
-                  }}
-                >
-                  <Minus className="h-3 w-3" />
-                </Button>
-              </div>
-            </TableCell>
-          </TableRow>
-        ))}
-    </>
-  );
+  `, queryRef);
+  const connection = data.clogStockedItems;
+  const items = connection?.edges?.flatMap((edge) => edge?.node ? [edge.node] : []) ?? [];
+  return <Stack gap={3}>
+    <p>{connection?.totalCount ?? 0} stocked items</p>
+    {items.length === 0 ? <p>No inventory found</p> : <Table>
+      <TableHeader><TableRow><TableHeaderCell>Item / Location</TableHeaderCell><TableHeaderCell>Quantity</TableHeaderCell><TableHeaderCell>Details</TableHeaderCell></TableRow></TableHeader>
+      <TableBody>{items.map((item) => <Fragment key={item.id}>
+        <TableRow>
+          <TableCell><Stack gap={2}>
+            <Link href={inventoryPath(`/items/${encodeURIComponent(item.id)}`)}>{item.name}</Link>
+            <Button children={expanded.has(item.id) ? 'Hide locations' : 'Locations'} label={`${expanded.has(item.id) ? 'Hide' : 'Show'} locations for ${item.name}`} variant="ghost" aria-expanded={expanded.has(item.id)} onClick={() => setExpanded((current) => {
+              const next = new Set(current); if (next.has(item.id)) next.delete(item.id); else next.add(item.id); return next;
+            })} />
+          </Stack></TableCell>
+          <TableCell>{item.stockCount}</TableCell>
+          <TableCell><Button children="Details" label={`Details for ${item.name}`} variant="ghost" href={inventoryPath(`/stock/${encodeURIComponent(item.id)}${location ? `/${encodeURIComponent(location)}` : ''}`)} /></TableCell>
+        </TableRow>
+        {expanded.has(item.id) && <TableRow><TableCell colSpan={3}>
+          <StockLocations item={item.id} location={location} inventoryPath={inventoryPath} />
+        </TableCell></TableRow>}
+      </Fragment>)}</TableBody>
+    </Table>}
+    {error && <p role="alert">{error}</p>}
+    {hasNext && <Button label="Load more stocked items" isLoading={isLoadingNext} onClick={() => {
+      setError(''); loadNext(25, { onComplete: (failure) => { if (failure) setError(failure.message); } });
+    }} />}
+  </Stack>;
 }

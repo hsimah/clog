@@ -207,10 +207,10 @@ the representative Relay query. Run `scripts/node.sh npm run relay` for applicat
 artifacts and `scripts/node.sh npm run relay:check` to verify both sets. CI checks
 the schema and artifacts for drift.
 
-The app frame uses Astryx and StyleX. Items and locations use route-owned Relay queries,
-server pagination/search, direct detail queries and typed mutations; other screens
-retain the temporary Apollo bridge. See the [UI migration conventions](client/UI-MIGRATION.md)
-and [Relay data ownership guide](client/RELAY.md) when migrating the remaining screens.
+All screens use Astryx and StyleX with route-owned Relay queries and colocated
+fragments. Inventory groups, location tabs, stock units and selectors paginate on
+the server; dashboard and stock totals are authoritative. See the
+[UI conventions](client/UI-MIGRATION.md) and [Relay data ownership guide](client/RELAY.md).
 
 ---
 

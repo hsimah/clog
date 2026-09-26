@@ -20,7 +20,7 @@ final readonly class InventoryFields
     public static function connectionConfig(array $config): array
     {
         if ('RootQuery' !== ($config['fromType'] ?? '') || !in_array($config['fromFieldName'] ?? '',
-            ['clogItemSearch', 'clogLocationSearch', 'clogInventorySearch'], true)) {
+            ['clogItemSearch', 'clogStockedItems', 'clogLocationSearch', 'clogInventorySearch'], true)) {
             return $config;
         }
         $resolve = $config['resolve'];

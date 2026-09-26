@@ -9,6 +9,7 @@ writes require `edit_posts` and use the generated mutations.
 
 | Field | `where` filters | Ordering |
 | --- | --- | --- |
+| `clogStockedItems` | `term`, `location` | name ascending, then database ID ascending |
 | `clogItemSearch` | `term`, `location` | name ascending, then database ID ascending |
 | `clogLocationSearch` | `term`, `item` | name ascending, then database ID ascending |
 | `clogInventorySearch` | `term`, `item`, `location` | dateAdded descending, then database ID ascending |
@@ -19,6 +20,14 @@ search matches its name. Terms are trimmed and capped at 200 characters; `%`, `_
 and backslash are literal, not SQL wildcards. Matching uses the storage schema's
 case-insensitive collation. Omitted/null filters mean no restriction.
 
+The inventory workspace uses `clogStockedItems`: it excludes items without stock,
+returns each item once, and searches item name/barcode **or** the names of locations
+holding that item. With a location filter, the text match must be satisfied at that
+location. A name match selects the item group; `stockCount(location:)` still counts
+all its units in the selected location (or everywhere when no location is selected).
+Removing an item's last unit removes its group. The catalogue and item selector
+continue to use `clogItemSearch` so unstocked items remain available.
+
 Filtering items by location returns each stocked item once, regardless of how
 many units it has. Filtering locations by item similarly returns each occupied
 location once. The same connections without stock filters are paginated selectors
@@ -26,7 +35,7 @@ that include empty locations and unstocked items.
 
 ```graphql
 query ItemsAtLocation($location: ID, $term: String, $after: String) {
-  clogItemSearch(first: 25, after: $after, where: {location: $location, term: $term}) {
+  clogStockedItems(first: 25, after: $after, where: {location: $location, term: $term}) {
     totalCount
     edges { cursor node { id name barcode stockCount(location: $location) } }
     pageInfo { hasNextPage endCursor }

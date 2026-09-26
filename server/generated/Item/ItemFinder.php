@@ -9,12 +9,13 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Item/ItemFinder.php
- * digest: sha256:6514184315a01b212c6bd684ec8530a7f2ea41fba9e7137047b48074461c2ea6
+ * digest: sha256:6937ae1e2eb6e4e5c66c868d6e22addc81b5279e4b7f413c8116597bbe635fbe
  */
 
 namespace Clog\Entity\Item;
 
 use Clog\Entity\Item\Contract\ItemSearchQuery;
+use Clog\Entity\Item\Contract\ItemStockedQuery;
 use Eleph\Runtime\Identity\EntityId;
 use Eleph\Runtime\Query\EntityQuery;
 
@@ -25,6 +26,7 @@ final class ItemFinder
 {
     public function __construct(
         private readonly ItemSearchQuery $searchQuery,
+        private readonly ItemStockedQuery $stockedQuery,
     ) {
 
     }
@@ -37,5 +39,15 @@ final class ItemFinder
         ?EntityId $location = null,
     ): EntityQuery {
         return $this->searchQuery->find($term, $location);
+    }
+
+    /**
+     * @return EntityQuery<Item>
+     */
+    public function stocked(
+        ?string $term = null,
+        ?EntityId $location = null,
+    ): EntityQuery {
+        return $this->stockedQuery->find($term, $location);
     }
 }

@@ -46,6 +46,7 @@ final class RuntimeFactory
         $container->set(InventoryDisplayNameSideEffect::class, new InventoryDisplayName($runtime));
         $queries = new \Clog\Query\InventoryQueries($database, $runtime, $viewers);
         $container->set(\Clog\Entity\Item\Contract\ItemSearchQuery::class, new \Clog\Contract\ItemSearch($queries));
+        $container->set(\Clog\Entity\Item\Contract\ItemStockedQuery::class, new \Clog\Contract\ItemStocked($queries));
         $container->set(\Clog\Entity\Location\Contract\LocationSearchQuery::class, new \Clog\Contract\LocationSearch($queries));
         $container->set(\Clog\Entity\Inventory\Contract\InventorySearchQuery::class, new \Clog\Contract\InventorySearch($queries));
         (new BootCheck($catalogue, $container))->run();

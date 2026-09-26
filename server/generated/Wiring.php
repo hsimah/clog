@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Wiring.php
- * digest: sha256:ee4ef348b93798b148391216e14380998d8f8707b6e941a53c2df711a8f9f59c
+ * digest: sha256:e1b9a7ea0d3c07232231abc6eb4a0dfb1eebe591185b413d0017550d2e07878c
  */
 
 namespace Clog\Entity;
@@ -24,6 +24,7 @@ use Clog\Entity\Inventory\InventorySideEffects;
 use Clog\Entity\Inventory\InventoryVerifiers;
 use Clog\Entity\Inventory\InventoryWritePolicies;
 use Clog\Entity\Item\Contract\ItemSearchQuery;
+use Clog\Entity\Item\Contract\ItemStockedQuery;
 use Clog\Entity\Item\ItemFinder;
 use Clog\Entity\Item\ItemHydrator;
 use Clog\Entity\Item\ItemInput;
@@ -71,7 +72,7 @@ final class Wiring
             ItemVerifiers::class => static fn (ContainerInterface $c): object => new ItemVerifiers(),
             ItemReadPolicies::class => static fn (ContainerInterface $c): object => new ItemReadPolicies(self::resolve($c, ClogPostSignedInReadPolicy::class)),
             ItemWritePolicies::class => static fn (ContainerInterface $c): object => new ItemWritePolicies(self::resolve($c, ClogPostStaffWritePolicy::class)),
-            ItemFinder::class => static fn (ContainerInterface $c): object => new ItemFinder(self::resolve($c, ItemSearchQuery::class)),
+            ItemFinder::class => static fn (ContainerInterface $c): object => new ItemFinder(self::resolve($c, ItemSearchQuery::class), self::resolve($c, ItemStockedQuery::class)),
             LocationHydrator::class => static fn (ContainerInterface $c): object => new LocationHydrator(self::resolve($c, ValueDecoder::class)),
             LocationInput::class => static fn (ContainerInterface $c): object => new LocationInput(self::resolve($c, ValueDecoder::class)),
             LocationSideEffects::class => static fn (ContainerInterface $c): object => new LocationSideEffects(),
