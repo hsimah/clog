@@ -206,3 +206,10 @@ Use JavaScript `Date` objects throughout the app:
   and a fresh WordPress GraphQL nonce. Reuse this fetch transport for Relay; wire
   the same session-change cache disposal when replacing Apollo. Do not restore JWT
   injection/localStorage or automatically retry failed mutations.
+- Use the generated `clog*Search` connections with `where` filters for paginated
+  screens, and `stockCount` / `clogSummary` for totals. Never count a loaded page
+  as the whole inventory. See `server/docs/graphql-contract.md` for ordering,
+  cursor reset and mutation invalidation rules.
+- `SignedInUsers::allows` is shared by SQL aggregate authorization and the entity
+  read policy. If introducing row-specific policies, update aggregate/query
+  authorization too; the current optimization relies on uniform signed-in reads.

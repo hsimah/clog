@@ -33,7 +33,7 @@ if [ ! -f /var/www/html/wp-content/object-cache.php ]; then
 fi
 
 # Install and activate plugins via WP-CLI
-wp plugin install wp-graphql --activate --allow-root
+wp plugin install wp-graphql --version=2.23.1 --activate --allow-root
 wp plugin install wp-redis --activate --allow-root
 
 # Activate the local clog plugin (mounted via volume, not installed via WP-CLI).

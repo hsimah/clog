@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   graphql-manifest.php
- * digest: sha256:c730f9819ff2029f35afe9482058202b03ccdadc567dfb7d2b41f9375ff7ffa5
+ * digest: sha256:d77ed8a213265f3dd817f5d89445806ca8ecd4abcc390aa626816590a9835b51
  */
 
 namespace Eleph\WPGraphQL\Manifest;
@@ -47,7 +47,7 @@ return new Manifest(
                 'databaseId' => new FieldEntry('databaseId', new GraphQLType('ID', true, false), 'getId', 'The row as storage knows it, unique within its table rather than the schema.', FieldEncoding::Id, null),
                 'createdAt' => new FieldEntry('createdAt', new GraphQLType('String', true, false), 'getCreatedAt', null, FieldEncoding::Datetime, null),
                 'updatedAt' => new FieldEntry('updatedAt', new GraphQLType('String', true, false), 'getUpdatedAt', null, FieldEncoding::Datetime, null),
-                'name' => new FieldEntry('name', new GraphQLType('String', true, false), 'getName', 'What the item is called. Projected to post_title.', FieldEncoding::Value, null),
+                'name' => new FieldEntry('name', new GraphQLType('String', true, false), 'getName', 'What the item is called.', FieldEncoding::Value, null),
                 'barcode' => new FieldEntry('barcode', new GraphQLType('String', false, false), 'getBarcode', 'The barcode that identifies this item. One per item: a serialized list could not be indexed, and scanning a barcode to find an item is the query this data exists to serve.
 ', FieldEncoding::Value, null),
             ],
@@ -65,7 +65,7 @@ return new Manifest(
                 'databaseId' => new FieldEntry('databaseId', new GraphQLType('ID', true, false), 'getId', 'The row as storage knows it, unique within its table rather than the schema.', FieldEncoding::Id, null),
                 'createdAt' => new FieldEntry('createdAt', new GraphQLType('String', true, false), 'getCreatedAt', null, FieldEncoding::Datetime, null),
                 'updatedAt' => new FieldEntry('updatedAt', new GraphQLType('String', true, false), 'getUpdatedAt', null, FieldEncoding::Datetime, null),
-                'name' => new FieldEntry('name', new GraphQLType('String', true, false), 'getName', 'What the location is called. Projected to post_title.', FieldEncoding::Value, null),
+                'name' => new FieldEntry('name', new GraphQLType('String', true, false), 'getName', 'What the location is called.', FieldEncoding::Value, null),
             ],
             [
                 'inventoryEntries' => new ConnectionEntry('inventoryEntries', 'ClogLocation', 'ClogInventory', 'inventoryEntries', 'location', 'The Inventory pointing here through "location".'),
@@ -156,6 +156,32 @@ return new Manifest(
         'ClogLocation' => new RootFieldEntry('ClogLocation', 'ClogLocations', 'Location'),
     ],
     queries: [
-
+        'clogInventorySearch' => new QueryFieldEntry(
+            'clogInventorySearch',
+            'ClogInventory',
+            true,
+            'Inventory',
+            'search',
+            ['term' => new GraphQLType('String', false, false), 'location' => new GraphQLType('ID', false, false), 'item' => new GraphQLType('ID', false, false)],
+            'Stable paginated search with authoritative counts for the app.',
+        ),
+        'clogItemSearch' => new QueryFieldEntry(
+            'clogItemSearch',
+            'ClogItem',
+            true,
+            'Item',
+            'search',
+            ['term' => new GraphQLType('String', false, false), 'location' => new GraphQLType('ID', false, false)],
+            'Stable paginated search with authoritative counts for the app.',
+        ),
+        'clogLocationSearch' => new QueryFieldEntry(
+            'clogLocationSearch',
+            'ClogLocation',
+            true,
+            'Location',
+            'search',
+            ['term' => new GraphQLType('String', false, false), 'item' => new GraphQLType('ID', false, false)],
+            'Stable paginated search with authoritative counts for the app.',
+        ),
     ],
 );

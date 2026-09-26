@@ -18,7 +18,21 @@ storage:
 fields:
   name:
     type: string
-    description: What the location is called. Projected to post_title.
+    description: What the location is called.
     required: true
     unique: true
     maxLength: 200
+
+queries:
+  search:
+    description: Stable paginated search with authoritative counts for the app.
+    args:
+      term: { type: string, nullable: true }
+      item: { type: id, nullable: true }
+    returns:
+      type: Location
+      cardinality: many
+    integrations:
+      wpgraphql:
+        field: clogLocationSearch
+    handler: true

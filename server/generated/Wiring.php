@@ -9,24 +9,30 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Wiring.php
- * digest: sha256:c3f009838d707e786d62a63d6f57e162af52e1983903b96b94cd40d15eebc153
+ * digest: sha256:ee4ef348b93798b148391216e14380998d8f8707b6e941a53c2df711a8f9f59c
  */
 
 namespace Clog\Entity;
 
 use Clog\Entity\Inventory\Contract\InventoryDisplayNameSideEffect;
+use Clog\Entity\Inventory\Contract\InventorySearchQuery;
+use Clog\Entity\Inventory\InventoryFinder;
 use Clog\Entity\Inventory\InventoryHydrator;
 use Clog\Entity\Inventory\InventoryInput;
 use Clog\Entity\Inventory\InventoryReadPolicies;
 use Clog\Entity\Inventory\InventorySideEffects;
 use Clog\Entity\Inventory\InventoryVerifiers;
 use Clog\Entity\Inventory\InventoryWritePolicies;
+use Clog\Entity\Item\Contract\ItemSearchQuery;
+use Clog\Entity\Item\ItemFinder;
 use Clog\Entity\Item\ItemHydrator;
 use Clog\Entity\Item\ItemInput;
 use Clog\Entity\Item\ItemReadPolicies;
 use Clog\Entity\Item\ItemSideEffects;
 use Clog\Entity\Item\ItemVerifiers;
 use Clog\Entity\Item\ItemWritePolicies;
+use Clog\Entity\Location\Contract\LocationSearchQuery;
+use Clog\Entity\Location\LocationFinder;
 use Clog\Entity\Location\LocationHydrator;
 use Clog\Entity\Location\LocationInput;
 use Clog\Entity\Location\LocationReadPolicies;
@@ -58,18 +64,21 @@ final class Wiring
             InventoryVerifiers::class => static fn (ContainerInterface $c): object => new InventoryVerifiers(),
             InventoryReadPolicies::class => static fn (ContainerInterface $c): object => new InventoryReadPolicies(self::resolve($c, ClogPostSignedInReadPolicy::class)),
             InventoryWritePolicies::class => static fn (ContainerInterface $c): object => new InventoryWritePolicies(self::resolve($c, ClogPostStaffWritePolicy::class)),
+            InventoryFinder::class => static fn (ContainerInterface $c): object => new InventoryFinder(self::resolve($c, InventorySearchQuery::class)),
             ItemHydrator::class => static fn (ContainerInterface $c): object => new ItemHydrator(self::resolve($c, ValueDecoder::class)),
             ItemInput::class => static fn (ContainerInterface $c): object => new ItemInput(self::resolve($c, ValueDecoder::class)),
             ItemSideEffects::class => static fn (ContainerInterface $c): object => new ItemSideEffects(),
             ItemVerifiers::class => static fn (ContainerInterface $c): object => new ItemVerifiers(),
             ItemReadPolicies::class => static fn (ContainerInterface $c): object => new ItemReadPolicies(self::resolve($c, ClogPostSignedInReadPolicy::class)),
             ItemWritePolicies::class => static fn (ContainerInterface $c): object => new ItemWritePolicies(self::resolve($c, ClogPostStaffWritePolicy::class)),
+            ItemFinder::class => static fn (ContainerInterface $c): object => new ItemFinder(self::resolve($c, ItemSearchQuery::class)),
             LocationHydrator::class => static fn (ContainerInterface $c): object => new LocationHydrator(self::resolve($c, ValueDecoder::class)),
             LocationInput::class => static fn (ContainerInterface $c): object => new LocationInput(self::resolve($c, ValueDecoder::class)),
             LocationSideEffects::class => static fn (ContainerInterface $c): object => new LocationSideEffects(),
             LocationVerifiers::class => static fn (ContainerInterface $c): object => new LocationVerifiers(),
             LocationReadPolicies::class => static fn (ContainerInterface $c): object => new LocationReadPolicies(self::resolve($c, ClogPostSignedInReadPolicy::class)),
             LocationWritePolicies::class => static fn (ContainerInterface $c): object => new LocationWritePolicies(self::resolve($c, ClogPostStaffWritePolicy::class)),
+            LocationFinder::class => static fn (ContainerInterface $c): object => new LocationFinder(self::resolve($c, LocationSearchQuery::class)),
         ];
     }
 

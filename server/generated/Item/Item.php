@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Item/Item.php
- * digest: sha256:5edbb490678aa006156f0551384ee68859b7c6cd54db4a17c96d3b1fcc012382
+ * digest: sha256:f41dd0af0e4091313dae30030856191630db0e51f4bdab174d328d1c59aff454
  */
 
 namespace Clog\Entity\Item;
@@ -50,7 +50,7 @@ final class Item implements ClogPost
     }
 
     /**
-     * What the item is called. Projected to post_title.
+     * What the item is called.
      */
     public function getName(): string {
         return $this->name;

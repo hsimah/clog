@@ -13,9 +13,14 @@ final readonly class SignedInUsers implements ClogPostSignedInReadPolicy
 {
     public function decide(ClogPost $entity, Viewer $viewer): PolicyDecision
     {
-        return $viewer->isAuthenticated()
+        return self::allows($viewer)
             ? PolicyDecision::allow()
             : PolicyDecision::deny('Sign in to read the inventory.');
     }
-}
 
+    /** Clog's read policy is uniform across rows; aggregates use the same gate. */
+    public static function allows(Viewer $viewer): bool
+    {
+        return $viewer->isAuthenticated();
+    }
+}

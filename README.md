@@ -199,6 +199,12 @@ managed timestamps, relationships, failed updates, deletion rules, policies and
 GraphQL Node/mutation identity, migration preservation and rollback. Its containers
 are removed on exit.
 
+The [GraphQL contract](server/docs/graphql-contract.md) documents paginated search,
+location/item filters, stock counts, direct detail lookup, and mutation invalidation.
+Use `scripts/test-backend.sh --schema` to refresh `client/schema.graphql` from
+disposable WordPress, then `scripts/node.sh npm run relay:contract` to regenerate
+the representative Relay query. CI checks both artifacts for drift.
+
 ---
 
 ## Running tests

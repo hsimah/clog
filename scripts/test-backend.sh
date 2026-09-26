@@ -23,5 +23,8 @@ if [ "${1:-}" = --e2e ]; then
     COMPOSE+=(-f "$ROOT/server/tests/docker-compose.e2e.yml")
     EXIT_SERVICE=browser
 fi
+if [ "${1:-}" = --schema ]; then
+    COMPOSE+=(-f "$ROOT/server/tests/docker-compose.schema.yml")
+fi
 trap '"${COMPOSE[@]}" down --volumes' EXIT
 "${COMPOSE[@]}" up --force-recreate --abort-on-container-exit --exit-code-from "$EXIT_SERVICE"

@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Location/Location.php
- * digest: sha256:ffd36810384423142bf3c51e6f6d078d084239875d0286e0a06432311b654f90
+ * digest: sha256:157c4cb4fda11dbd6edd2ec758e2410e9bf04a6ff96e6a406630085aea638d33
  */
 
 namespace Clog\Entity\Location;
@@ -49,7 +49,7 @@ final class Location implements ClogPost
     }
 
     /**
-     * What the location is called. Projected to post_title.
+     * What the location is called.
      */
     public function getName(): string {
         return $this->name;

@@ -9,12 +9,13 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Catalogue.php
- * digest: sha256:e27ded7df7367f02ddccef622476e4ffe4b4579778fed5150c7fe1a140e54430
+ * digest: sha256:64d348384af654eab9db52b4923f2793a3e13dcc8fa3f8a3a8f84b296cf538d1
  */
 
 namespace Clog\Entity;
 
 use Clog\Entity\Inventory\InventoryDeleter;
+use Clog\Entity\Inventory\InventoryFinder;
 use Clog\Entity\Inventory\InventoryHydrator;
 use Clog\Entity\Inventory\InventoryInput;
 use Clog\Entity\Inventory\InventoryMutator;
@@ -23,6 +24,7 @@ use Clog\Entity\Inventory\InventorySideEffects;
 use Clog\Entity\Inventory\InventoryVerifiers;
 use Clog\Entity\Inventory\InventoryWritePolicies;
 use Clog\Entity\Item\ItemDeleter;
+use Clog\Entity\Item\ItemFinder;
 use Clog\Entity\Item\ItemHydrator;
 use Clog\Entity\Item\ItemInput;
 use Clog\Entity\Item\ItemMutator;
@@ -31,6 +33,7 @@ use Clog\Entity\Item\ItemSideEffects;
 use Clog\Entity\Item\ItemVerifiers;
 use Clog\Entity\Item\ItemWritePolicies;
 use Clog\Entity\Location\LocationDeleter;
+use Clog\Entity\Location\LocationFinder;
 use Clog\Entity\Location\LocationHydrator;
 use Clog\Entity\Location\LocationInput;
 use Clog\Entity\Location\LocationMutator;
@@ -292,7 +295,9 @@ final readonly class Catalogue implements EntityCatalogue
         string $entity,
     ): object {
         $finder = match ($entity) {
-        
+            'Inventory' => $this->container->get(InventoryFinder::class),
+            'Item' => $this->container->get(ItemFinder::class),
+            'Location' => $this->container->get(LocationFinder::class),
             default => throw new RuntimeException(sprintf('%s declares no queries.', $entity)),
         };
         
@@ -321,7 +326,9 @@ final readonly class Catalogue implements EntityCatalogue
         string $query,
     ): array {
         return match ($entity . '.' . $query) {
-        
+            'Inventory.search' => ['term', 'location', 'item'],
+            'Item.search' => ['term', 'location'],
+            'Location.search' => ['term', 'item'],
             default => [],
         };
     }
@@ -427,6 +434,6 @@ final readonly class Catalogue implements EntityCatalogue
      * @return list<string>
      */
     public function contracts(): array {
-        return ['Clog\\Entity\\Inventory\\Contract\\InventoryDisplayNameSideEffect', 'Clog\\Entity\\Pattern\\ClogPost\\Contract\\ClogPostSignedInReadPolicy', 'Clog\\Entity\\Pattern\\ClogPost\\Contract\\ClogPostStaffWritePolicy'];
+        return ['Clog\\Entity\\Inventory\\Contract\\InventoryDisplayNameSideEffect', 'Clog\\Entity\\Inventory\\Contract\\InventorySearchQuery', 'Clog\\Entity\\Item\\Contract\\ItemSearchQuery', 'Clog\\Entity\\Location\\Contract\\LocationSearchQuery', 'Clog\\Entity\\Pattern\\ClogPost\\Contract\\ClogPostSignedInReadPolicy', 'Clog\\Entity\\Pattern\\ClogPost\\Contract\\ClogPostStaffWritePolicy'];
     }
 }
