@@ -122,12 +122,15 @@ writes. Stop and export the current state, then reconcile the new writes or
 restore a coordinated database/plugin backup with an explicitly accepted recovery
 point. A plugin-only downgrade is not a database rollback.
 
-## Verification and remaining deployment gate
+## Verification and deployment state
 
 `scripts/test-backend.sh` tests fresh installation, a frozen old-schema fixture,
 leading-zero barcode and timestamp preservation, broken edges, mixed post data,
 interrupted copies, repeated runs, retained post mappings, and table restoration
 in isolated MySQL/WordPress containers. It does not access the garage inventory.
-Before closing #33, inspect the real deployment export and rehearse its WordPress
-ZIP update and full backup restore. Add a legacy importer only if that inspection
-shows it is needed. MariaDB migrations are currently unsupported.
+The owner confirmed on 2026-09-26 that Clog is not in use and has no real data.
+The first rollout therefore uses the verified fresh-install path; there is no
+deployment export to rehearse for #33. For any future existing-data installation,
+inspect its actual export and rehearse the ZIP update and full backup restore. Add
+a legacy importer only if that inspection shows it is needed. MariaDB migrations
+are currently unsupported.

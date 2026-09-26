@@ -188,8 +188,9 @@ The explicit v1-to-v2 migration has read-only `wp clog migration status` and
 `wp clog migration plan` commands, followed by a guarded `run` command. It verifies
 copies before an atomic table exchange and retains the originals and post links.
 Follow the [upgrade and rollback procedure](server/docs/storage-upgrade.md).
-Do not deploy over the garage inventory until its actual database export and
-WordPress update have been rehearsed, as tracked in [#33](https://github.com/hsimah/clog/issues/33).
+For an existing installation, rehearse its actual database export and WordPress
+update before replacing live inventory. The owner confirmed Clog has no real data
+and is not in use, so the first rollout follows the fresh-install path (#33).
 `wp clog install` handles fresh installations; it refuses existing or unsupported
 storage upgrades. Normal plugin loading also detects pending upgrades without
 requiring reactivation. Post/postmeta-only deployments require a separate import.
@@ -262,8 +263,9 @@ and the source plugin version unchanged. Build output is ignored by Git.
 The release check installs that exact ZIP into a fresh disposable WordPress,
 runs runtime/GraphQL and legacy migration/restore fixtures without generator
 packages, then replaces the plugin from the ZIP and compares every stored row.
-This synthetic rehearsal does **not** replace the actual garage export and full
-backup restore rehearsal required by [#33](https://github.com/hsimah/clog/issues/33).
+The owner confirmed there is no existing data, so the first rollout uses the
+verified fresh-install path. For future existing-data upgrades, rehearse the actual
+export and full backup restore; synthetic fixtures cannot replace that check.
 See [release verification](server/docs/release-verification.md) for the evidence
 and deployment gates.
 
