@@ -77,8 +77,8 @@ final readonly class StorageUpgrade
         $version = (string) $this->db->scalar('SELECT VERSION()');
         $maria = str_contains($version, 'MariaDB');
         preg_match('/(\d+\.\d+\.\d+)/', $version, $match);
-        if (!isset($match[1]) || version_compare($match[1], $maria ? '10.6.1' : '8.0.0', '<')) {
-            throw new RuntimeException('Atomic table exchange requires MySQL 8+ or MariaDB 10.6.1+.');
+        if (!isset($match[1]) || version_compare($match[1], $maria ? '10.6.1' : '8.0.13', '<')) {
+            throw new RuntimeException('Atomic locked table exchange requires MySQL 8.0.13+ or MariaDB 10.6.1+.');
         }
         $this->validateRelationships();
         $this->validateProjections();

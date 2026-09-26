@@ -50,7 +50,9 @@ and add an explicit repair/import if needed.
 
 ## Cut over
 
-MySQL 8+ or MariaDB 10.6.1+ is required for atomic InnoDB table renames. The database
+[MySQL 8.0.13+](https://dev.mysql.com/doc/refman/8.0/en/rename-table.html) or
+[MariaDB 10.6.1+](https://mariadb.com/docs/server/reference/sql-statements/data-definition/rename-table)
+is required for the locked, atomic InnoDB table exchange. The database
 user needs CREATE, INSERT, SELECT, ALTER, DROP (for RENAME privilege checking),
 LOCK TABLES and access to its schema metadata. Reserve space for a second copy
 of all three entity tables. The command never issues DROP.
