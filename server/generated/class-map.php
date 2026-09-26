@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   class-map.php
- * digest: sha256:5a2d5e32050c2bef33bcc667cdd3dfc1bec2de6021b86d5a6b6ab3797c0997cc
+ * digest: sha256:e503fc50be4da42eb5bd778dc05e9bee7cf32ad9fc1c063693a9ae04521dba4f
  */
 
 return [
@@ -21,8 +21,10 @@ return [
     'classes' => [
         'Clog\\Entity\\Catalogue' => 'Catalogue.php',
         'Clog\\Entity\\Inventory\\Contract\\InventoryDisplayNameSideEffect' => 'Inventory/Contract/InventoryDisplayNameSideEffect.php',
+        'Clog\\Entity\\Inventory\\Contract\\InventorySearchQuery' => 'Inventory/Contract/InventorySearchQuery.php',
         'Clog\\Entity\\Inventory\\Inventory' => 'Inventory/Inventory.php',
         'Clog\\Entity\\Inventory\\InventoryDeleter' => 'Inventory/InventoryDeleter.php',
+        'Clog\\Entity\\Inventory\\InventoryFinder' => 'Inventory/InventoryFinder.php',
         'Clog\\Entity\\Inventory\\InventoryHydrator' => 'Inventory/InventoryHydrator.php',
         'Clog\\Entity\\Inventory\\InventoryInput' => 'Inventory/InventoryInput.php',
         'Clog\\Entity\\Inventory\\InventoryMutationContext' => 'Inventory/InventoryMutationContext.php',
@@ -33,8 +35,10 @@ return [
         'Clog\\Entity\\Inventory\\InventoryVerifiers' => 'Inventory/InventoryVerifiers.php',
         'Clog\\Entity\\Inventory\\InventoryWriteContext' => 'Inventory/InventoryWriteContext.php',
         'Clog\\Entity\\Inventory\\InventoryWritePolicies' => 'Inventory/InventoryWritePolicies.php',
+        'Clog\\Entity\\Item\\Contract\\ItemSearchQuery' => 'Item/Contract/ItemSearchQuery.php',
         'Clog\\Entity\\Item\\Item' => 'Item/Item.php',
         'Clog\\Entity\\Item\\ItemDeleter' => 'Item/ItemDeleter.php',
+        'Clog\\Entity\\Item\\ItemFinder' => 'Item/ItemFinder.php',
         'Clog\\Entity\\Item\\ItemHydrator' => 'Item/ItemHydrator.php',
         'Clog\\Entity\\Item\\ItemInput' => 'Item/ItemInput.php',
         'Clog\\Entity\\Item\\ItemMutationContext' => 'Item/ItemMutationContext.php',
@@ -45,8 +49,10 @@ return [
         'Clog\\Entity\\Item\\ItemVerifiers' => 'Item/ItemVerifiers.php',
         'Clog\\Entity\\Item\\ItemWriteContext' => 'Item/ItemWriteContext.php',
         'Clog\\Entity\\Item\\ItemWritePolicies' => 'Item/ItemWritePolicies.php',
+        'Clog\\Entity\\Location\\Contract\\LocationSearchQuery' => 'Location/Contract/LocationSearchQuery.php',
         'Clog\\Entity\\Location\\Location' => 'Location/Location.php',
         'Clog\\Entity\\Location\\LocationDeleter' => 'Location/LocationDeleter.php',
+        'Clog\\Entity\\Location\\LocationFinder' => 'Location/LocationFinder.php',
         'Clog\\Entity\\Location\\LocationHydrator' => 'Location/LocationHydrator.php',
         'Clog\\Entity\\Location\\LocationInput' => 'Location/LocationInput.php',
         'Clog\\Entity\\Location\\LocationMutationContext' => 'Location/LocationMutationContext.php',

@@ -1,0 +1,7 @@
+{
+  "src": "./relay-contract",
+  "schema": "./schema.graphql",
+  "language": "typescript",
+  "eagerEsModules": true,
+  "excludes": ["**/__generated__/**"]
+}

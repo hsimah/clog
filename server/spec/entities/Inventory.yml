@@ -43,6 +43,21 @@ edges:
       unique: false
     onDelete: restrict
     required: true
+queries:
+  search:
+    description: Stable paginated search with authoritative counts for the app.
+    args:
+      term: { type: string, nullable: true }
+      location: { type: id, nullable: true }
+      item: { type: id, nullable: true }
+    returns:
+      type: Inventory
+      cardinality: many
+    integrations:
+      wpgraphql:
+        field: clogInventorySearch
+    handler: true
+
 sideEffects:
   displayName:
     description: Derive the inventory label from its authoritative item and location.

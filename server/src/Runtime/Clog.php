@@ -93,6 +93,7 @@ final class Clog
             $this->gateway = RuntimeFactory::create(
                 $this->adaptor(),
                 new WordPressViewerProvider(),
+                $this->database,
                 $this->logger,
             );
         }
@@ -106,6 +107,11 @@ final class Clog
     public function tables(): Tables
     {
         return new Tables($this->database, $this->manifest());
+    }
+
+    public function queries(): \Clog\Query\InventoryQueries
+    {
+        return new \Clog\Query\InventoryQueries($this->database, $this->gateway(), new WordPressViewerProvider());
     }
 
     public function migration(): \Clog\Migration\StorageUpgrade

@@ -18,7 +18,7 @@ storage:
 fields:
   name:
     type: string
-    description: What the item is called. Projected to post_title.
+    description: What the item is called.
     required: true
     indexed: true
     maxLength: 200
@@ -31,3 +31,17 @@ fields:
     nullable: true
     unique: true
     maxLength: 64
+
+queries:
+  search:
+    description: Stable paginated search with authoritative counts for the app.
+    args:
+      term: { type: string, nullable: true }
+      location: { type: id, nullable: true }
+    returns:
+      type: Item
+      cardinality: many
+    integrations:
+      wpgraphql:
+        field: clogItemSearch
+    handler: true

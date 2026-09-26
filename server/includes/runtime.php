@@ -19,6 +19,14 @@ use Eleph\Runtime\Type\NullProcessorRegistry;
  * hand-written registrations that read post meta.
  */
 add_action( 'plugins_loaded', 'clog_boot_graphql' );
+add_filter( 'graphql_wp_connection_type_config', [\Clog\GraphQL\InventoryFields::class, 'connectionConfig'] );
+add_action( 'graphql_register_types', static function (): void {
+	try {
+		(new \Clog\GraphQL\InventoryFields(Clog::instance()->queries()))->register();
+	} catch ( RuntimeException $failure ) {
+		// The normal boot notice describes a pending schema upgrade.
+	}
+}, 20 );
 
 function clog_boot_graphql(): void {
 	$clog = Clog::instance();
