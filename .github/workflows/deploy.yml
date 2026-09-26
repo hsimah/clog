@@ -6,6 +6,11 @@ on:
     types: [published]
 
 jobs:
+  release-zip:
+    uses: ./.github/workflows/release-checks.yml
+    with:
+      version: ${{ github.event_name == 'release' && github.event.release.tag_name || '' }}
+
   backend:
     uses: ./.github/workflows/backend.yml
 
@@ -25,6 +30,8 @@ jobs:
 
       - run: npm ci
 
+      - run: npx tsc -p tsconfig.e2e.json
+
       - run: npm run lint
 
       - run: npm run relay:check
@@ -32,12 +39,6 @@ jobs:
       - run: npm run build
         env:
           VITE_GRAPHQL_URL: /graphql
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: client/dist/
-          include-hidden-files: true
 
   e2e-tests:
     runs-on: ubuntu-latest
@@ -120,49 +121,19 @@ jobs:
 
   package:
     runs-on: ubuntu-latest
-    needs: [build, e2e-tests, backend]
+    needs: [build, e2e-tests, backend, release-zip]
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-
       - uses: actions/download-artifact@v4
         with:
-          name: dist
-          path: server/dist/
-
-      - name: Install PHP dependencies
-        run: >
-          docker run --rm -v "$PWD/server:/app" -u "$(id -u):$(id -g)"
-          -e COMPOSER_HOME=/tmp/composer composer:2
-          install --no-dev --no-interaction --prefer-dist --optimize-autoloader
-
-      # WordPress's Plugins page reads this header as the "installed version"
-      # and compares it against the release tag to decide whether an update
-      # is available — it has to match the tag exactly.
-      - name: Stamp plugin version from release tag
-        if: github.event_name == 'release'
-        run: |
-          sed -i "s/^ \* Version: .*/ * Version: ${{ github.event.release.tag_name }}/" server/clog.php
-
-      - name: Build plugin zip
-        run: |
-          mkdir -p build/clog
-          cp -a server/. build/clog/
-          (cd build && zip -rq ../clog.zip clog)
-
-      # Attaching to the release is what lets the self-hosted update checker
-      # (server/includes/updates.php) find it — WordPress downloads this
-      # asset when someone clicks "Update Now" on the Plugins page.
-      - name: Attach zip to release
+          name: clog-plugin
+          path: build/
+      # Publish the exact ZIP that passed the production install/upgrade checks.
+      - name: Attach verified ZIP to release
         if: github.event_name == 'release'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ github.event.release.tag_name }}" clog.zip --clobber
-
-      - name: Upload zip as workflow artifact
-        if: github.event_name != 'release'
-        uses: actions/upload-artifact@v4
-        with:
-          name: clog-plugin
-          path: clog.zip
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" build/clog.zip --clobber

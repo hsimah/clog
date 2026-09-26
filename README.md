@@ -47,10 +47,11 @@ Node all run inside containers, so nothing needs to be installed on the host.
 1. **Start everything**
 
    ```bash
+   scripts/php.sh composer install --no-interaction --prefer-dist
    scripts/dev.sh up
    ```
 
-   That is the whole setup. The script picks a container runtime, starts the podman
+   Install the locked PHP dependencies before activation. The dev script picks a container runtime, starts the podman
    socket if that is what you have, creates `.env` from `.env.example` if it is
    missing, and brings the stack up. On first run WordPress installs itself,
    activates the `clog` plugin from the bind-mounted `server/` directory, and
@@ -216,39 +217,55 @@ the server; dashboard and stock totals are authoritative. See the
 
 ## Running tests
 
-Without host Node, use `scripts/node.sh npm run lint` and
-`scripts/node.sh npm run build`. Backend commands are listed above.
-
-End‑to‑end tests live under `client/e2e` and use Playwright.
-
-Before running tests ensure the `.env` file includes:
-
-```dotenv
-WP_ADMIN_USER=admin
-WP_ADMIN_PASSWORD=secret
-VITE_GRAPHQL_URL=http://localhost:8080/graphql
-```
-
-Execute from the client directory:
+The supported checks require containers, not host PHP or Node:
 
 ```bash
-npm run test:e2e          # headless
-npm run test:e2e:headed   # with browser
-npm run test:e2e:ui       # open Playwright UI
+scripts/php.sh composer install --no-interaction --prefer-dist
+scripts/php.sh composer build-generators
+scripts/php.sh composer check-generated
+scripts/php.sh composer test
+scripts/node.sh npm ci
+scripts/node.sh npm run relay:check
+scripts/node.sh npm run lint
+scripts/node.sh npm run build
+scripts/node.sh npx tsc -p tsconfig.e2e.json
+scripts/test-backend.sh --schema
+scripts/test-backend.sh --e2e
 ```
 
-CI uses a dedicated compose file (`.github/workflows/e2e-tests/docker-compose.yml`) and `.env.ci`.
+The last two commands use disposable WordPress/MySQL containers with no host
+ports or persistent data. They supply test credentials, seed data and clean up
+afterwards. Run them sequentially: all isolated checks use the `clog-backend-test`
+Compose project. Browser tests cover Vite and WordPress-served compiled deep links.
+Do not point this suite at production; it creates test records and the backend
+migration fixture replaces its explicitly guarded test tables.
 
----
+For interactive Playwright against your own development stack, set
+`WP_ADMIN_USER`, `WP_ADMIN_PASSWORD` and `VITE_GRAPHQL_URL` in `client/.env`, then
+run `npm run test:e2e:ui` from `client` with host Node and Playwright installed.
 
-## Building for production
+## Building and checking the production ZIP
 
 ```bash
-cd client
-npm run build            # outputs static files to client/dist
-``` 
+scripts/node.sh npm ci
+scripts/node.sh npm run build
+scripts/package-plugin.sh           # optional argument: release version, e.g. 0.1.0
+scripts/test-backend.sh --release
+```
 
-The build artifacts are mounted into the WordPress plugin via the `docker-compose.yml` volume, so the plugin can be packaged or deployed as-is.
+The ZIP is `build/clog.zip`. Packaging copies runtime source, generated manifests,
+migration support and compiled assets into an isolated staging directory, installs
+locked Composer dependencies with `--no-dev`, checks all manifest assets and the
+separate StyleX stylesheet, and creates the archive. It leaves `server/vendor`
+and the source plugin version unchanged. Build output is ignored by Git.
+
+The release check installs that exact ZIP into a fresh disposable WordPress,
+runs runtime/GraphQL and legacy migration/restore fixtures without generator
+packages, then replaces the plugin from the ZIP and compares every stored row.
+This synthetic rehearsal does **not** replace the actual garage export and full
+backup restore rehearsal required by [#33](https://github.com/hsimah/clog/issues/33).
+See [release verification](server/docs/release-verification.md) for the evidence
+and deployment gates.
 
 ---
 
@@ -276,7 +293,7 @@ plugin directory. If the plugin fails to activate, check the labels with
 
 ## Deployment
 
-Publishing a GitHub release runs backend checks, client build/lint and Playwright on GitHub-hosted runners, then attaches `clog.zip`. The plugin update checker offers that release in WordPress; deploying to pupyrus is a manual **Update Now** action. No workflow automatically updates the production container. See `.github/workflows/deploy.yml`.
+Publishing a GitHub release runs backend/schema/generation checks, client/Relay checks, Playwright and production-ZIP install/upgrade checks on GitHub-hosted runners, then attaches the exact verified `clog.zip`. A manual workflow run provides the ZIP as a downloadable artifact. The plugin update checker offers that release in WordPress; deploying to pupyrus is a manual **Update Now** action. No workflow automatically updates the production container. See `.github/workflows/deploy.yml`.
 
 ---
 

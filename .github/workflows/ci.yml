@@ -5,6 +5,9 @@ on:
     branches: [main]
 
 jobs:
+  release-zip:
+    uses: ./.github/workflows/release-checks.yml
+
   backend:
     uses: ./.github/workflows/backend.yml
 
@@ -23,6 +26,8 @@ jobs:
           cache-dependency-path: client/package-lock.json
 
       - run: npm ci
+
+      - run: npx tsc -p tsconfig.e2e.json
 
       - run: npm run lint
 

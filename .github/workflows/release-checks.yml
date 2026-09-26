@@ -1,0 +1,34 @@
+name: Production plugin ZIP
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        required: false
+        default: ''
+
+jobs:
+  release-zip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: Build compiled client
+        working-directory: client
+        run: npm ci && npm run relay:check && npm run build
+      - name: Build production plugin ZIP
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: scripts/package-plugin.sh "$RELEASE_VERSION"
+      - name: Test exact ZIP in disposable WordPress
+        run: scripts/test-backend.sh --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clog-plugin
+          path: build/clog.zip
+          retention-days: 30

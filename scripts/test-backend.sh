@@ -17,7 +17,11 @@ elif command -v podman >/dev/null 2>&1; then
         COMPOSE=(podman compose)
     fi
 fi
-COMPOSE+=(-p clog-backend-test -f "$ROOT/server/tests/docker-compose.yml")
+COMPOSE_FILE="$ROOT/server/tests/docker-compose.yml"
+if [ "${1:-}" = --release ]; then
+    COMPOSE_FILE="$ROOT/server/tests/docker-compose.release.yml"
+fi
+COMPOSE+=(-p clog-backend-test -f "$COMPOSE_FILE")
 EXIT_SERVICE=wordpress
 if [ "${1:-}" = --e2e ]; then
     COMPOSE+=(-f "$ROOT/server/tests/docker-compose.e2e.yml")
