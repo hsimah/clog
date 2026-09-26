@@ -1,8 +1,8 @@
 # Relay in Clog
 
 The runtime/compiler are Relay 21.0.1. Astryx/StyleX are independent of data
-ownership. Locations are the first migrated flow; items, stock and the dashboard
-remain on the bounded Apollo/DataContext bridge until #38/#39.
+ownership. Items and locations use Relay. Stock and the dashboard remain on the bounded
+Apollo/DataContext bridge until #39.
 
 - `scripts/node.sh npm run relay` regenerates application artifacts from
   `client/schema.graphql`. Commit them with their source operations.
@@ -50,3 +50,20 @@ The frame stays mounted across this boundary. Remove both the boundary and Apoll
 with the final migrated consumers in #39; do not create a two-cache synchronization
 layer. The Relay browser tests cover read retry, pagination, raw off-page details,
 CRUD, route return, uncertain writes, draft recovery and actual store disposal.
+
+## Initial item stock and scanning
+
+New items are created once, then their optional initial stock is added sequentially.
+The form records the returned item ID before adding any units, reports confirmed
+additions, and disables item creation once that ID is known. A failed stock response
+stops the batch; its result may be uncertain, so the form links to the saved item
+for review instead of replaying it or recreating the item. Leaving the route stops
+further additions after the current request; pending work warns before tab closure.
+Location selection uses server search and a paginated connection, including choices
+outside the first page.
+
+The Astryx scanner offers manual input even if camera permission or detection fails.
+Its hook invalidates old capture sessions, closes tracks on detection/close/unmount,
+and stops streams whose permission request resolves after closure. Session expiry
+closes the native dialog and stops the camera. Barcode values remain strings; the
+form trims surrounding space, preserves leading zeroes, and writes null when empty.

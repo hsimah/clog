@@ -32,7 +32,7 @@ export function LocationDetails({ locationRef }: { locationRef: LocationDetails_
     {error && <p role="alert">{error}</p>}
     <Stack direction="horizontal" gap={2} wrap="wrap">
       <Button label="Edit" href={`/locations/${encodeURIComponent(location.id)}/edit`} isDisabled={!canWrite || pending} />
-      <Button label="Delete" isLoading={pending} isDisabled={!canWrite || location.stockCount > 0} onClick={() => {
+      <Button label="Delete" variant="destructive" isLoading={pending} isDisabled={!canWrite || location.stockCount > 0} onClick={() => {
         if (!window.confirm(`Delete ${location.name}?`)) return;
         setError('');
         save({ input: { id: location.id } }, (response) => {

@@ -1,117 +1,81 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import 'barcode-detector/polyfill';
 
-interface UseBarcodeSccannerOptions {
-  onDetected: (rawValue: string) => void;
-  formats?: string[];
-}
-
-export function useBarcodeScanner({ onDetected, formats }: UseBarcodeSccannerOptions) {
+interface UseBarcodeScannerOptions { onDetected: (rawValue: string) => void }
+export function useBarcodeScanner({ onDetected }: UseBarcodeScannerOptions) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const detectorRef = useRef<BarcodeDetector | null>(null);
-  const rafRef = useRef<number>(0);
-  const lastDetectTimeRef = useRef(0);
+  const stream = useRef<MediaStream | null>(null);
+  const detector = useRef<BarcodeDetector | null>(null);
+  const frame = useRef(0);
+  const generation = useRef(0);
+  const running = useRef(false);
+  const detecting = useRef(false);
+  const callback = useRef(onDetected);
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  useEffect(() => { callback.current = onDetected; }, [onDetected]);
 
   const stop = useCallback(() => {
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = 0;
-    }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
+    generation.current++;
+    running.current = false;
+    detecting.current = false;
+    cancelAnimationFrame(frame.current);
+    stream.current?.getTracks().forEach((track) => track.stop());
+    stream.current = null;
+    detector.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
     setIsScanning(false);
   }, []);
 
-  const detect = useCallback(() => {
+  const detect = useCallback(async (token: number, manual = false) => {
     const video = videoRef.current;
-    const detector = detectorRef.current;
-    if (!video || !detector || video.readyState < 2) {
-      // eslint-disable-next-line react-hooks/immutability
-      rafRef.current = requestAnimationFrame(detect);
-      return;
+    if (!running.current || token !== generation.current || detecting.current || !video || video.readyState < 2 || !detector.current) return;
+    detecting.current = true;
+    try {
+      const codes = await detector.current.detect(video);
+      if (!running.current || token !== generation.current) return;
+      if (codes[0]?.rawValue) {
+        stop(); // Invalidate concurrent detection/capture before delivering once.
+        callback.current(codes[0].rawValue);
+      } else if (manual) setError('No barcode found. Adjust the camera or enter the barcode below.');
+    } catch {
+      if (manual && token === generation.current) setError('Detection failed. Enter the barcode below.');
+    } finally {
+      if (token === generation.current) detecting.current = false;
     }
-
-    const now = performance.now();
-    if (now - lastDetectTimeRef.current < 150) {
-      rafRef.current = requestAnimationFrame(detect);
-      return;
-    }
-    lastDetectTimeRef.current = now;
-
-    detector
-      .detect(video)
-      .then((barcodes) => {
-        if (barcodes.length > 0) {
-          onDetected(barcodes[0].rawValue);
-          stop();
-          return;
-        }
-        rafRef.current = requestAnimationFrame(detect);
-      })
-      .catch(() => {
-        rafRef.current = requestAnimationFrame(detect);
-      });
-  }, [onDetected, stop]);
+  }, [stop]);
 
   const start = useCallback(async () => {
+    stop();
+    const token = generation.current;
     setError(null);
     try {
-      detectorRef.current = new BarcodeDetector(
-        formats ? { formats: formats as BarcodeFormat[] } : undefined
-      );
-
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' },
-      });
-      streamRef.current = stream;
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+      detector.current = new BarcodeDetector();
+      const next = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      if (token !== generation.current || !videoRef.current) {
+        next.getTracks().forEach((track) => track.stop());
+        return;
       }
-
+      stream.current = next;
+      videoRef.current.srcObject = next;
+      await videoRef.current.play();
+      if (token !== generation.current) return;
+      running.current = true;
       setIsScanning(true);
-      rafRef.current = requestAnimationFrame(detect);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to access camera';
-      setError(message);
+      let last = 0;
+      const tick = (now: number) => {
+        if (!running.current || token !== generation.current) return;
+        if (now - last >= 150) { last = now; void detect(token); }
+        frame.current = requestAnimationFrame(tick);
+      };
+      frame.current = requestAnimationFrame(tick);
+    } catch (failure) {
+      if (token !== generation.current) return;
+      setError(`${failure instanceof Error ? failure.message : 'Camera unavailable'}. You can enter a barcode manually.`);
       stop();
     }
-  }, [formats, detect, stop]);
-
-  useEffect(() => {
-    return () => {
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-      }
-    };
-  }, []);
-
-  const capture = useCallback(async () => {
-    const video = videoRef.current;
-    const detector = detectorRef.current;
-    if (!video || !detector || video.readyState < 2) return;
-
-    try {
-      const barcodes = await detector.detect(video);
-      if (barcodes.length > 0) {
-        onDetected(barcodes[0].rawValue);
-        stop();
-      } else {
-        setError('No barcode found. Try adjusting the camera angle.');
-      }
-    } catch {
-      setError('Detection failed. Please try again.');
-    }
-  }, [onDetected, stop]);
-
+  }, [detect, stop]);
+  useEffect(() => stop, [stop]);
+  const capture = useCallback(() => { void detect(generation.current, true); }, [detect]);
   return { videoRef, start, stop, capture, isScanning, error };
 }

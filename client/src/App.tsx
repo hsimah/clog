@@ -12,7 +12,7 @@ import { SessionBoundary } from '@/components/layout/SessionBoundary';
 // Temporary bridge: migrated routes do not mount the all-collections provider.
 function LegacyDataBoundary({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
-  return pathname === '/locations' || pathname.startsWith('/locations/')
+  return ['/locations', '/items'].some((path) => pathname === path || pathname.startsWith(`${path}/`))
     ? children : <DataProvider>{children}</DataProvider>;
 }
 

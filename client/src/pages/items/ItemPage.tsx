@@ -1,44 +1,30 @@
+import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { graphql, usePreloadedQuery, type PreloadedQuery } from 'react-relay';
 import { ItemDetails } from '@/components/items/ItemDetails';
 import { ItemForm } from '@/components/items/ItemForm';
-import { useData } from '@/context/DataContext';
+import { QueryBoundary } from '@/relay/QueryBoundary';
+import { useRouteQuery } from '@/relay/useRouteQuery';
+import type { ItemPageQuery } from './__generated__/ItemPageQuery.graphql';
 
-export function ItemPage() {
-  const { id } = useParams<{ id: string }>();
-  const { getItem, loading } = useData();
-  const item = id ? getItem(id) : undefined;
-
-  if (loading) {
-    return <div className="text-muted-foreground">Loading...</div>;
+const query = graphql`
+  query ItemPageQuery($id: ID!) {
+    clogItem(id: $id) { id ...ItemDetails_item ...ItemForm_item }
   }
-
-  if (!item) {
-    return <div className="text-muted-foreground">Item not found</div>;
-  }
-
-  return (
-    <div className="max-w-md">
-      <ItemDetails item={item} />
-    </div>
-  );
+`;
+export function ItemPage() { return <ItemRoute edit={false} />; }
+export function EditItemPage() { return <ItemRoute edit />; }
+function ItemRoute({ edit }: { edit: boolean }) {
+  const { id = '' } = useParams();
+  const [revision, setRevision] = useState(0);
+  const variables = useMemo(() => ({ id }), [id]);
+  const reference = useRouteQuery<ItemPageQuery>(query, variables, revision);
+  return <QueryBoundary key={reference?.fetchKey ?? "initial"} retry={() => setRevision((value) => value + 1)}>
+    {reference ? <Detail reference={reference} edit={edit} /> : <p role="status">Loading...</p>}
+  </QueryBoundary>;
 }
-
-export function EditItemPage() {
-  const { id } = useParams<{ id: string }>();
-  const { getItem, loading } = useData();
-  const item = id ? getItem(id) : undefined;
-
-  if (loading) {
-    return <div className="text-muted-foreground">Loading...</div>;
-  }
-
-  if (!item) {
-    return <div className="text-muted-foreground">Item not found</div>;
-  }
-
-  return (
-    <div className="max-w-md">
-      <ItemForm item={item} />
-    </div>
-  );
+function Detail({ reference, edit }: { reference: PreloadedQuery<ItemPageQuery>; edit: boolean }) {
+  const { clogItem } = usePreloadedQuery<ItemPageQuery>(query, reference);
+  if (!clogItem) return <p>Item not found</p>;
+  return edit ? <ItemForm key={clogItem.id} itemRef={clogItem} /> : <ItemDetails itemRef={clogItem} />;
 }

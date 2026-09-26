@@ -121,14 +121,9 @@ import type { Item } from '@/types';
 
 ## Global State Management
 
-Locations use Relay route queries and colocated fragments (`client/RELAY.md`).
-Only unmigrated screens still use `DataContext`:
-- Items management
-- Locations management
-- Inventory management
-- CRUD operations (add, update, delete, get)
-
-Components should use `const { items, addItem, updateItem, deleteItem, ... } = useData();`
+Items and locations use Relay route queries and colocated fragments (`client/RELAY.md`).
+Only the inventory workspace and dashboard still use `DataContext`. New and
+migrated components must use route-owned Relay queries and mutation hooks.
 
 ## Git Workflow
 
@@ -216,3 +211,8 @@ Use JavaScript `Date` objects throughout the app:
 - `SignedInUsers::allows` is shared by SQL aggregate authorization and the entity
   read policy. If introducing row-specific policies, update aggregate/query
   authorization too; the current optimization relies on uniform signed-in reads.
+
+- `NullableUpdateDatabase` preserves SQL NULL for WordPress adapter 0.2.3's generated
+  UPDATE statements. Without it, clearing a barcode writes an empty string and can
+  break the unique nullable index. Keep the regression test until upstream fixes
+  its update compiler; never hand-edit generated/vendor files for this workaround.
