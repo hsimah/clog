@@ -86,6 +86,9 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Build WordPress-served client
+        run: npm run build && mkdir -p ../server/dist && cp -r dist/. ../server/dist/
+
       - name: Run Playwright tests
         env:
           VITE_GRAPHQL_URL: http://localhost:6060/graphql

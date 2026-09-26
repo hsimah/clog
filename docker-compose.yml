@@ -50,7 +50,6 @@ services:
         define('WP_REDIS_HOST', '${REDIS_HOST}');
         define('WP_REDIS_PORT', ${REDIS_PORT});
         define('WP_CACHE', true);
-        define('GRAPHQL_JWT_AUTH_SECRET_KEY', '${GRAPHQL_JWT_AUTH_SECRET_KEY}');
         define('WP_DEBUG_LOG', true);
         define('WP_DEBUG_DISPLAY', true);
         define('GRAPHQL_DEBUG', true);
@@ -87,7 +86,7 @@ services:
       - ./client/src:/app/src:z
       - ./client/public:/app/public:z
     environment:
-      VITE_GRAPHQL_URL: http://localhost:8080/graphql
+      WP_PROXY_TARGET: http://wordpress
 
 volumes:
   db_data:

@@ -16,14 +16,21 @@ export function LocationForm({ location }: LocationFormProps) {
   const { addLocation, updateLocation } = useData();
   const [name, setName] = useState(location?.name ?? '');
 
+  const [error, setError] = useState('');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (location) {
-      await updateLocation(location.id, { name });
-      navigate(`/locations/${location.id}`);
-    } else {
-      const newLocation = await addLocation({ name });
-      navigate(`/locations/${newLocation.id}`);
+    setError('');
+    try {
+      if (location) {
+        await updateLocation(location.id, { name });
+        navigate(`/locations/${location.id}`);
+      } else {
+        const newLocation = await addLocation({ name });
+        navigate(`/locations/${newLocation.id}`);
+      }
+    } catch (failure) {
+      setError(`${failure instanceof Error ? failure.message : 'Could not save.'} Check inventory before retrying; changes may have been saved.`);
     }
   };
 
@@ -33,6 +40,7 @@ export function LocationForm({ location }: LocationFormProps) {
       content={
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+              {error && <p role="alert">{error}</p>}
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
               <Input

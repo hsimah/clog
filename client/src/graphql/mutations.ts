@@ -90,11 +90,3 @@ export const DELETE_INVENTORY = gql`
     }
   }
 `;
-
-export const LOGIN = gql`
-  mutation Login($username: String!, $password: String!) {
-    login(input: { username: $username, password: $password }) {
-      authToken
-    }
-  }
-`;

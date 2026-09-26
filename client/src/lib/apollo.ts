@@ -1,23 +1,17 @@
-import { ApolloClient, InMemoryCache, createHttpLink, ApolloLink } from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
-import { getToken } from '@/lib/auth';
+import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
+import { graphqlUrl, sessionFetch, subscribeSession, getSessionSnapshot } from '@/lib/session';
 
 const httpLink = createHttpLink({
-  uri: import.meta.env.VITE_GRAPHQL_URL || 'http://localhost:8080/graphql',
-});
-
-const authLink = setContext((_, { headers }) => {
-  const token = getToken();
-  return {
-    headers: {
-      ...headers,
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-  };
+  uri: graphqlUrl,
+  fetch: sessionFetch,
 });
 
 export const client = new ApolloClient({
-  link: ApolloLink.from([authLink, httpLink]),
+  link: httpLink,
   // Elephentity exposes globally unique Node IDs; Apollo normalizes them directly.
   cache: new InMemoryCache(),
+});
+
+subscribeSession(() => {
+  if (['changed', 'signed-out'].includes(getSessionSnapshot().status)) void client.clearStore();
 });

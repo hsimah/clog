@@ -43,4 +43,3 @@ services:
         define('WP_REDIS_HOST', 'redis');
         define('WP_REDIS_PORT', 6379);
         define('WP_CACHE', true);
-        define('GRAPHQL_JWT_AUTH_SECRET_KEY', 'clog-ci-jwt-secret-key');

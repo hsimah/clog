@@ -7,6 +7,8 @@
 $assets    = clog_get_vite_assets();
 $dist_url  = plugins_url( 'dist/', dirname( __FILE__ ) );
 $asset_url = plugins_url( 'assets/', dirname( __FILE__ ) );
+nocache_headers();
+header( 'Cache-Control: private, no-store, max-age=0' );
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -22,11 +24,11 @@ $asset_url = plugins_url( 'assets/', dirname( __FILE__ ) );
 </head>
 <body>
     <div id="root"></div>
-    <?php
-    $token = \WPGraphQL\JWT_Authentication\Auth::get_token( wp_get_current_user() );
-    if ( $token && ! is_wp_error( $token ) ) : ?>
-    <script>window.__CLOG_TOKEN__ = <?php echo wp_json_encode( $token ); ?>;</script>
-    <?php endif; ?>
+    <script id="clog-config" type="application/json"><?php echo wp_json_encode( [
+        'ajaxUrl' => admin_url( 'admin-ajax.php', 'relative' ),
+        'graphqlUrl' => wp_make_link_relative( graphql_get_endpoint_url() ),
+        'loginUrl' => wp_login_url( home_url( '/clog' ) ),
+    ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?></script>
     <?php if ( $assets['js'] ) : ?>
     <script type="module" src="<?php echo esc_url( $dist_url . $assets['js'] ); ?>"></script>
     <?php endif; ?>
