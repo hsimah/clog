@@ -148,10 +148,11 @@ Components should use `const { items, addItem, updateItem, deleteItem, ... } = u
 
 ## Styling
 
-- Use Tailwind CSS utility classes
+- New and migrated UI uses Astryx component props and StyleX; read `client/UI-MIGRATION.md`.
+- Tailwind utilities are transitional only on screens awaiting migration.
 - Use `cn()` utility from `@/lib/utils` for conditional class merging
-- Maintain consistent spacing with Tailwind (gap-2, p-6, mt-4, etc.)
-- Color classes: use semantic names like `text-muted-foreground`, `bg-card`
+- Prefer Astryx spacing props/tokens and layout primitives for migrated UI.
+- Prefer Astryx color tokens in migrated UI; legacy color utilities remain scoped to the old screens.
 
 ## Future Improvements
 
