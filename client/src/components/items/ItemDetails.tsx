@@ -20,7 +20,7 @@ export function ItemDetails({ itemRef }: { itemRef: ItemDetails_item$key }) {
   const barcode = useSaveMutation<ItemDetailsBarcodeMutation>(graphql`
     mutation ItemDetailsBarcodeMutation($input: UpdateClogItemInput!) { updateClogItem(input: $input) { clogItem { ...ItemDetails_item } } }
   `);
-  const { refreshItems, onClose } = useOutletContext<ItemRouteContext>();
+  const { refreshItems, onClose, itemPath } = useOutletContext<ItemRouteContext>();
   const heading = useRef<HTMLElement>(null);
   useEffect(() => { heading.current?.focus(); }, [item.id]);
   const [error, setError] = useState('');
@@ -35,7 +35,7 @@ export function ItemDetails({ itemRef }: { itemRef: ItemDetails_item$key }) {
     <p>{item.stockCount} stocked units</p>
     {error && <p role="alert">{error}</p>}
     <Stack direction="horizontal" gap={2} wrap="wrap">
-      <Button label="Edit" href={`/items/${encodeURIComponent(item.id)}/edit`} isDisabled={!canWrite || pending} />
+      <Button label="Edit" href={itemPath?.(item.id, true) ?? `/items/${encodeURIComponent(item.id)}/edit`} isDisabled={!canWrite || pending} />
       <Button label="Scan Barcode" variant="ghost" onClick={() => setScannerOpen(true)} isDisabled={!canWrite || pending} />
       <Button label="Delete" variant="destructive" isLoading={remove.pending} isDisabled={!canWrite || pending} onClick={() => {
         if (!window.confirm(`Delete ${item.name} and all ${item.stockCount} stocked units?`)) return;

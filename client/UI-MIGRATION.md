@@ -1,8 +1,6 @@
 # Clog UI conventions
 
-Astryx 0.6.0 and StyleX are the target UI stack. The application frame is migrated;
-Items, locations and the dashboard use Astryx and StyleX. The inventory workspace
-retains the legacy UI components until its #39 migration lands.
+All screens use Astryx 0.6.0 and StyleX.
 Use `scripts/node.sh npx astryx component <name>` to read the installed API before
 changing a component. `component --list` and `docs tokens` list the available APIs.
 
@@ -11,11 +9,9 @@ Use component props first, then Stack/Grid/Section for layout, then
 Use the documented Astryx tokens for colors, spacing and typography. Do not add
 new Tailwind utilities or duplicate Astryx components with bespoke styled HTML.
 
-The root Theme uses neutralTheme in light mode while legacy screens still have
-light-only colors. `index.css` imports the reset, core and theme CSS once, in the
-documented layer order with transitional Tailwind layers. Legacy semantic color
-utilities are inlined so shared CSS variable names cannot change their meaning.
-Do not import the optional Tailwind token bridge during this migration.
+The root Theme uses neutralTheme in light mode. `index.css` imports the reset,
+core and theme CSS once in the documented layer order. There are no Tailwind
+utilities, compatibility layers, or local UI wrappers.
 
 React Router owns the `/clog` basename. Pass app-relative paths (`/items`) through
 LinkProvider/RouterLink; use normal anchors for external links and hashes. AppShell
@@ -42,22 +38,21 @@ Migrate screen composition directly rather than recreating the old wrapper APIs.
 | Card + header/content/footer wrappers | Card takes children; compose Text/Stack and sections instead of forwarding the old slot object. |
 | Dialog | Dialog uses `isOpen`/`onOpenChange`, DialogHeader and children; `purpose="form"` protects edits from backdrop dismissal after interaction. |
 | DropdownMenu | `button` describes the trigger; `items` describe actions, or use compound menu children. Navigation belongs in links, not an action menu. |
-| SidePanel | Compose a route-owned Dialog with an end position or fullscreen presentation for a small screen; closing navigates to the parent. Overlay is a media overlay, not a drawer replacement. |
+| SidePanel | Use the route-owned aside: details precede the list on narrow screens and sit in an end column on wide screens. Closing navigates to the filtered parent. |
 
 Preserve labels, focus restoration, unsaved input on session expiry, and route
 back/forward behavior as each screen migrates. The browser suite checks the frame
 at 390×844, 1080×1920 and 1440×900, plus the WordPress-served build.
 
-For subsequent screens, keep table overflow inside its own container, keep the
+For all screens, keep table overflow inside its own container, keep the
 name/detail link visible, and move row actions into the detail view (#11). On a
 phone, route-owned detail forms should fill the available width; desktop and
 portrait screens can use a bounded end panel without forcing the table wider.
 Keep portrait layout driven by available width rather than device orientation.
-Verify these screen behaviors as #38/#39 migrate their owners; the frame tests
-alone do not complete the whole portrait-display issue #25.
+Keep browser coverage for the screen contents as well as the shared frame.
 
 Relay query references belong to routes, fragments to the components reading
 them, and mutation hooks to the forms performing them (#36). Reuse the shared
 session transport and discard the store on account change; never automatically
 retry writes. Use authoritative totals and paginated search connections from
-`server/docs/graphql-contract.md`, not the temporary DataContext arrays.
+`server/docs/graphql-contract.md`.

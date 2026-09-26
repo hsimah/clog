@@ -27,7 +27,7 @@ export function LocationForm({ locationRef }: { locationRef?: LocationForm_locat
     }
   `);
   const navigate = useNavigate();
-  const { refreshLocations, onClose } = useOutletContext<LocationRouteContext>();
+  const { refreshLocations, onClose, locationPath } = useOutletContext<LocationRouteContext>();
   const canWrite = useCanWrite();
   const [name, setName] = useState(location?.name ?? '');
   const [error, setError] = useState('');
@@ -36,7 +36,7 @@ export function LocationForm({ locationRef }: { locationRef?: LocationForm_locat
   function completed(id?: string) {
     if (!id) { failed(new Error('The server did not confirm the saved location.')); return; }
     refreshLocations();
-    navigate(`/locations/${encodeURIComponent(id)}`);
+    navigate(locationPath?.(id) ?? `/locations/${encodeURIComponent(id)}`);
   }
   return <Stack gap={4}>
     <Text as="h2" type="display-3">{location ? 'Edit Location' : 'New Location'}</Text>

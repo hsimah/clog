@@ -1,5 +1,12 @@
 import { useEffect, useSyncExternalStore, type ReactNode } from 'react';
+import { Button } from '@astryxdesign/core/Button';
+import { Link } from '@astryxdesign/core/Link';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Text } from '@astryxdesign/core/Text';
+import * as stylex from '@stylexjs/stylex';
 import { getSessionSnapshot, subscribeSession, refreshSession, suspendSession, loginUrl } from '@/lib/session';
+
+const styles = stylex.create({ session: { marginInline: 'auto', maxWidth: '32rem', padding: 'var(--spacing-8)' } });
 
 export function SessionBoundary({ children }: { children: ReactNode }) {
   const session = useSyncExternalStore(subscribeSession, getSessionSnapshot);
@@ -23,16 +30,14 @@ export function SessionBoundary({ children }: { children: ReactNode }) {
   const active = session.status === 'active';
   const ended = ['changed', 'signed-out'].includes(session.status);
   return <>
-    {!active && <main className="mx-auto max-w-lg space-y-4 p-8" aria-label="Session">
-      <h1 className="text-xl font-bold">{session.status === 'checking' ? 'Checking your session…' : ended ? 'Session ended' : session.status === 'unavailable' ? 'Could not check your session' : 'Sign in to continue'}</h1>
+    {!active && <main {...stylex.props(styles.session)} aria-label="Session"><Stack gap={4}>
+      <Text as="h1" type="display-3">{session.status === 'checking' ? 'Checking your session…' : ended ? 'Session ended' : session.status === 'unavailable' ? 'Could not check your session' : 'Sign in to continue'}</Text>
       {session.status !== 'checking' && <>
         <p>{ended ? 'Reload to continue with the current account. Previous account data has been cleared.' : 'Your unsaved input stays in this tab. Sign in in another tab, then check your session here.'}</p>
-        <a className="underline" href={loginUrl} target="_blank" rel="noopener noreferrer">Open WordPress sign-in</a>
-        <button className="block underline" onClick={() => ended ? location.reload() : void refreshSession().catch(() => {})}>
-          {ended ? 'Reload Clog' : 'Check session'}
-        </button>
+        <Link href={loginUrl} target="_blank" rel="noopener noreferrer">Open WordPress sign-in</Link>
+        <Button variant="secondary" label={ended ? 'Reload Clog' : 'Check session'} onClick={() => ended ? location.reload() : void refreshSession().catch(() => {})} />
       </>}
-    </main>}
+    </Stack></main>}
     <div hidden={!active} inert={!active}>{session.userId !== null && !ended ? children : null}</div>
   </>;
 }

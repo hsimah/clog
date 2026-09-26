@@ -9,6 +9,7 @@ const LocationsPage = React.lazy(() => import('@/pages/locations/LocationsPage')
 const NewLocationPage = React.lazy(() => import('@/pages/locations/NewLocationPage').then(m => ({ default: m.NewLocationPage })));
 const LocationPage = React.lazy(() => import('@/pages/locations/LocationPage').then(m => ({ default: m.LocationPage })));
 const EditLocationPage = React.lazy(() => import('@/pages/locations/LocationPage').then(m => ({ default: m.EditLocationPage })));
+const StockSelectionPage = React.lazy(() => import('@/pages/inventory/StockSelectionPage').then(m => ({ default: m.StockSelectionPage })));
 const InventoryPage = React.lazy(() => import('@/pages/inventory/InventoryPage').then(m => ({ default: m.InventoryPage })));
 const NewInventoryPage = React.lazy(() => import('@/pages/inventory/NewInventoryPage').then(m => ({ default: m.NewInventoryPage })));
 const InventoryItemPage = React.lazy(() => import('@/pages/inventory/InventoryItemPage').then(m => ({ default: m.InventoryItemPage })));
@@ -63,6 +64,12 @@ export const routeMap: RouteConfig[] = [
     element: InventoryPage,
     children: [
       { path: 'new', element: NewInventoryPage, label: 'New Inventory' },
+      { path: 'stock/:itemId', element: StockSelectionPage },
+      { path: 'stock/:itemId/:locationId', element: StockSelectionPage },
+      { path: 'items/:id', element: ItemPage },
+      { path: 'items/:id/edit', element: EditItemPage },
+      { path: 'locations/:id', element: LocationPage },
+      { path: 'locations/:id/edit', element: EditLocationPage },
       { path: ':id', element: InventoryItemPage },
       { path: ':id/edit', element: EditInventoryPage },
     ],

@@ -19,7 +19,7 @@ export function LocationDetails({ locationRef }: { locationRef: LocationDetails_
       deleteClogLocation(input: $input) { deletedId @deleteRecord }
     }
   `);
-  const { refreshLocations, onClose } = useOutletContext<LocationRouteContext>();
+  const { refreshLocations, onClose, locationPath } = useOutletContext<LocationRouteContext>();
   const heading = useRef<HTMLElement>(null);
   useEffect(() => { heading.current?.focus(); }, [location.id]);
   const [error, setError] = useState('');
@@ -31,7 +31,7 @@ export function LocationDetails({ locationRef }: { locationRef: LocationDetails_
     {location.stockCount > 0 && <p>Remove or move the stock before deleting this location.</p>}
     {error && <p role="alert">{error}</p>}
     <Stack direction="horizontal" gap={2} wrap="wrap">
-      <Button label="Edit" href={`/locations/${encodeURIComponent(location.id)}/edit`} isDisabled={!canWrite || pending} />
+      <Button label="Edit" href={locationPath?.(location.id, true) ?? `/locations/${encodeURIComponent(location.id)}/edit`} isDisabled={!canWrite || pending} />
       <Button label="Delete" variant="destructive" isLoading={pending} isDisabled={!canWrite || location.stockCount > 0} onClick={() => {
         if (!window.confirm(`Delete ${location.name}?`)) return;
         setError('');

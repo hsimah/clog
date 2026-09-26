@@ -32,7 +32,7 @@ export function ItemForm({ itemRef, initialBarcode }: ItemFormProps) {
   `);
   const stock = useAddStock();
   const navigate = useNavigate();
-  const { refreshItems, onClose } = useOutletContext<ItemRouteContext>();
+  const { refreshItems, onClose, itemPath } = useOutletContext<ItemRouteContext>();
   const canWrite = useCanWrite();
   const [name, setName] = useState(item?.name ?? '');
   const [barcode, setBarcode] = useState(item?.barcode ?? initialBarcode ?? '');
@@ -52,7 +52,7 @@ export function ItemForm({ itemRef, initialBarcode }: ItemFormProps) {
     return () => window.removeEventListener('beforeunload', warn);
   }, [busy]);
   function finish(id: string) {
-    setPhase('idle'); refreshItems(); navigate(`/items/${encodeURIComponent(id)}`);
+    setPhase('idle'); refreshItems(); navigate(itemPath?.(id) ?? `/items/${encodeURIComponent(id)}`);
   }
   function failed(failure: Error) {
     setPhase('stopped');

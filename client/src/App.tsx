@@ -1,54 +1,32 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { Suspense, type ReactNode } from 'react';
-import { ApolloProvider } from '@apollo/client/react';
-import { client } from '@/lib/apollo';
-import { DataProvider } from '@/context/DataContext';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Suspense } from 'react';
 import { RelayEnvironmentProvider } from 'react-relay';
 import { environment } from '@/relay/environment';
 import { Layout } from '@/components/layout/Layout';
 import { routeMap } from '@/lib/route-map';
 import { SessionBoundary } from '@/components/layout/SessionBoundary';
 
-// Temporary bridge: migrated routes do not mount the all-collections provider.
-function LegacyDataBoundary({ children }: { children: ReactNode }) {
-  const { pathname } = useLocation();
-  return ['/locations', '/items', '/home'].some((path) => pathname === path || pathname.startsWith(`${path}/`))
-    ? children : <DataProvider>{children}</DataProvider>;
-}
-
 function App() {
   return (
-    <ApolloProvider client={client}>
-      <SessionBoundary>
-        <RelayEnvironmentProvider environment={environment}>
-          <BrowserRouter basename='/clog'>
-            <Layout>
-              <LegacyDataBoundary>
-                <Suspense fallback={<div className="p-4">Loading...</div>}>
-                  <Routes>
-                    {routeMap.map((route) => (
-                      <Route
-                        key={route.path}
-                        path={route.path}
-                        element={<route.element />}
-                      >
-                        {route.children?.map((child) => (
-                          <Route
-                            key={`${route.path}/${child.path}`}
-                            path={child.path}
-                            element={<child.element />}
-                          />
-                        ))}
-                      </Route>
+    <SessionBoundary>
+      <RelayEnvironmentProvider environment={environment}>
+        <BrowserRouter basename="/clog">
+          <Layout>
+            <Suspense fallback={<p role="status">Loading...</p>}>
+              <Routes>
+                {routeMap.map((route) => (
+                  <Route key={route.path} path={route.path} element={<route.element />}>
+                    {route.children?.map((child) => (
+                      <Route key={`${route.path}/${child.path}`} path={child.path} element={<child.element />} />
                     ))}
-                  </Routes>
-                </Suspense>
-              </LegacyDataBoundary>
-            </Layout>
-          </BrowserRouter>
-        </RelayEnvironmentProvider>
-      </SessionBoundary>
-    </ApolloProvider>
+                  </Route>
+                ))}
+              </Routes>
+            </Suspense>
+          </Layout>
+        </BrowserRouter>
+      </RelayEnvironmentProvider>
+    </SessionBoundary>
   );
 }
 

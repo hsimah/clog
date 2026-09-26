@@ -1,8 +1,8 @@
 # Relay in Clog
 
 The runtime/compiler are Relay 21.0.1. Astryx/StyleX are independent of data
-ownership. Items, locations and the dashboard use Relay. Stock remains on the bounded
-Apollo/DataContext bridge until #39.
+ownership. All application data uses route-owned Relay queries; there is no
+Apollo cache or global collection provider.
 
 - `scripts/node.sh npm run relay` regenerates application artifacts from
   `client/schema.graphql`. Commit them with their source operations.
@@ -44,12 +44,23 @@ refreshes its owning list route; deletions use `@deleteRecord`. Disable duplicat
 submits; preserve input and tell the user to check inventory before retrying an
 uncertain write. Respect `canWrite` in the UI; server policy remains authoritative.
 
-`LegacyDataBoundary` only mounts DataContext for unmigrated routes. Its queries use
-network-only on mount so returning from Relay cannot reuse stale Apollo inventory.
-The frame stays mounted across this boundary. Remove both the boundary and Apollo
-with the final migrated consumers in #39; do not create a two-cache synchronization
-layer. The Relay browser tests cover read retry, pagination, raw off-page details,
-CRUD, route return, uncertain writes, draft recovery and actual store disposal.
+## Inventory workspace
+
+`clogStockedItems` pages item groups before loading physical units. A group's
+quantity and each location breakdown use server `stockCount` fields, never loaded
+array lengths. Expanding an item fetches a paginated occupied-location connection;
+a selected location fetches its own count directly. The details carousel pages
+`clogInventorySearch` and resets after writes. All stock actions live in that panel.
+
+Location tabs are paginated; an off-page selected location is fetched directly.
+Search and location filters live in URL parameters. Nested item/location/stock
+routes keep those parameters through open, edit, save, close, reload and browser
+history. The root `/` remains an inventory alias; nested workspace links use
+`/inventory`. Standalone item and location pages retain their own route contexts.
+
+Inventory creation uses paginated item/location selectors and creates one physical
+unit. Date editing does not change its item or location. Lost write responses are
+reported without replay; all writes use the shared session gate and pending state.
 
 ## Initial item stock and scanning
 
