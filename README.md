@@ -203,7 +203,14 @@ The [GraphQL contract](server/docs/graphql-contract.md) documents paginated sear
 location/item filters, stock counts, direct detail lookup, and mutation invalidation.
 Use `scripts/test-backend.sh --schema` to refresh `client/schema.graphql` from
 disposable WordPress, then `scripts/node.sh npm run relay:contract` to regenerate
-the representative Relay query. CI checks both artifacts for drift.
+the representative Relay query. Run `scripts/node.sh npm run relay` for application
+artifacts and `scripts/node.sh npm run relay:check` to verify both sets. CI checks
+the schema and artifacts for drift.
+
+The app frame uses Astryx and StyleX. Locations use route-owned Relay queries,
+server pagination/search, direct detail queries and typed mutations; other screens
+retain the temporary Apollo bridge. See the [UI migration conventions](client/UI-MIGRATION.md)
+and [Relay data ownership guide](client/RELAY.md) when migrating the remaining screens.
 
 ---
 

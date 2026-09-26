@@ -103,9 +103,9 @@ function transformInventory(gqlInventory: GraphQLInventory): Inventory {
 }
 
 export function DataProvider({ children }: { children: ReactNode }) {
-  const { data: itemsData, loading: itemsLoading, error: itemsError } = useQuery<ItemsQueryData>(GET_ITEMS);
-  const { data: locationsData, loading: locationsLoading, error: locationsError } = useQuery<LocationsQueryData>(GET_LOCATIONS);
-  const { data: inventoryData, loading: inventoryLoading, error: inventoryError } = useQuery<InventoryQueryData>(GET_INVENTORY);
+  const { data: itemsData, loading: itemsLoading, error: itemsError } = useQuery<ItemsQueryData>(GET_ITEMS, { fetchPolicy: 'network-only' });
+  const { data: locationsData, loading: locationsLoading, error: locationsError } = useQuery<LocationsQueryData>(GET_LOCATIONS, { fetchPolicy: 'network-only' });
+  const { data: inventoryData, loading: inventoryLoading, error: inventoryError } = useQuery<InventoryQueryData>(GET_INVENTORY, { fetchPolicy: 'network-only' });
 
   const [createItemMutation] = useMutation<CreateItemData>(CREATE_ITEM, { refetchQueries: [{ query: GET_ITEMS }] });
   const [updateItemMutation] = useMutation(UPDATE_ITEM, { refetchQueries: [{ query: GET_ITEMS }] });

@@ -1,0 +1,52 @@
+# Relay in Clog
+
+The runtime/compiler are Relay 21.0.1. Astryx/StyleX are independent of data
+ownership. Locations are the first migrated flow; items, stock and the dashboard
+remain on the bounded Apollo/DataContext bridge until #38/#39.
+
+- `scripts/node.sh npm run relay` regenerates application artifacts from
+  `client/schema.graphql`. Commit them with their source operations.
+- `scripts/node.sh npm run relay:check` validates both the application artifacts
+  and the API contract fixture. CI/release builds run this without a live server.
+- `scripts/test-backend.sh --schema` refreshes the schema from a real disposable
+  WordPress install. Never generate against the production database.
+
+Routes own query references with `useRouteQuery`; memoize the variables, load on
+ID/filter changes, and read through `usePreloadedQuery` below Suspense. The hook
+explicitly disposes the previous reference on variable changes and unmount. This
+releases retention and cancels the request; Relay 21's `useQueryLoader` alone only
+releases ordinary queries and leaves their network work running. Error
+boundaries key off the query reference's fetch key, so retry replaces the failed
+reference and resets the boundary. Keep loading, not-found, empty and error states
+distinct. Feature components read colocated `useFragment` or
+`usePaginationFragment` data; do not duplicate query response shapes as handwritten
+entity models or load the whole inventory into application context.
+
+The location list uses a 25-row `clogLocationSearch` connection and its `where`
+filter is part of the Relay connection identity. Totals are server counts. Search
+and successful writes reset to the first page rather than appending to a shifting
+offset cursor. Detail/edit routes call `clogLocation(id:)` directly, preserving
+raw numeric URLs as well as global IDs. Names and route keys use normalized global
+IDs returned by the server. More contract rules: `server/docs/graphql-contract.md`.
+
+`relay/environment.ts` uses the common cookie/nonce `sessionFetch` transport and
+abortable Observable subscriptions. HTTP, GraphQL and malformed payload failures
+reach the query boundary or mutation callback. No operation retries automatically.
+Account changes/logout abort in-flight work and clear the entire record source;
+the session boundary unmounts its authenticated children and requires a reload.
+Same-account session recovery preserves form state while the UI is hidden/inert.
+No Relay records or credentials are persisted in browser storage.
+
+Use `useSaveMutation` for writes. It exposes Relay's pending state, marks the store
+stale after a successful payload, and suppresses component callbacks after unmount.
+Request the fragments needed to normalize updated records. A successful write
+refreshes its owning list route; deletions use `@deleteRecord`. Disable duplicate
+submits; preserve input and tell the user to check inventory before retrying an
+uncertain write. Respect `canWrite` in the UI; server policy remains authoritative.
+
+`LegacyDataBoundary` only mounts DataContext for unmigrated routes. Its queries use
+network-only on mount so returning from Relay cannot reuse stale Apollo inventory.
+The frame stays mounted across this boundary. Remove both the boundary and Apollo
+with the final migrated consumers in #39; do not create a two-cache synchronization
+layer. The Relay browser tests cover read retry, pagination, raw off-page details,
+CRUD, route return, uncertain writes, draft recovery and actual store disposal.

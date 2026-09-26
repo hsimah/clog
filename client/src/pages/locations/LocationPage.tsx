@@ -1,44 +1,30 @@
+import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { graphql, usePreloadedQuery, type PreloadedQuery } from 'react-relay';
 import { LocationDetails } from '@/components/locations/LocationDetails';
 import { LocationForm } from '@/components/locations/LocationForm';
-import { useData } from '@/context/DataContext';
+import { QueryBoundary } from '@/relay/QueryBoundary';
+import { useRouteQuery } from '@/relay/useRouteQuery';
+import type { LocationPageQuery } from './__generated__/LocationPageQuery.graphql';
 
-export function LocationPage() {
-  const { id } = useParams<{ id: string }>();
-  const { getLocation, loading } = useData();
-  const location = id ? getLocation(id) : undefined;
-
-  if (loading) {
-    return <div className="text-muted-foreground">Loading...</div>;
+const query = graphql`
+  query LocationPageQuery($id: ID!) {
+    clogLocation(id: $id) { id ...LocationDetails_location ...LocationForm_location }
   }
-
-  if (!location) {
-    return <div className="text-muted-foreground">Location not found</div>;
-  }
-
-  return (
-    <div className="max-w-md">
-      <LocationDetails location={location} />
-    </div>
-  );
+`;
+export function LocationPage() { return <LocationRoute edit={false} />; }
+export function EditLocationPage() { return <LocationRoute edit />; }
+function LocationRoute({ edit }: { edit: boolean }) {
+  const { id = '' } = useParams();
+  const [revision, setRevision] = useState(0);
+  const variables = useMemo(() => ({ id }), [id]);
+  const reference = useRouteQuery<LocationPageQuery>(query, variables, revision);
+  return <QueryBoundary key={reference?.fetchKey ?? "initial"} retry={() => setRevision((value) => value + 1)}>
+    {reference ? <Detail reference={reference} edit={edit} /> : <p role="status">Loading...</p>}
+  </QueryBoundary>;
 }
-
-export function EditLocationPage() {
-  const { id } = useParams<{ id: string }>();
-  const { getLocation, loading } = useData();
-  const location = id ? getLocation(id) : undefined;
-
-  if (loading) {
-    return <div className="text-muted-foreground">Loading...</div>;
-  }
-
-  if (!location) {
-    return <div className="text-muted-foreground">Location not found</div>;
-  }
-
-  return (
-    <div className="max-w-md">
-      <LocationForm location={location} />
-    </div>
-  );
+function Detail({ reference, edit }: { reference: PreloadedQuery<LocationPageQuery>; edit: boolean }) {
+  const { clogLocation } = usePreloadedQuery<LocationPageQuery>(query, reference);
+  if (!clogLocation) return <p>Location not found</p>;
+  return edit ? <LocationForm key={clogLocation.id} locationRef={clogLocation} /> : <LocationDetails locationRef={clogLocation} />;
 }
