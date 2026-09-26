@@ -198,6 +198,7 @@ Use JavaScript `Date` objects throughout the app:
 - Inventory labels are derived on the server. Do not send managed timestamps.
 - Run `scripts/php.sh composer test` and `scripts/test-backend.sh` for backend changes.
   The latter uses disposable MySQL/WordPress containers with no exposed ports.
-- Existing databases require the explicit #33 migration before this foundation can
-  be deployed. Never bypass a schema refusal or delete old projections to make boot pass.
+- Existing databases require the explicit #33 migration and a rehearsal using the
+  actual deployment export. Follow `server/docs/storage-upgrade.md`. Never bypass
+  a schema refusal or delete old projections to make boot pass.
 - Apollo/Tailwind remain transitional until the separate Relay/Astryx/StyleX issues land.

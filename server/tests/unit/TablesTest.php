@@ -43,7 +43,7 @@ final class TablesTest extends TestCase
         $tables = new Tables($database, $manifest);
         self::assertFalse($tables->plan()->isSafe());
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('explicit data migration');
+        $this->expectExceptionMessage('wp clog migration status');
         $tables->install();
     }
 

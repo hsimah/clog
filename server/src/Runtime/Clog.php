@@ -108,6 +108,11 @@ final class Clog
         return new Tables($this->database, $this->manifest());
     }
 
+    public function migration(): \Clog\Migration\StorageUpgrade
+    {
+        return new \Clog\Migration\StorageUpgrade($this->database, $this->manifest());
+    }
+
     public function adminPages(): Pages
     {
         return Pages::fromManifest($this->generated . 'wordpress/admin-pages.php', $this->gateway());

@@ -21,13 +21,15 @@ use Eleph\Runtime\Type\NullProcessorRegistry;
 add_action( 'plugins_loaded', 'clog_boot_graphql' );
 
 function clog_boot_graphql(): void {
-	if ( ! class_exists( ElephGraphQL::class ) ) {
-		return;
-	}
-
 	$clog = Clog::instance();
 
 	try {
+		// Updates do not rerun activation. Detect a pending upgrade on normal loads,
+		// including sites where WPGraphQL is temporarily unavailable.
+		$clog->tables()->requireReady();
+		if ( ! class_exists( ElephGraphQL::class ) ) {
+			return;
+		}
 		ElephGraphQL::fromManifest(
 			$clog->graphqlManifestPath(), $clog->gateway(), new NullProcessorRegistry()
 		)->boot();

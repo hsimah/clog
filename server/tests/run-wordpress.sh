@@ -16,3 +16,6 @@ if [ "${CLOG_BROWSER_TESTS:-0}" = 1 ]; then
     exec php -d memory_limit=512M /usr/local/bin/wp server --host=0.0.0.0 --port=8080
 fi
 wp eval-file wp-content/plugins/clog/tests/integration/runtime.php --user=clog-test
+wp eval-file wp-content/plugins/clog/tests/integration/migration.php --user=clog-test
+wp clog migration status --user=clog-test
+wp clog migration plan --user=clog-test
