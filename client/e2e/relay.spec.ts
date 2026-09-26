@@ -84,7 +84,7 @@ test('Relay preserves draft on expiry, never replays a lost write, and clears on
     } else await route.continue();
   });
   await page.getByRole('button', { name: 'Create', exact: true }).click();
-  await expect(page.getByRole('alert')).toContainText('Check inventory before retrying');
+  await expect(page.getByRole('alert').filter({ hasText: 'Check inventory before retrying' })).toContainText('Check inventory before retrying');
   await expect(page.getByRole('textbox', { name: /^Name/ })).toHaveValue('Clog E2E Relay uncertain');
   expect(writes).toBe(1);
   await page.route('**/admin-ajax.php?action=clog_graphql_session', (route) => route.fulfill({ json: { userId: 'different-user', nonce: 'changed', canWrite: false } }));

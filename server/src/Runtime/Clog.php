@@ -7,6 +7,7 @@ namespace Clog\Runtime;
 use Eleph\Runtime\Gateway\EntityGateway;
 use Eleph\WordPress\Admin\Pages;
 use Eleph\WordPress\Database\WpdbDatabase;
+use Eleph\WordPress\Database\Database;
 use Eleph\WordPress\Manifest\StorageManifest;
 use Eleph\WordPress\Registration\PostTypeRegistrar;
 use Eleph\WordPress\Viewer\WordPressViewerProvider;
@@ -53,7 +54,7 @@ final class Clog
     private ?WordPressAdaptor $adaptor = null;
 
     private function __construct(
-        private readonly WpdbDatabase $database,
+        private readonly Database $database,
         private readonly string $generated,
         private readonly LoggerInterface $logger,
     ) {
@@ -69,7 +70,7 @@ final class Clog
             global $wpdb;
 
             self::$instance = new self(
-                new WpdbDatabase($wpdb),
+                new NullableUpdateDatabase(new WpdbDatabase($wpdb)),
                 CLOG_PLUGIN_DIR . 'generated/',
                 new ErrorLogLogger(),
             );

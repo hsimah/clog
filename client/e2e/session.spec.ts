@@ -34,14 +34,14 @@ test('cookie session uses fresh nonces and preserves drafts after expiry', async
   await page.goto('/clog/items/new');
   expect((await request).headers()['x-wp-nonce']).toBeTruthy();
   expect((await request).headers()['authorization']).toBeUndefined();
-  await page.getByLabel('Name', { exact: true }).fill('Unsubmitted draft');
+  await page.getByRole('textbox', { name: /^Name/ }).fill('Unsubmitted draft');
   await context.clearCookies();
   await page.evaluate(() => window.dispatchEvent(new Event('focus')));
   await expect(page.getByRole('heading', { name: 'Sign in to continue' })).toBeVisible();
-  await expect(page.getByLabel('Name', { exact: true })).toBeHidden();
+  await expect(page.getByRole('textbox', { name: /^Name/ })).toBeHidden();
   await login(context.request);
   await page.getByRole('button', { name: 'Check session' }).click();
-  await expect(page.getByLabel('Name', { exact: true })).toHaveValue('Unsubmitted draft');
+  await expect(page.getByRole('textbox', { name: /^Name/ })).toHaveValue('Unsubmitted draft');
   expect(await page.evaluate(() => localStorage.getItem('clog_jwt_token'))).toBeNull();
 });
 
@@ -80,7 +80,7 @@ test('a lost mutation response is not replayed and leaves input available', asyn
   await authenticate();
   let writes = 0;
   await page.route('**/graphql', async (route) => {
-    if (route.request().postDataJSON()?.operationName === 'CreateItem') {
+    if (route.request().postDataJSON()?.operationName === 'ItemFormCreateMutation') {
       writes++;
       await route.fetch(); // The server committed; only its response is lost.
       await route.abort('failed');
@@ -89,9 +89,9 @@ test('a lost mutation response is not replayed and leaves input available', asyn
     }
   });
   await page.goto('/clog/items/new');
-  await page.getByLabel('Name', { exact: true }).fill('Clog E2E Lost response');
+  await page.getByRole('textbox', { name: /^Name/ }).fill('Clog E2E Lost response');
   await page.getByRole('button', { name: 'Create', exact: true }).click();
-  await expect(page.getByRole('alert')).toContainText('Check inventory before retrying');
-  await expect(page.getByLabel('Name', { exact: true })).toHaveValue('Clog E2E Lost response');
+  await expect(page.getByRole('alert').filter({ hasText: 'Check inventory before retrying' })).toContainText('Check inventory before retrying');
+  await expect(page.getByRole('textbox', { name: /^Name/ })).toHaveValue('Clog E2E Lost response');
   expect(writes).toBe(1);
 });

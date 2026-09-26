@@ -41,6 +41,13 @@ $createdAt = $item->entity->getCreatedAt();
 $gateway->create('Item', ['name' => 'No barcode one', 'barcode' => null]);
 $gateway->create('Item', ['name' => 'No barcode two', 'barcode' => null]);
 rejected(fn () => $gateway->create('Item', ['name' => 'Duplicate', 'barcode' => '00001234']), 'duplicate barcode');
+$gateway->update('Item', $item->id, ['barcode' => null, 'name' => 'Test item']);
+check(null === $gateway->find('Item', $item->id)->getBarcode(), 'cleared barcode persists SQL NULL, not empty string');
+check('Test item' === $gateway->find('Item', $item->id)->getName(), 'nullable update preserves following field bindings');
+$cleared = $gateway->create('Item', ['name' => 'Second cleared barcode', 'barcode' => '00998877']);
+$gateway->update('Item', $cleared->id, ['barcode' => null]);
+check(null === $gateway->find('Item', $cleared->id)->getBarcode(), 'multiple cleared barcodes remain independently nullable');
+$gateway->update('Item', $item->id, ['barcode' => '00001234']);
 rejected(fn () => $gateway->create('Location', ['name' => 'Test shelf']), 'duplicate location');
 rejected(fn () => $gateway->create('Item', []), 'required item name');
 

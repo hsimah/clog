@@ -45,7 +45,7 @@ test('WordPress deep routes load the StyleX stylesheet and bundled logo', async 
   const base = process.env.WP_SHELL_URL || new URL(process.env.VITE_GRAPHQL_URL || 'http://localhost:8080').origin;
   await login(context.request, base);
   await page.goto(`${base}/clog/items/new`);
-  await expect(page.getByLabel('Name', { exact: true })).toBeVisible();
+  await expect(page.getByRole('textbox', { name: /^Name/ })).toBeVisible();
   const stylesheet = page.locator('link[rel="stylesheet"][href*="stylex.css?ver="]');
   await expect(stylesheet).toHaveCount(1);
   expect((await context.request.get((await stylesheet.getAttribute('href'))!)).ok()).toBe(true);

@@ -6,8 +6,6 @@ export function NewItemPage() {
   const scannedBarcode = (location.state as { scannedBarcode?: string } | null)?.scannedBarcode;
 
   return (
-    <div className="max-w-md">
-      <ItemForm initialBarcode={scannedBarcode} />
-    </div>
+    <ItemForm initialBarcode={scannedBarcode} />
   );
 }
