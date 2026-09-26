@@ -78,3 +78,22 @@ test.describe('Navigation', () => {
     await expect(page).toHaveURL('/clog');
   });
 });
+
+test('development and WordPress deep links deliver both favicon variants', async ({ page, context, authenticate }) => {
+  await authenticate();
+  const wordpress = process.env.WP_SHELL_URL || new URL(process.env.VITE_GRAPHQL_URL || 'http://localhost:8080').origin;
+  await login(context.request, wordpress);
+  for (const url of ['/clog/home', `${wordpress}/clog/items/new`]) {
+    await page.goto(url);
+    await expect(page.getByRole('main')).toBeVisible();
+    const icons = page.locator('link[rel="icon"]');
+    await expect(icons).toHaveCount(2);
+    for (const icon of await icons.all()) {
+      const href = await icon.evaluate((element: HTMLLinkElement) => element.href);
+      const response = await context.request.get(href);
+      expect(response.ok()).toBe(true);
+      expect(response.headers()['content-type']).toContain('image/png');
+      await expect(icon).toHaveAttribute('type', 'image/png');
+    }
+  }
+});

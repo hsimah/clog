@@ -37,6 +37,19 @@ The React/TypeScript client lives in `client/`; the WordPress plugin in `server/
 - Run Relay generation/validation, lint and builds through `scripts/node.sh`.
   Use `scripts/test-backend.sh --e2e` for meaningful flow changes.
 
+## Release verification
+
+- Build `client/dist`, then run `scripts/package-plugin.sh [version]` and
+  `scripts/test-backend.sh --release`. Packaging stages separate production-only
+  dependencies; never strip the working `server/vendor` to prepare a release.
+- Release CI uploads the same ZIP that passed install/upgrade checks. Keep the
+  runtime allowlist, migration support and separate StyleX asset validation intact.
+- The owner confirmed Clog is not in use and has no real data; the first rollout
+  uses the fresh-install path. For future existing-data upgrades, rehearse the
+  actual backup, ZIP upgrade and restore. See `server/docs/release-verification.md`.
+- Run backend, schema, browser and release container suites sequentially; they
+  share one disposable Compose project and must not overlap.
+
 ## Git workflow
 
 Use feature branches and descriptive conventional commits. Keep generated code,

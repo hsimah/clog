@@ -44,3 +44,6 @@ client/tsconfig.e2e.tsbuildinfo
 # Composer
 /server/vendor/
 /server/.phpunit.cache/
+
+# Reproducible plugin packaging output
+/build/
