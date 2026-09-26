@@ -54,7 +54,7 @@ Node all run inside containers, so nothing needs to be installed on the host.
    socket if that is what you have, creates `.env` from `.env.example` if it is
    missing, and brings the stack up. On first run WordPress installs itself,
    activates the `clog` plugin from the bind-mounted `server/` directory, and
-   installs WPGraphQL, WPGraphQL-JWT and WP-Redis (see
+   installs WPGraphQL and WP-Redis (see
    `.docker/wordpress/entrypoint.sh`).
 
    Other subcommands:
@@ -95,13 +95,39 @@ Node all run inside containers, so nothing needs to be installed on the host.
    cd client && npm install && npm run dev
    ```
 
-   Either way the client talks to `http://localhost:8080/graphql` (configurable via
-   `VITE_GRAPHQL_URL`).
+   The browser uses same-origin GraphQL and WordPress cookies. Vite proxies
+   `/graphql`, `/wp-admin`, `/wp-login.php` and `/wp-includes` to WordPress.
+   Set `WP_PROXY_TARGET` to the WordPress origin when running Vite on the host
+   (default `http://localhost:8080`); Compose uses `http://wordpress` internally.
+   The old `VITE_GRAPHQL_URL` variable remains a proxy-target fallback for tests.
 
 3. **Access the app**
 
    - **Frontend:** http://localhost:3000/clog
    - **WordPress admin:** http://localhost:8080/wp-admin (use credentials from `.env`)
+
+   Sign in to WordPress first, or use the app's sign-in link. An expired session
+   hides inventory and preserves drafts in the current tab; sign in in another tab
+   and choose **Check session**. Mutations are never automatically replayed.
+   Logout and account changes clear the client cache; logout warns before discarding
+   drafts and notifies other Clog tabs. Session checks run before/after requests,
+   on tab focus and every 30 seconds. No credentials or inventory are persisted in
+   localStorage. Drafts survive same-account reauthentication only while the tab stays open.
+
+   | WordPress user | Read inventory | Create/update/delete | Run migrations |
+   | --- | --- | --- | --- |
+   | Anonymous | No | No | No |
+   | Signed in, without `edit_posts` (e.g. subscriber) | Yes | No | No |
+   | With `edit_posts` (e.g. author/editor) | Yes | Yes | No |
+   | Administrator (`manage_options`) | Yes | Yes | Yes |
+
+   Entity policies enforce this for GraphQL, generated admin pages and CLI. CLI
+   commands must name a user. Generated WordPress admin screens additionally require
+   `manage_options`. The frontend's write controls will adopt the session's
+   `canWrite` flag during the UI migration; the backend already enforces it.
+   The session endpoint and plugin shell send private/no-store responses.
+   JWT is no longer a Clog dependency; remove an already installed JWT plugin only
+   after checking whether another application on the site uses it.
 
 4. **Stopping/tearing down**
 

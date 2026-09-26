@@ -24,21 +24,28 @@ export function ItemForm({ item, initialBarcode }: ItemFormProps) {
   const [locationId, setLocationId] = useState('');
   const [count, setCount] = useState('');
 
+  const [error, setError] = useState('');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmedBarcode = barcode.trim() || null;
-    if (item) {
-      await updateItem(item.id, { name, barcode: trimmedBarcode });
-      navigate(`/items/${item.id}`);
-    } else {
-      const newItem = await addItem({ name, barcode: trimmedBarcode });
-      if (locationId) {
-        const itemCount = parseInt(count, 10) || 0;
-        for (let i = 0; i < itemCount; i++) {
-          await addInventory({ itemId: newItem.id, locationId, dateAdded: new Date() });
+    setError('');
+    try {
+      const trimmedBarcode = barcode.trim() || null;
+      if (item) {
+        await updateItem(item.id, { name, barcode: trimmedBarcode });
+        navigate(`/items/${item.id}`);
+      } else {
+        const newItem = await addItem({ name, barcode: trimmedBarcode });
+        if (locationId) {
+          const itemCount = parseInt(count, 10) || 0;
+          for (let i = 0; i < itemCount; i++) {
+            await addInventory({ itemId: newItem.id, locationId, dateAdded: new Date() });
+          }
         }
+        navigate(`/items/${newItem.id}`);
       }
-      navigate(`/items/${newItem.id}`);
+    } catch (failure) {
+      setError(`${failure instanceof Error ? failure.message : 'Could not save.'} Check inventory before retrying; changes may have been saved.`);
     }
   };
 
@@ -49,6 +56,7 @@ export function ItemForm({ item, initialBarcode }: ItemFormProps) {
         content={
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {error && <p role="alert">{error}</p>}
               <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
                 <Input

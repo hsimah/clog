@@ -202,3 +202,7 @@ Use JavaScript `Date` objects throughout the app:
   actual deployment export. Follow `server/docs/storage-upgrade.md`. Never bypass
   a schema refusal or delete old projections to make boot pass.
 - Apollo/Tailwind remain transitional until the separate Relay/Astryx/StyleX issues land.
+- Browser GraphQL requests use `client/src/lib/session.ts` with same-origin cookies
+  and a fresh WordPress GraphQL nonce. Reuse this fetch transport for Relay; wire
+  the same session-change cache disposal when replacing Apollo. Do not restore JWT
+  injection/localStorage or automatically retry failed mutations.

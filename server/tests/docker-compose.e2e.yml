@@ -17,7 +17,8 @@ services:
       VITE_GRAPHQL_URL: http://wordpress:8080/graphql
       WP_ADMIN_USER: clog-test
       WP_ADMIN_PASSWORD: clog-test-password
+      WP_SHELL_URL: http://wordpress:8080
     depends_on:
       wordpress:
         condition: service_healthy
-    command: [sh, -c, 'npm ci && npm run test:e2e']
+    command: [sh, -c, 'npm ci && npm run build && mkdir -p ../server/dist && cp -r dist/. ../server/dist/ && npm run test:e2e']

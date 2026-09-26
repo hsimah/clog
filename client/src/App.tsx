@@ -5,10 +5,12 @@ import { client } from '@/lib/apollo';
 import { DataProvider } from '@/context/DataContext';
 import { Layout } from '@/components/layout/Layout';
 import { routeMap } from '@/lib/route-map';
+import { SessionBoundary } from '@/components/layout/SessionBoundary';
 
 function App() {
   return (
     <ApolloProvider client={client}>
+      <SessionBoundary>
       <DataProvider>
         <BrowserRouter basename='/clog'>
           <Layout>
@@ -34,6 +36,7 @@ function App() {
           </Layout>
         </BrowserRouter>
       </DataProvider>
+      </SessionBoundary>
     </ApolloProvider>
   );
 }

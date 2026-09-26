@@ -32,19 +32,8 @@ if [ ! -f /var/www/html/wp-content/object-cache.php ]; then
   echo "Copied object-cache.php drop-in"
 fi
 
-# Remove legacy plugin directory (old Dockerfile unzipped the GitHub archive with a versioned name)
-if [ -d /var/www/html/wp-content/plugins/wp-graphql-jwt-authentication-0.7.0 ]; then
-  rm -rf /var/www/html/wp-content/plugins/wp-graphql-jwt-authentication-0.7.0
-  echo "Removed legacy wp-graphql-jwt-authentication-0.7.0 directory"
-fi
-
 # Install and activate plugins via WP-CLI
 wp plugin install wp-graphql --activate --allow-root
-if [ -d /var/www/html/wp-content/plugins/wp-graphql-jwt-authentication ]; then
-  wp plugin activate wp-graphql-jwt-authentication --allow-root
-else
-  wp plugin install https://github.com/wp-graphql/wp-graphql-jwt-authentication/archive/refs/tags/v0.7.0.zip --activate --allow-root
-fi
 wp plugin install wp-redis --activate --allow-root
 
 # Activate the local clog plugin (mounted via volume, not installed via WP-CLI).

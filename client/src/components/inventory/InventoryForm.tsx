@@ -27,20 +27,27 @@ export function InventoryForm({ inventory, onClose }: InventoryFormProps) {
 
   const isEditing = !!inventory;
 
+  const [error, setError] = useState('');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isEditing) {
-      await updateInventory(inventory.id, {
-        dateAdded: new Date(dateAdded + 'T00:00:00.000Z'),
-      });
-      navigate(`/inventory/${inventory.id}`);
-    } else {
-      const newInventory = await addInventory({
-        itemId,
-        locationId,
-        dateAdded: new Date(dateAdded + 'T00:00:00.000Z'),
-      });
-      navigate(`/inventory/${newInventory.id}`);
+    setError('');
+    try {
+      if (isEditing) {
+        await updateInventory(inventory.id, {
+          dateAdded: new Date(dateAdded + 'T00:00:00.000Z'),
+        });
+        navigate(`/inventory/${inventory.id}`);
+      } else {
+        const newInventory = await addInventory({
+          itemId,
+          locationId,
+          dateAdded: new Date(dateAdded + 'T00:00:00.000Z'),
+        });
+        navigate(`/inventory/${newInventory.id}`);
+      }
+    } catch (failure) {
+      setError(`${failure instanceof Error ? failure.message : 'Could not save.'} Check inventory before retrying; changes may have been saved.`);
     }
   };
 
@@ -54,6 +61,7 @@ export function InventoryForm({ inventory, onClose }: InventoryFormProps) {
       content={
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+              {error && <p role="alert">{error}</p>}
             <div className="space-y-2">
               <Label htmlFor="item">Item</Label>
               <Select

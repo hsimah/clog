@@ -40,13 +40,6 @@ function clog_template_include( $template ) {
 add_filter( 'template_include', 'clog_template_include' );
 
 /**
- * Extend JWT expiry to 1 hour for SPA sessions.
- */
-add_filter( 'graphql_jwt_auth_expire', function () {
-	return HOUR_IN_SECONDS;
-} );
-
-/**
  * Read the Vite manifest and return the entry point JS and CSS filenames.
  *
  * @return array{js: string, css: string[]} Asset paths relative to dist/.
