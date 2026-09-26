@@ -1,6 +1,15 @@
-@import "tailwindcss";
+/* Tailwind remains for screens awaiting migration. Keep both resets in ordered layers. */
+@layer reset, theme, base, astryx-base, astryx-theme, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import '@astryxdesign/core/reset.css';
+@import '@astryxdesign/core/astryx.css';
+@import '@astryxdesign/theme-neutral/theme.css';
+@import 'tailwindcss/utilities.css' layer(utilities);
 
-@theme {
+/* Inline legacy utilities so shared names (accent/border) cannot override
+   Astryx's token values or pick up a different meaning from its theme. */
+@theme inline {
   --color-background: oklch(1 0 0);
   --color-foreground: oklch(0.145 0 0);
   --color-card: oklch(1 0 0);

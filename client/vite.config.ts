@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import stylex from 'unplugin-stylex/vite'
 import path from 'path'
 
 export default defineConfig(({ mode }) => {
@@ -8,7 +9,7 @@ export default defineConfig(({ mode }) => {
   const target = new URL(env.WP_PROXY_TARGET || env.VITE_GRAPHQL_URL || '/', 'http://localhost:8080').origin;
   const proxy = { target, changeOrigin: true, cookieDomainRewrite: '' };
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [stylex(), react(), tailwindcss()],
     base: mode === 'production' ? './' : '/clog',
     build: { manifest: true },
     resolve: { alias: { '@': path.resolve(__dirname, './src') } },

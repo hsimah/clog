@@ -56,10 +56,18 @@ function clog_get_vite_assets() {
 
 	$manifest = json_decode( file_get_contents( $manifest_path ), true );
 	$entry    = $manifest['index.html'] ?? array();
+	$css      = $entry['css'] ?? array();
+	// unplugin-stylex emits this separately from Vite's manifest CSS list.
+	// WordPress serves our own HTML shell, so include it explicitly with a
+	// content version to avoid stale styles after a plugin update.
+	$stylex = CLOG_PLUGIN_DIR . 'dist/assets/stylex.css';
+	if ( file_exists( $stylex ) ) {
+		$css[] = 'assets/stylex.css?ver=' . hash_file( 'sha256', $stylex );
+	}
 
 	return array(
 		'js'  => $entry['file'] ?? '',
-		'css' => $entry['css'] ?? array(),
+		'css' => $css,
 	);
 }
 

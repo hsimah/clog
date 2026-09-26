@@ -1,48 +1,38 @@
-import { Link, useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { navItems } from '@/lib/route-map';
-import clogLogo from '/clog.png';
-import { logout } from '@/lib/session';
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { Button } from '@astryxdesign/core/Button';
+import { TopNav, TopNavHeading, TopNavItem } from '@astryxdesign/core/TopNav';
+import * as stylex from '@stylexjs/stylex';
+import { navItems } from '@/lib/route-map';
+import { logout } from '@/lib/session';
+import clogLogo from '@/assets/clog.png';
+
+const styles = stylex.create({
+  logo: { width: 32, height: 32, objectFit: 'contain', flexShrink: 0 },
+});
 
 export function Header() {
-  const location = useLocation();
+  const { pathname } = useLocation();
   const [error, setError] = useState('');
 
   return (
-    <header className="border-b bg-background">
-      <div className="container mx-auto px-4">
-        <div className="flex h-14 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img src={clogLogo} className="h-8 w-8" alt="Clog logo" />
-            <Link to="/" className="text-xl font-bold">
-              clog
-            </Link></div>
-          <nav className="flex items-center gap-6">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  'text-sm font-medium transition-colors hover:text-primary',
-                  location.pathname === item.path ||
-                    (item.path !== '/' && location.pathname.startsWith(item.path))
-                    ? 'text-primary'
-                    : 'text-muted-foreground'
-                )}
-              >
-                {item.label}
-              </Link>
-            ))}
-            <button className="text-sm underline" onClick={() => {
-              if (window.confirm('Sign out? Unsaved changes in Clog tabs will be discarded.')) {
-                void logout().catch(() => setError('Could not sign out. Please try again.'));
-              }
-            }}>Sign out</button>
-          </nav>
-        </div>
-      </div>
+    <>
+      <TopNav
+        label="Main navigation"
+        heading={<TopNavHeading heading="clog" headingHref="/"
+          logo={<img src={clogLogo} {...stylex.props(styles.logo)} alt="" />} />}
+        startContent={navItems.map((item) => (
+          <TopNavItem key={item.path} href={item.path} label={item.label}
+            isSelected={pathname === item.path || pathname.startsWith(`${item.path}/`) ||
+              (item.path === '/inventory' && pathname === '/')} />
+        ))}
+        endContent={<Button label="Sign out" variant="ghost" onClick={() => {
+          if (window.confirm('Sign out? Unsaved changes in Clog tabs will be discarded.')) {
+            void logout().catch(() => setError('Could not sign out. Please try again.'));
+          }
+        }} />}
+      />
       {error && <p role="alert">{error}</p>}
-    </header>
+    </>
   );
 }
