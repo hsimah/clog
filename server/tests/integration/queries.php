@@ -58,6 +58,33 @@ $locations = queryResult('query($item: ID!) { clogLocationSearch(where: {item: $
 queryCheck(2 === $locations['totalCount'] && 126 === array_sum(array_column($locations['nodes'], 'stockCount')), 'item location breakdown counts all units');
 $summary = queryResult('{ clogSummary { items locations inventory } }')['clogSummary'];
 queryCheck($baseline['items'] + 125 === $summary['items'] && $baseline['inventory'] + 250 === $summary['inventory'], 'dashboard totals are authoritative');
+// The workspace groups items before paging; it must not group a truncated stock page.
+$empty = $gateway->create('Item', ['name' => 'Pagination item empty']);
+$groupQuery = 'query($after: String) { clogStockedItems(where: {term: "Pagination item"}, first: 37, after: $after) { totalCount edges { node { id stockCount } } pageInfo { hasNextPage endCursor } } }';
+$groupIds = [];
+$groupUnits = 0;
+$cursor = null;
+do {
+    $groups = queryResult($groupQuery, ['after' => $cursor])['clogStockedItems'];
+    queryCheck(125 === $groups['totalCount'], 'stocked-item count excludes empty items and ignores page size');
+    foreach ($groups['edges'] as $edge) {
+        $groupIds[] = $edge['node']['id'];
+        $groupUnits += $edge['node']['stockCount'];
+    }
+    $cursor = $groups['pageInfo']['hasNextPage'] ? $groups['pageInfo']['endCursor'] : null;
+} while (null !== $cursor);
+queryCheck($ids === $groupIds && 250 === $groupUnits, 'stocked groups page deterministically without duplicate or missing units');
+queryCheck(126 === queryResult('{ clogItemSearch(where: {term: "Pagination item"}) { totalCount } }')['clogItemSearch']['totalCount'], 'catalogue still includes items with no stock');
+$groupFilter = 'query($location: ID, $term: String) { clogStockedItems(where: {term: $term, location: $location}) { totalCount nodes { id stockCount(location: $location) } } }';
+$freezerGroups = queryResult($groupFilter, ['term' => 'Pagination freezer'])['clogStockedItems'];
+queryCheck(1 === $freezerGroups['totalCount'] && $firstItem === $freezerGroups['nodes'][0]['id'], 'stocked search matches location names without duplicating item groups');
+$freezerGroups = queryResult($groupFilter, ['location' => $freezer, 'term' => '00000000'])['clogStockedItems'];
+queryCheck(1 === $freezerGroups['totalCount'] && 125 === $freezerGroups['nodes'][0]['stockCount'], 'stocked search combines barcode and location filters with accurate counts');
+queryCheck(0 === queryResult($groupFilter, ['location' => $shelf, 'term' => 'Pagination freezer'])['clogStockedItems']['totalCount'], 'a location name match must belong to the selected location');
+queryCheck(!empty(graphql(['query' => $groupFilter, 'variables' => ['location' => $firstItem]])['errors']), 'stocked query rejects a location ID with the wrong type');
+foreach (['last: 5', 'first: 101', 'after: "invalid"'] as $arguments) {
+    queryCheck(!empty(graphql(['query' => '{ clogStockedItems(' . $arguments . ') { totalCount } }'])['errors']), 'stocked query uses the shared pagination validation');
+}
 foreach (['Item', 'Location', 'Inventory'] as $entity) {
     $id = GlobalId::encode('Clog' . $entity, 1);
     $sameNumber[$entity] = queryResult('query($id: ID!) { node(id: $id) { id __typename } }', ['id' => $id])['node'];
@@ -74,10 +101,14 @@ $wrongType = graphql(['query' => 'query($id: ID!) { clogItemSearch(where: {locat
 queryCheck(!empty($wrongType['errors']), 'search rejects a global ID for the wrong entity type');
 $literal = $gateway->create('Item', ['name' => 'Literal %_ marker']);
 queryCheck(1 === queryResult('{ clogItemSearch(where: {term: "%_"}) { totalCount } }')['clogItemSearch']['totalCount'], 'search treats SQL wildcard characters literally');
+$literalUnit = $gateway->create('Inventory', ['item' => $literal->id->raw(), 'location' => $location->id->raw(), 'dateAdded' => '2020-01-01T00:00:00Z']);
+queryCheck(1 === queryResult('{ clogStockedItems(where: {term: "%_"}) { totalCount } }')['clogStockedItems']['totalCount'], 'stocked search escapes SQL wildcard characters');
+$gateway->delete('Inventory', $literalUnit->id);
+queryCheck(0 === queryResult('{ clogStockedItems(where: {term: "%_"}) { totalCount } }')['clogStockedItems']['totalCount'], 'removing the last unit removes its item from workspace groups');
 $deleted = queryResult('mutation($input: DeleteClogItemInput!) { deleteClogItem(input: $input) { deletedId } }', ['input' => ['id' => GlobalId::encode('ClogItem', (string) $literal->id)]]);
 queryCheck(GlobalId::encode('ClogItem', (string) $literal->id) === $deleted['deleteClogItem']['deletedId'], 'delete payload identifies the Relay record to remove');
 wp_set_current_user(0);
-$anonymous = queryResult('{ clogSummary { inventory } clogItemSearch { totalCount nodes { id stockCount } } clogInventorySearch { totalCount nodes { id } } }');
-queryCheck(null === $anonymous['clogSummary'] && 0 === $anonymous['clogItemSearch']['totalCount'] && [] === $anonymous['clogInventorySearch']['nodes'], 'aggregates and search do not disclose anonymous inventory');
+$anonymous = queryResult('{ clogStockedItems { totalCount nodes { id } } clogSummary { inventory } clogItemSearch { totalCount nodes { id stockCount } } clogInventorySearch { totalCount nodes { id } } }');
+queryCheck(0 === $anonymous['clogStockedItems']['totalCount'] && [] === $anonymous['clogStockedItems']['nodes'] && null === $anonymous['clogSummary'] && 0 === $anonymous['clogItemSearch']['totalCount'] && [] === $anonymous['clogInventorySearch']['nodes'], 'aggregates and search do not disclose anonymous inventory');
 wp_set_current_user($admin);
 WP_CLI::success('Paginated inventory query contract passed.');

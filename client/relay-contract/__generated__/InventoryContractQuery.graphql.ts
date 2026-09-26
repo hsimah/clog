@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5a9bcb13d668e8c9c93e60611048b659>>
+ * @generated SignedSource<<a27cfeb319eab243ac8ef0aed23199a3>>
  * @lightSyntaxTransform
  */
 
@@ -54,6 +54,22 @@ export type InventoryContractQuery$data = {
       readonly id: string;
       readonly name: string;
       readonly stockCount: number;
+    }>;
+    readonly pageInfo: {
+      readonly endCursor: string | null | undefined;
+      readonly hasNextPage: boolean;
+    };
+    readonly totalCount: number | null | undefined;
+  } | null | undefined;
+  readonly clogStockedItems: {
+    readonly edges: ReadonlyArray<{
+      readonly cursor: string | null | undefined;
+      readonly node: {
+        readonly barcode: string | null | undefined;
+        readonly id: string;
+        readonly name: string;
+        readonly stockCount: number;
+      };
     }>;
     readonly pageInfo: {
       readonly endCursor: string | null | undefined;
@@ -200,21 +216,49 @@ v13 = {
   "kind": "ObjectValue",
   "name": "where"
 },
-v14 = {
+v14 = [
+  (v13/*:: as any*/)
+],
+v15 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "totalCount",
   "storageKey": null
 },
-v15 = {
+v16 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v16 = [
+v17 = [
+  {
+    "alias": null,
+    "args": null,
+    "kind": "ScalarField",
+    "name": "cursor",
+    "storageKey": null
+  },
+  {
+    "alias": null,
+    "args": null,
+    "concreteType": "ClogItem",
+    "kind": "LinkedField",
+    "name": "node",
+    "plural": false,
+    "selections": [
+      (v7/*:: as any*/),
+      (v8/*:: as any*/),
+      (v9/*:: as any*/),
+      (v11/*:: as any*/),
+      (v16/*:: as any*/)
+    ],
+    "storageKey": null
+  }
+],
+v18 = [
   {
     "alias": null,
     "args": null,
@@ -230,8 +274,8 @@ v16 = [
     "storageKey": null
   }
 ],
-v17 = [
-  (v14/*:: as any*/),
+v19 = [
+  (v15/*:: as any*/),
   {
     "alias": null,
     "args": null,
@@ -239,31 +283,7 @@ v17 = [
     "kind": "LinkedField",
     "name": "edges",
     "plural": true,
-    "selections": [
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "cursor",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "concreteType": "ClogItem",
-        "kind": "LinkedField",
-        "name": "node",
-        "plural": false,
-        "selections": [
-          (v7/*:: as any*/),
-          (v8/*:: as any*/),
-          (v9/*:: as any*/),
-          (v11/*:: as any*/),
-          (v15/*:: as any*/)
-        ],
-        "storageKey": null
-      }
-    ],
+    "selections": (v17/*:: as any*/),
     "storageKey": null
   },
   {
@@ -273,29 +293,52 @@ v17 = [
     "kind": "LinkedField",
     "name": "pageInfo",
     "plural": false,
-    "selections": (v16/*:: as any*/),
+    "selections": (v18/*:: as any*/),
     "storageKey": null
   }
 ],
-v18 = {
+v20 = [
+  (v15/*:: as any*/),
+  {
+    "alias": null,
+    "args": null,
+    "concreteType": "RootQueryToClogStockedItemsConnectionEdge",
+    "kind": "LinkedField",
+    "name": "edges",
+    "plural": true,
+    "selections": (v17/*:: as any*/),
+    "storageKey": null
+  },
+  {
+    "alias": null,
+    "args": null,
+    "concreteType": "RootQueryToClogStockedItemsConnectionPageInfo",
+    "kind": "LinkedField",
+    "name": "pageInfo",
+    "plural": false,
+    "selections": (v18/*:: as any*/),
+    "storageKey": null
+  }
+],
+v21 = {
   "kind": "Literal",
   "name": "first",
   "value": 20
 },
-v19 = {
+v22 = {
   "kind": "Variable",
   "name": "item",
   "variableName": "id"
 },
-v20 = [
-  (v19/*:: as any*/)
+v23 = [
+  (v22/*:: as any*/)
 ],
-v21 = {
+v24 = {
   "alias": null,
   "args": [
-    (v18/*:: as any*/),
+    (v21/*:: as any*/),
     {
-      "fields": (v20/*:: as any*/),
+      "fields": (v23/*:: as any*/),
       "kind": "ObjectValue",
       "name": "where"
     }
@@ -305,7 +348,7 @@ v21 = {
   "name": "clogLocationSearch",
   "plural": false,
   "selections": [
-    (v14/*:: as any*/),
+    (v15/*:: as any*/),
     {
       "alias": null,
       "args": null,
@@ -318,7 +361,7 @@ v21 = {
         (v8/*:: as any*/),
         {
           "alias": null,
-          "args": (v20/*:: as any*/),
+          "args": (v23/*:: as any*/),
           "kind": "ScalarField",
           "name": "stockCount",
           "storageKey": null
@@ -333,22 +376,22 @@ v21 = {
       "kind": "LinkedField",
       "name": "pageInfo",
       "plural": false,
-      "selections": (v16/*:: as any*/),
+      "selections": (v18/*:: as any*/),
       "storageKey": null
     }
   ],
   "storageKey": null
 },
-v22 = [
+v25 = [
   (v7/*:: as any*/)
 ],
-v23 = {
+v26 = {
   "alias": null,
   "args": [
-    (v18/*:: as any*/),
+    (v21/*:: as any*/),
     {
       "fields": [
-        (v19/*:: as any*/),
+        (v22/*:: as any*/),
         (v10/*:: as any*/)
       ],
       "kind": "ObjectValue",
@@ -360,7 +403,7 @@ v23 = {
   "name": "clogInventorySearch",
   "plural": false,
   "selections": [
-    (v14/*:: as any*/),
+    (v15/*:: as any*/),
     {
       "alias": null,
       "args": null,
@@ -384,7 +427,7 @@ v23 = {
           "kind": "LinkedField",
           "name": "item",
           "plural": false,
-          "selections": (v22/*:: as any*/),
+          "selections": (v25/*:: as any*/),
           "storageKey": null
         },
         {
@@ -394,7 +437,7 @@ v23 = {
           "kind": "LinkedField",
           "name": "location",
           "plural": false,
-          "selections": (v22/*:: as any*/),
+          "selections": (v25/*:: as any*/),
           "storageKey": null
         }
       ],
@@ -407,13 +450,13 @@ v23 = {
       "kind": "LinkedField",
       "name": "pageInfo",
       "plural": false,
-      "selections": (v16/*:: as any*/),
+      "selections": (v18/*:: as any*/),
       "storageKey": null
     }
   ],
   "storageKey": null
 },
-v24 = [
+v27 = [
   {
     "kind": "Variable",
     "name": "after",
@@ -425,6 +468,9 @@ v24 = [
     "variableName": "first"
   },
   (v13/*:: as any*/)
+],
+v28 = [
+  "where"
 ];
 return {
   "fragment": {
@@ -455,18 +501,26 @@ return {
       },
       {
         "alias": "clogItemSearch",
-        "args": [
-          (v13/*:: as any*/)
-        ],
+        "args": (v14/*:: as any*/),
         "concreteType": "RootQueryToClogItemSearchConnection",
         "kind": "LinkedField",
         "name": "__InventoryContract__clogItemSearch_connection",
         "plural": false,
-        "selections": (v17/*:: as any*/),
+        "selections": (v19/*:: as any*/),
         "storageKey": null
       },
-      (v21/*:: as any*/),
-      (v23/*:: as any*/)
+      {
+        "alias": "clogStockedItems",
+        "args": (v14/*:: as any*/),
+        "concreteType": "RootQueryToClogStockedItemsConnection",
+        "kind": "LinkedField",
+        "name": "__InventoryContract__clogStockedItems_connection",
+        "plural": false,
+        "selections": (v20/*:: as any*/),
+        "storageKey": null
+      },
+      (v24/*:: as any*/),
+      (v26/*:: as any*/)
     ],
     "type": "RootQuery",
     "abstractKey": null
@@ -492,7 +546,7 @@ return {
         "name": "node",
         "plural": false,
         "selections": [
-          (v15/*:: as any*/),
+          (v16/*:: as any*/),
           (v7/*:: as any*/),
           (v12/*:: as any*/)
         ],
@@ -500,31 +554,48 @@ return {
       },
       {
         "alias": null,
-        "args": (v24/*:: as any*/),
+        "args": (v27/*:: as any*/),
         "concreteType": "RootQueryToClogItemSearchConnection",
         "kind": "LinkedField",
         "name": "clogItemSearch",
         "plural": false,
-        "selections": (v17/*:: as any*/),
+        "selections": (v19/*:: as any*/),
         "storageKey": null
       },
       {
         "alias": null,
-        "args": (v24/*:: as any*/),
-        "filters": [
-          "where"
-        ],
+        "args": (v27/*:: as any*/),
+        "filters": (v28/*:: as any*/),
         "handle": "connection",
         "key": "InventoryContract__clogItemSearch",
         "kind": "LinkedHandle",
         "name": "clogItemSearch"
       },
-      (v21/*:: as any*/),
-      (v23/*:: as any*/)
+      {
+        "alias": null,
+        "args": (v27/*:: as any*/),
+        "concreteType": "RootQueryToClogStockedItemsConnection",
+        "kind": "LinkedField",
+        "name": "clogStockedItems",
+        "plural": false,
+        "selections": (v20/*:: as any*/),
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": (v27/*:: as any*/),
+        "filters": (v28/*:: as any*/),
+        "handle": "connection",
+        "key": "InventoryContract__clogStockedItems",
+        "kind": "LinkedHandle",
+        "name": "clogStockedItems"
+      },
+      (v24/*:: as any*/),
+      (v26/*:: as any*/)
     ]
   },
   "params": {
-    "cacheID": "61e2af0f4490db9704a83f344b739b46",
+    "cacheID": "cd73bcb0aad5770d81c801b11f4aefc6",
     "id": null,
     "metadata": {
       "connection": [
@@ -535,16 +606,24 @@ return {
           "path": [
             "clogItemSearch"
           ]
+        },
+        {
+          "count": "first",
+          "cursor": "after",
+          "direction": "forward",
+          "path": [
+            "clogStockedItems"
+          ]
         }
       ]
     },
     "name": "InventoryContractQuery",
     "operationKind": "query",
-    "text": "query InventoryContractQuery(\n  $term: String\n  $location: ID\n  $id: ID!\n  $first: Int!\n  $after: String\n) {\n  clogSummary {\n    items\n    locations\n    inventory\n  }\n  node(id: $id) {\n    __typename\n    id\n    ... on ClogItem {\n      name\n      barcode\n      stockCount(location: $location)\n    }\n  }\n  clogItemSearch(first: $first, after: $after, where: {term: $term, location: $location}) {\n    totalCount\n    edges {\n      cursor\n      node {\n        id\n        name\n        barcode\n        stockCount(location: $location)\n        __typename\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n  clogLocationSearch(first: 20, where: {item: $id}) {\n    totalCount\n    nodes {\n      id\n      name\n      stockCount(item: $id)\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n  clogInventorySearch(first: 20, where: {item: $id, location: $location}) {\n    totalCount\n    nodes {\n      id\n      dateAdded\n      item {\n        id\n      }\n      location {\n        id\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n"
+    "text": "query InventoryContractQuery(\n  $term: String\n  $location: ID\n  $id: ID!\n  $first: Int!\n  $after: String\n) {\n  clogSummary {\n    items\n    locations\n    inventory\n  }\n  node(id: $id) {\n    __typename\n    id\n    ... on ClogItem {\n      name\n      barcode\n      stockCount(location: $location)\n    }\n  }\n  clogItemSearch(first: $first, after: $after, where: {term: $term, location: $location}) {\n    totalCount\n    edges {\n      cursor\n      node {\n        id\n        name\n        barcode\n        stockCount(location: $location)\n        __typename\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n  clogStockedItems(first: $first, after: $after, where: {term: $term, location: $location}) {\n    totalCount\n    edges {\n      cursor\n      node {\n        id\n        name\n        barcode\n        stockCount(location: $location)\n        __typename\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n  clogLocationSearch(first: 20, where: {item: $id}) {\n    totalCount\n    nodes {\n      id\n      name\n      stockCount(item: $id)\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n  clogInventorySearch(first: 20, where: {item: $id, location: $location}) {\n    totalCount\n    nodes {\n      id\n      dateAdded\n      item {\n        id\n      }\n      location {\n        id\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "a031d66285dbef41980cea0db0de8343";
+(node as any).hash = "9d4feca6c09f54567a3b6d992695f398";
 
 export default node;

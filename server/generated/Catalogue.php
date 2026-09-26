@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Catalogue.php
- * digest: sha256:64d348384af654eab9db52b4923f2793a3e13dcc8fa3f8a3a8f84b296cf538d1
+ * digest: sha256:19dfa15f755d7cb823f87958685428844362edb80854d9143fe79ea42a0a479b
  */
 
 namespace Clog\Entity;
@@ -328,6 +328,7 @@ final readonly class Catalogue implements EntityCatalogue
         return match ($entity . '.' . $query) {
             'Inventory.search' => ['term', 'location', 'item'],
             'Item.search' => ['term', 'location'],
+            'Item.stocked' => ['term', 'location'],
             'Location.search' => ['term', 'item'],
             default => [],
         };
@@ -434,6 +435,6 @@ final readonly class Catalogue implements EntityCatalogue
      * @return list<string>
      */
     public function contracts(): array {
-        return ['Clog\\Entity\\Inventory\\Contract\\InventoryDisplayNameSideEffect', 'Clog\\Entity\\Inventory\\Contract\\InventorySearchQuery', 'Clog\\Entity\\Item\\Contract\\ItemSearchQuery', 'Clog\\Entity\\Location\\Contract\\LocationSearchQuery', 'Clog\\Entity\\Pattern\\ClogPost\\Contract\\ClogPostSignedInReadPolicy', 'Clog\\Entity\\Pattern\\ClogPost\\Contract\\ClogPostStaffWritePolicy'];
+        return ['Clog\\Entity\\Inventory\\Contract\\InventoryDisplayNameSideEffect', 'Clog\\Entity\\Inventory\\Contract\\InventorySearchQuery', 'Clog\\Entity\\Item\\Contract\\ItemSearchQuery', 'Clog\\Entity\\Item\\Contract\\ItemStockedQuery', 'Clog\\Entity\\Location\\Contract\\LocationSearchQuery', 'Clog\\Entity\\Pattern\\ClogPost\\Contract\\ClogPostSignedInReadPolicy', 'Clog\\Entity\\Pattern\\ClogPost\\Contract\\ClogPostStaffWritePolicy'];
     }
 }

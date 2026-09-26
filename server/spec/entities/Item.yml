@@ -45,3 +45,15 @@ queries:
       wpgraphql:
         field: clogItemSearch
     handler: true
+  stocked:
+    description: Stocked items matching an item, barcode or location search.
+    args:
+      term: { type: string, nullable: true }
+      location: { type: id, nullable: true }
+    returns:
+      type: Item
+      cardinality: many
+    integrations:
+      wpgraphql:
+        field: clogStockedItems
+    handler: true

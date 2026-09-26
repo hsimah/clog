@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   class-map.php
- * digest: sha256:e503fc50be4da42eb5bd778dc05e9bee7cf32ad9fc1c063693a9ae04521dba4f
+ * digest: sha256:cc4146b120ee1d4191221ade04022d4053d9162e654a786e9af68d51ff81c67d
  */
 
 return [
@@ -36,6 +36,7 @@ return [
         'Clog\\Entity\\Inventory\\InventoryWriteContext' => 'Inventory/InventoryWriteContext.php',
         'Clog\\Entity\\Inventory\\InventoryWritePolicies' => 'Inventory/InventoryWritePolicies.php',
         'Clog\\Entity\\Item\\Contract\\ItemSearchQuery' => 'Item/Contract/ItemSearchQuery.php',
+        'Clog\\Entity\\Item\\Contract\\ItemStockedQuery' => 'Item/Contract/ItemStockedQuery.php',
         'Clog\\Entity\\Item\\Item' => 'Item/Item.php',
         'Clog\\Entity\\Item\\ItemDeleter' => 'Item/ItemDeleter.php',
         'Clog\\Entity\\Item\\ItemFinder' => 'Item/ItemFinder.php',

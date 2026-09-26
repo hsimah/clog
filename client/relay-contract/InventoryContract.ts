@@ -1,4 +1,4 @@
-// Compile-only contract fixture; the application adopts Relay in #36.
+// Compile-only coverage for the inventory workspace GraphQL contract.
 declare function graphql(strings: TemplateStringsArray): unknown;
 
 export const query = graphql`
@@ -10,6 +10,12 @@ export const query = graphql`
     }
     clogItemSearch(first: $first, after: $after, where: {term: $term, location: $location})
       @connection(key: "InventoryContract__clogItemSearch", filters: ["where"]) {
+      totalCount
+      edges { cursor node { id name barcode stockCount(location: $location) } }
+      pageInfo { hasNextPage endCursor }
+    }
+    clogStockedItems(first: $first, after: $after, where: {term: $term, location: $location})
+      @connection(key: "InventoryContract__clogStockedItems", filters: ["where"]) {
       totalCount
       edges { cursor node { id name barcode stockCount(location: $location) } }
       pageInfo { hasNextPage endCursor }

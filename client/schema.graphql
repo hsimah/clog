@@ -40,6 +40,9 @@ type RootQuery {
   "Every ClogLocation."
   clogLocations(first: Int, last: Int, after: String, before: String): RootQueryToClogLocationConnection
 
+  "Stocked items matching an item, barcode or location search."
+  clogStockedItems(first: Int, last: Int, after: String, before: String, where: RootQueryToClogStockedItemsConnectionWhereArgs): RootQueryToClogStockedItemsConnection
+
   "Authoritative catalogue and stock totals, independent of loaded pages."
   clogSummary: ClogSummary
 
@@ -5987,6 +5990,47 @@ type RootQueryToClogLocationConnectionEdge implements ClogLocationConnectionEdge
 }
 
 type RootQueryToClogLocationConnectionPageInfo implements ClogLocationConnectionPageInfo & WPPageInfo & PageInfo {
+  ""
+  endCursor: String
+
+  ""
+  hasNextPage: Boolean!
+
+  ""
+  hasPreviousPage: Boolean!
+
+  ""
+  startCursor: String
+}
+
+input RootQueryToClogStockedItemsConnectionWhereArgs {
+  location: ID
+  term: String
+}
+
+type RootQueryToClogStockedItemsConnection implements ClogItemConnection & Connection {
+  ""
+  edges: [RootQueryToClogStockedItemsConnectionEdge!]!
+
+  ""
+  nodes: [ClogItem!]!
+
+  ""
+  pageInfo: RootQueryToClogStockedItemsConnectionPageInfo!
+
+  "How many match, ignoring pagination."
+  totalCount: Int
+}
+
+type RootQueryToClogStockedItemsConnectionEdge implements ClogItemConnectionEdge & Edge {
+  ""
+  cursor: String
+
+  ""
+  node: ClogItem!
+}
+
+type RootQueryToClogStockedItemsConnectionPageInfo implements ClogItemConnectionPageInfo & WPPageInfo & PageInfo {
   ""
   endCursor: String
 

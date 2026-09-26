@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   graphql-manifest.php
- * digest: sha256:d77ed8a213265f3dd817f5d89445806ca8ecd4abcc390aa626816590a9835b51
+ * digest: sha256:fe8a97167d21599de29713619cb619c238e6a254404e9951bb788b5b74b53d5c
  */
 
 namespace Eleph\WPGraphQL\Manifest;
@@ -182,6 +182,15 @@ return new Manifest(
             'search',
             ['term' => new GraphQLType('String', false, false), 'item' => new GraphQLType('ID', false, false)],
             'Stable paginated search with authoritative counts for the app.',
+        ),
+        'clogStockedItems' => new QueryFieldEntry(
+            'clogStockedItems',
+            'ClogItem',
+            true,
+            'Item',
+            'stocked',
+            ['term' => new GraphQLType('String', false, false), 'location' => new GraphQLType('ID', false, false)],
+            'Stocked items matching an item, barcode or location search.',
         ),
     ],
 );
