@@ -1,7 +1,7 @@
 # Relay in Clog
 
 The runtime/compiler are Relay 21.0.1. Astryx/StyleX are independent of data
-ownership. Items and locations use Relay. Stock and the dashboard remain on the bounded
+ownership. Items, locations and the dashboard use Relay. Stock remains on the bounded
 Apollo/DataContext bridge until #39.
 
 - `scripts/node.sh npm run relay` regenerates application artifacts from
@@ -67,3 +67,6 @@ Its hook invalidates old capture sessions, closes tracks on detection/close/unmo
 and stops streams whose permission request resolves after closure. Session expiry
 closes the native dialog and stops the camera. Barcode values remain strings; the
 form trims surrounding space, preserves leading zeroes, and writes null when empty.
+
+The dashboard requests only `clogSummary`; its counts never depend on a loaded
+connection page. Returning to the route reloads those totals after writes.

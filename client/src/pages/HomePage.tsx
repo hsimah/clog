@@ -1,81 +1,66 @@
-import { Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
-import { useData } from '@/context/DataContext';
+import { useState } from 'react';
+import { graphql, usePreloadedQuery, type PreloadedQuery } from 'react-relay';
+import { Card } from '@astryxdesign/core/Card';
+import { Layout, LayoutHeader, LayoutContent, LayoutFooter } from '@astryxdesign/core/Layout';
+import { Button } from '@astryxdesign/core/Button';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Text } from '@astryxdesign/core/Text';
+import * as stylex from '@stylexjs/stylex';
+import { QueryBoundary } from '@/relay/QueryBoundary';
+import { useRouteQuery } from '@/relay/useRouteQuery';
+import { useCanWrite } from '@/relay/useCanWrite';
+import type { HomePageQuery } from './__generated__/HomePageQuery.graphql';
+
+const query = graphql`
+  query HomePageQuery { clogSummary { items locations inventory } }
+`;
+const variables = {};
+const styles = stylex.create({
+  cards: {
+    display: 'grid', gap: 'var(--spacing-4)',
+    gridTemplateColumns: { default: 'minmax(0, 1fr)', '@media (min-width: 900px)': 'repeat(3, minmax(0, 1fr))' },
+  },
+});
 
 export function HomePage() {
-  const { items, locations, inventory, loading, error } = useData();
+  const [revision, setRevision] = useState(0);
+  const reference = useRouteQuery<HomePageQuery>(query, variables, revision);
+  return <Stack gap={6}>
+    <Stack gap={2}>
+      <Text as="h1" type="display-2">Welcome to Clog</Text>
+      <Text>Cave Log - Inventory Management System</Text>
+    </Stack>
+    <QueryBoundary key={reference?.fetchKey ?? 'initial'} retry={() => setRevision((value) => value + 1)}>
+      {reference ? <Summary reference={reference} /> : <p role="status">Loading...</p>}
+    </QueryBoundary>
+  </Stack>;
+}
 
-  if (loading) {
-    return <p className="text-muted-foreground">Loading...</p>;
-  }
-
-  if (error) {
-    return <p className="text-destructive">Error loading data: {error.message}</p>;
-  }
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Welcome to Clog</h1>
-        <p className="text-muted-foreground">Cave Log - Inventory Management System</p>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card
-          header={<CardHeader title={<CardTitle>Items</CardTitle>}><CardDescription>Manage your inventory items</CardDescription></CardHeader>}
-          content={
-            <CardContent>
-              <p className="text-3xl font-bold">{items.length}</p>
-              <p className="text-sm text-muted-foreground">Total items</p>
-              <div className="mt-4 flex gap-2">
-                <Button asChild size="sm">
-                  <Link to="/items">View All</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link to="/items/new">Add New</Link>
-                </Button>
-              </div>
-            </CardContent>
-          }
-        />
-
-        <Card
-          header={<CardHeader title={<CardTitle>Locations</CardTitle>}><CardDescription>Manage storage locations</CardDescription></CardHeader>}
-          content={
-            <CardContent>
-              <p className="text-3xl font-bold">{locations.length}</p>
-              <p className="text-sm text-muted-foreground">Total locations</p>
-              <div className="mt-4 flex gap-2">
-                <Button asChild size="sm">
-                  <Link to="/locations">View All</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link to="/locations/new">Add New</Link>
-                </Button>
-              </div>
-            </CardContent>
-          }
-        />
-
-        <Card
-          header={<CardHeader title={<CardTitle>Inventory</CardTitle>}><CardDescription>Track item quantities</CardDescription></CardHeader>}
-          content={
-            <CardContent>
-              <p className="text-3xl font-bold">{inventory.length}</p>
-              <p className="text-sm text-muted-foreground">Total items in stock</p>
-              <div className="mt-4 flex gap-2">
-                <Button asChild size="sm">
-                  <Link to="/inventory">View All</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link to="/inventory/new">Add New</Link>
-                </Button>
-              </div>
-            </CardContent>
-          }
-        />
-      </div>
-    </div>
-  );
+function Summary({ reference }: { reference: PreloadedQuery<HomePageQuery> }) {
+  const { clogSummary } = usePreloadedQuery<HomePageQuery>(query, reference);
+  const canWrite = useCanWrite();
+  if (!clogSummary) throw new Error('Inventory totals are unavailable.');
+  const cards = [
+    { title: 'Items', description: 'Manage your inventory items', count: clogSummary.items, label: 'Total items', path: '/items' },
+    { title: 'Locations', description: 'Manage storage locations', count: clogSummary.locations, label: 'Total locations', path: '/locations' },
+    { title: 'Inventory', description: 'Track item quantities', count: clogSummary.inventory, label: 'Total items in stock', path: '/inventory' },
+  ];
+  return <div {...stylex.props(styles.cards)}>
+    {cards.map(({ title, description, count, label, path }) => <Card key={path} role="region" aria-label={title} padding={0}>
+      <Layout height="auto"
+        header={<LayoutHeader><Stack gap={2}>
+          <Text as="h2" type="display-3">{title}</Text>
+          <Text>{description}</Text>
+        </Stack></LayoutHeader>}
+        content={<LayoutContent><Stack gap={2}>
+          <Text type="display-2" aria-label={label}>{count}</Text>
+          <Text>{label}</Text>
+        </Stack></LayoutContent>}
+        footer={<LayoutFooter><Stack direction="horizontal" gap={2} wrap="wrap">
+          <Button href={path} label="View All" />
+          <Button href={`${path}/new`} label="Add New" variant="secondary" isDisabled={!canWrite} />
+        </Stack></LayoutFooter>}
+      />
+    </Card>)}
+  </div>;
 }

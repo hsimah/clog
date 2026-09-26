@@ -1,7 +1,8 @@
 # Clog UI conventions
 
 Astryx 0.6.0 and StyleX are the target UI stack. The application frame is migrated;
-the feature screens still use the legacy UI components until issues #38/#39 land.
+Items, locations and the dashboard use Astryx and StyleX. The inventory workspace
+retains the legacy UI components until its #39 migration lands.
 Use `scripts/node.sh npx astryx component <name>` to read the installed API before
 changing a component. `component --list` and `docs tokens` list the available APIs.
 
