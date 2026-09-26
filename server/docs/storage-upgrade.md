@@ -50,9 +50,10 @@ and add an explicit repair/import if needed.
 
 ## Cut over
 
-[MySQL 8.0.13+](https://dev.mysql.com/doc/refman/8.0/en/rename-table.html) or
-[MariaDB 10.6.1+](https://mariadb.com/docs/server/reference/sql-statements/data-definition/rename-table)
-is required for the locked, atomic InnoDB table exchange. The database
+[MySQL 8.0.13+](https://dev.mysql.com/doc/refman/8.0/en/rename-table.html)
+is required for the locked, atomic InnoDB table exchange. MariaDB is refused before
+DDL: its [locked-table rename behavior differs](https://mariadb.com/docs/release-notes/community-server/about/compatibility-and-differences/incompatibilities-and-feature-differences-between-mariadb-10-11-and-mysql-8),
+so it needs a separately tested cutover strategy if production uses it. The database
 user needs CREATE, INSERT, SELECT, ALTER, DROP (for RENAME privilege checking),
 LOCK TABLES and access to its schema metadata. Reserve space for a second copy
 of all three entity tables. The command never issues DROP.
@@ -129,4 +130,4 @@ interrupted copies, repeated runs, retained post mappings, and table restoration
 in isolated MySQL/WordPress containers. It does not access the garage inventory.
 Before closing #33, inspect the real deployment export and rehearse its WordPress
 ZIP update and full backup restore. Add a legacy importer only if that inspection
-shows it is needed. MariaDB support must also be rehearsed on that engine if used.
+shows it is needed. MariaDB migrations are currently unsupported.
