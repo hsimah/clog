@@ -13,6 +13,7 @@ jobs:
           php-version: '8.3'
           extensions: pdo_sqlite, mbstring
           coverage: none
+          ini-values: opcache.jit=0, opcache.jit_buffer_size=0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -25,10 +26,8 @@ jobs:
         working-directory: client
       - run: php server/standalone/tests/conformance.php
       - run: php server/standalone/tests/integration.php
-      - run: sudo apt-get update -qq && sudo apt-get install -y gdb
       - run: php server/standalone/tests/http.php
-        env:
-          CLOG_TEST_GDB: '1' 
+
       - run: npx playwright install --with-deps chromium
         working-directory: client
       - name: Browser smoke test
