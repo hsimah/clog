@@ -1,6 +1,9 @@
-import { useSyncExternalStore } from 'react';
-import { getSessionSnapshot, subscribeSession } from '@/lib/session';
+import { useSyncExternalStore } from "react";
+import { SESSION } from "../lib/session";
 
 export function useCanWrite() {
-  return useSyncExternalStore(subscribeSession, getSessionSnapshot).canWrite;
+  return useSyncExternalStore(
+    SESSION.subscribeSession,
+    SESSION.getSessionSnapshot,
+  ).canWrite;
 }

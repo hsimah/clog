@@ -8,7 +8,7 @@ test('locations own their queries and retry a failed read', async ({ page, authe
   await page.route('**/graphql', async (route) => {
     const operation = route.request().postDataJSON()?.operationName;
     operations.push(operation);
-    if (operation === 'LocationsPageQuery' && fail) {
+    if (operation === 'LocationPageQuery' && fail) {
       fail = false;
       await route.fulfill({ json: { errors: [{ message: 'Temporary query failure' }] } });
     } else await route.continue();
@@ -17,7 +17,7 @@ test('locations own their queries and retry a failed read', async ({ page, authe
   await expect(page.getByRole('alert')).toHaveText('Temporary query failure');
   await page.getByRole('button', { name: 'Try again' }).click();
   await expect(page.getByRole('link', { name: 'Garage Shelves' })).toBeVisible();
-  expect(operations.every((operation) => operation === 'LocationsPageQuery')).toBe(true);
+  expect(operations.every((operation) => operation === 'LocationPageQuery')).toBe(true);
 });
 
 test('locations paginate and raw detail links resolve off-page records', async ({ page, context, authenticate }) => {
@@ -77,7 +77,7 @@ test('Relay preserves draft on expiry, never replays a lost write, and clears on
   await expect(page.getByRole('textbox', { name: /^Name/ })).toHaveValue('Clog E2E Relay uncertain');
   let writes = 0;
   await page.route('**/graphql', async (route) => {
-    if (route.request().postDataJSON()?.operationName === 'LocationFormCreateMutation') {
+    if (route.request().postDataJSON()?.operationName === 'useLocationFormCreateMutation') {
       writes++;
       await route.fetch();
       await route.abort('failed');
@@ -97,13 +97,13 @@ test('Relay preserves draft on expiry, never replays a lost write, and clears on
 test('leaving a Relay route aborts its pending query', async ({ page, authenticate }) => {
   await authenticate();
   await page.route('**/graphql', async (route) => {
-    if (route.request().postDataJSON()?.operationName !== 'LocationsPageQuery') await route.continue();
+    if (route.request().postDataJSON()?.operationName !== 'LocationPageQuery') await route.continue();
     // Hold this response so the route is left while its query is in flight.
   });
-  const request = page.waitForRequest((req) => req.postData()?.includes('LocationsPageQuery') ?? false);
+  const request = page.waitForRequest((req) => req.postData()?.includes('LocationPageQuery') ?? false);
   await page.goto('/locations');
   await request;
-  const aborted = page.waitForEvent('requestfailed', { predicate: (req) => req.postData()?.includes('LocationsPageQuery') ?? false });
+  const aborted = page.waitForEvent('requestfailed', { predicate: (req) => req.postData()?.includes('LocationPageQuery') ?? false });
   await page.getByRole('navigation').getByRole('link', { name: 'Overview', exact: true }).click();
   await aborted;
   await expect(page).toHaveURL(/\/$/);

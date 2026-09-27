@@ -43,7 +43,7 @@ jobs:
       - run: npm ci
         working-directory: client
       - run: php server/standalone/tests/export-schema.php --check
-      - run: npm run relay:check && npm run lint && npm run build && npx tsc -p tsconfig.e2e.json
+      - run: npm run check
         working-directory: client
       - run: composer test
         working-directory: server

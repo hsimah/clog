@@ -1,58 +1,66 @@
 # Clog UI conventions
 
-All screens use Astryx 0.6.0 and StyleX.
-Use `scripts/node.sh npx astryx component <name>` to read the installed API before
-changing a component. `component --list` and `docs tokens` list the available APIs.
+Read [AGENTS.md](AGENTS.md) and [UI standards](docs/ui-standards.md) before changing
+handwritten UI. Clog uses tsquid, React Router 8, Relay 21, Astryx 0.6, StyleX,
+and Vite 8. Local imports are relative so tsquid's architecture checker can
+resolve the full import graph.
 
-Use component props first, then Stack/Grid/Section for layout, then
-`stylex.create` with `stylex.props` for DOM or `xstyle` for Astryx components.
-Use the documented Astryx tokens for colors, spacing and typography. Do not add
-new Tailwind utilities or duplicate Astryx components with bespoke styled HTML.
+## Routes and data
 
-The root Theme uses neutralTheme in dark mode with orange accents. `index.css` imports the reset,
-core and theme CSS once in the documented layer order and defines the color overrides. There are no Tailwind
-utilities, compatibility layers, or local UI wrappers.
+`routes.json` declares routes and typed URL fields. After editing it, run
+`scripts/node.sh npm run routes` and commit the generated catalogue.
+`npm run routes:check` rejects stale output.
 
-React Router serves routes from the domain root. Pass app-relative paths (`/items`) through
-LinkProvider/RouterLink; use normal anchors for external links and hashes. AppShell
-owns the main landmark, skip link, scroll frame and mobile drawer. TopNav marks
-Overview selected at `/` and Inventory at `/inventory`; nested routes keep their section
-selected. Import logos from `src/assets` so Vite bundles their URLs.
+- Build destinations with generated `*URI.getURI(input)` methods.
+- Read and update URL state with the active entrypoint's generated context hook.
+  Item, location, and inventory searches survive reload, detail/edit navigation,
+  closing panels, and browser history. Search replaces the current history entry;
+  choosing a location pushes one.
+- `*.entrypoint.ts` describes the initial query graph. Inventory starts its list,
+  location tabs, and selected detail queries together. `*Route.ts` reads the
+  references and composes the page and selected panel.
+- `RouteResource` lazily loads route UI. `NavigationLink` adapts Astryx's `href`
+  to tsquid's link; hover and keyboard focus preload code and query graphs.
+- Initial query references belong to tsquid. `useRouteQuery` handles explicit
+  refreshes and on-demand picker/expanded-row requests, disposing those requests
+  when replaced or unmounted. Component data belongs in Relay fragments.
+- Dedicated `use…Mutation.ts` hooks own mutation documents. Keep uncertain writes
+  explicit and never replay them automatically. Session recovery must preserve
+  drafts; account changes clear the store and require a reload.
 
-`unplugin-stylex` runs before React in Vite. Its separate `assets/stylex.css` is
-absent from Vite's manifest; the standalone PHP shell includes it with a content
-hash query parameter. Keep the standalone deep-route browser tests: dev-only checks
-will not catch missing extracted CSS in the production HTML shell.
+See [Relay conventions](RELAY.md) for pagination, stock additions, and scanning.
 
-## Component migration map
+## Frame and theme
 
-These APIs were checked through the installed Astryx CLI and TypeScript declarations.
-Migrate screen composition directly rather than recreating the old wrapper APIs.
+TopNav suits the four stable sections: Overview, Items, Locations, and Inventory.
+AppShell owns the main landmark, skip link, and mobile navigation. Content has a
+1440px maximum width; tables fill their region and own their overflow. A selected
+detail uses a 384px end column at 1000px and above. Below that breakpoint, the
+detail precedes the list at full width. Grid and Stack enforce this contract.
 
-| Existing component | Astryx replacement and differences |
-| --- | --- |
-| Button | Button requires `label`; use `isDisabled`/`isLoading`, `variant`, `type`, `icon`. |
-| Input + Label | TextInput owns its accessible `label`; controlled `value`, `onChange(value, event)`. Use TextArea/NumberInput for the appropriate fields. |
-| Select | Selector uses `label`, `options`, `value`, `onChange(value)`; it is not a native select event callback. |
-| Table | Table with TableHeader/TableBody/TableRow/TableHeaderCell/TableCell, or data-driven columns; keep proper table sections and server pagination. |
-| Card + header/content/footer wrappers | Card takes children; compose Text/Stack and sections instead of forwarding the old slot object. |
-| Dialog | Dialog uses `isOpen`/`onOpenChange`, DialogHeader and children; `purpose="form"` protects edits from backdrop dismissal after interaction. |
-| DropdownMenu | `button` describes the trigger; `items` describe actions, or use compound menu children. Navigation belongs in links, not an action menu. |
-| SidePanel | Use the route-owned aside: details precede the list on narrow screens and sit in an end column on wide screens. Closing navigates to the filtered parent. |
+Dense records use tables; Overview totals are independent Card widgets. Use Astryx
+props first and tokens for any additional StyleX styling. Structural region widths
+may be explicit; interior spacing, color, typography, and motion use tokens.
 
-Preserve labels, focus restoration, unsaved input on session expiry, and route
-back/forward behavior as each screen migrates. The browser suite checks the frame
-using the compiled standalone build, including Overview at 390px and 1280px widths.
+`src/theme/ClogTheme.ts` owns the dark surfaces and deep-orange accent. The Astryx
+CLI compiles it into `src/theme/__generated__/` before development and production
+builds. Global CSS imports the reset, core styles, and compiled theme in order;
+it does not override color tokens. Theme mode stays dark. Fonts use the system
+stack, with no external font request.
 
-For all screens, keep table overflow inside its own container, keep the
-name/detail link visible, and move row actions into the detail view (#11). On a
-phone, route-owned detail forms should fill the available width; desktop and
-portrait screens can use a bounded end panel without forcing the table wider.
-Keep portrait layout driven by available width rather than device orientation.
-Keep browser coverage for the screen contents as well as the shared frame.
+The tsquid Vite preset runs StyleX before React and Relay. Its extracted
+`assets/stylex.css` is outside Vite's manifest, so the PHP shell includes it
+explicitly with a content hash. Keep browser coverage against the compiled PHP
+application; Vite-only checks cannot verify that shell.
 
-Relay query references belong to routes, fragments to the components reading
-them, and mutation hooks to the forms performing them (#36). Reuse the shared
-session transport and discard the store on account change; never automatically
-retry writes. Use authoritative totals and paginated search connections from
-`server/docs/graphql-contract.md`.
+## Checks
+
+```sh
+scripts/node.sh npm run check
+scripts/test-standalone-browser.sh
+```
+
+`check` validates generated routes, URI contracts, tsquid lint and architecture,
+Relay artifacts, TypeScript (including browser tests), and the production build.
+The browser suite uses disposable databases and covers preloading, filters,
+responsive layout, sessions, permissions, CRUD, pagination, and scanner cleanup.

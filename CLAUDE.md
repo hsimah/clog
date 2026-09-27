@@ -17,14 +17,16 @@ in `server/standalone/`, using generated entities under `server/generated/`.
 
 ## Client conventions
 
-- Read `client/UI-MIGRATION.md` and `client/RELAY.md` before changing client flows.
+- Read `client/AGENTS.md`, `client/docs/ui-standards.md`, `client/UI-MIGRATION.md`,
+  and `client/RELAY.md` before changing client flows.
 - Use Astryx component props and layout primitives first, then StyleX. Consult
   `scripts/node.sh npx astryx component <Name>` for the installed API. Do not
   reintroduce Tailwind utilities or local copies of Astryx components.
 - Compose Astryx Card with Layout header/content/footer slots and its section
   components. Button takes `label`; controls own accessible labels.
-- Use `@/` imports. Feature components and files use PascalCase; hooks/utilities
-  use camelCase. Import types with `type`; never use `any`.
+- Use relative imports and entity-owned public modules. Follow tsquid module
+  naming, declaration order, and architecture checks. Import types with `type`;
+  never use `any`.
 - Routes own Relay query references; components read colocated fragments. Generated
   response types are authoritative. Do not duplicate entity models or load whole
   collections into global context. Commit generated artifacts with their operations.
@@ -33,14 +35,16 @@ in `server/standalone/`, using generated entities under `server/generated/`.
   never automatically replay uncertain mutations. Respect `canWrite`.
 - Stock actions belong in the detail panel. Tables expose expansion and details
   navigation. Paginate groups and units independently; use server totals.
-- Use outlet contexts for refresh, close and detail paths. Workspace item/location
-  edits must stay inside `/inventory` and retain its search parameters. Routes use
-  the domain root; pass app-relative paths through RouterLink. Overview lives at `/`.
+- Declare routes in `client/routes.json`. Tsquid entrypoints preload Relay queries;
+  generated URI builders and active route contexts own URL state. WorkspaceContext
+  supplies refresh/close actions and typed detail paths. Inventory edits stay inside
+  `/inventory` and retain filters. NavigationLink preloads destinations on hover and
+  focus. Overview lives at `/`.
 - Put narrow-screen panels before lists, constrain wide-screen panels, and keep
   table overflow local. Focus the panel heading or first form field on entry.
 - Store GraphQL dates as ISO strings; format only for presentation. Date-only
   stock edits preserve the entered calendar date as midnight UTC.
-- Run Relay generation/validation, lint and builds through `scripts/node.sh`.
+- Run `scripts/node.sh npm run check` for routes, lint, Relay, types, and builds.
   Use `scripts/test-standalone-browser.sh` for meaningful flow changes.
 
 ## Release verification

@@ -46,12 +46,14 @@ test('location tabs, grouped details and browser history preserve workspace filt
   await authenticate();
   await page.goto('/inventory?term=ketchup');
   await page.getByRole('navigation', { name: 'Inventory locations' }).getByRole('button', { name: 'Kitchen Cabinet', exact: true }).click();
-  await expect(page).toHaveURL(/term=ketchup&location=/);
+  await expect.poll(() => new URL(page.url()).searchParams.get('location')).toBeTruthy();
+  expect(new URL(page.url()).searchParams.get('term')).toBe('ketchup');
   const filtered = page.url();
   await page.getByRole('link', { name: 'Heinz Ketchup', exact: true }).click();
   const panel = page.getByRole('complementary', { name: 'Inventory details' });
   await expect(panel.getByRole('heading', { name: 'Heinz Ketchup', exact: true })).toBeFocused();
-  await expect(page).toHaveURL(/\/inventory\/items\/.*\?term=ketchup&location=/);
+  await expect(page).toHaveURL(/\/inventory\/items\//);
+  expect(new URL(page.url()).search).toBe(new URL(filtered).search);
   await page.reload();
   await expect(panel.getByRole('heading', { name: 'Heinz Ketchup', exact: true })).toBeVisible();
   await panel.getByRole('button', { name: 'Close', exact: true }).click();
@@ -139,7 +141,7 @@ test('workspace pages groups and physical units beyond the first page, then edit
     await expect(panel.getByRole('link', { name: names[25], exact: true })).toBeVisible();
     expect(operations).not.toContain('GetItems');
     expect(operations).not.toContain('GetInventory');
-    expect(operations).toContain('StockSelectionPagePaginationQuery');
+    expect(operations).toContain('StockSelectionPaginationQuery');
     for (const viewport of [{ width: 390, height: 844 }, { width: 1080, height: 1920 }]) {
       await page.setViewportSize(viewport);
       await expect(panel.getByRole('heading', { name: 'Inventory Entry' })).toBeVisible();

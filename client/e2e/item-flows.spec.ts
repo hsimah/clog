@@ -7,7 +7,7 @@ test('initial stock reports partial completion without recreating the saved item
   let additions = 0;
   await page.route('**/graphql', async (route) => {
     const operation = route.request().postDataJSON()?.operationName;
-    if (operation === 'ItemFormCreateMutation') items++;
+    if (operation === 'useItemFormCreateMutation') items++;
     if (operation === 'useAddStockMutation') {
       additions++;
       if (additions === 2) {

@@ -1,7 +1,7 @@
 # Clog (Cave Log)
 
 Clog tracks items, storage locations, and individual stock units. The React client
-uses Relay and Astryx; the PHP application uses Elephentity, GraphQL, and SQLite.
+uses tsquid, Relay, and Astryx; the PHP application uses Elephentity, GraphQL, and SQLite.
 The app serves Overview at `/`, with inventory, items, and locations at their own
 root routes. Authentication uses local accounts, cookies, and CSRF tokens.
 
@@ -35,7 +35,7 @@ existing supported databases. Use `reader` for a read-only account. See the
 ```sh
 scripts/php.sh composer check-generated
 scripts/php.sh php standalone/tests/export-schema.php --check
-scripts/node.sh sh -c 'npm run relay:check && npm run lint && npm run build && npx tsc -p tsconfig.e2e.json'
+scripts/node.sh npm run check
 scripts/test-standalone.sh
 scripts/test-standalone-browser.sh
 scripts/package-standalone.sh
