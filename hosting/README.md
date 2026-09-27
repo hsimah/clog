@@ -1,0 +1,142 @@
+# Standalone Clog on nginx + PHP-FPM + SQLite
+
+The standalone application runs without WordPress, MySQL, Redis or Composer.
+This branch replaces the frontend session transport and GraphQL schema. The old
+plugin/dev files are retained as migration references; they are not the deployment
+path and are excluded from the standalone archive.
+
+## Build and verify elsewhere
+
+```sh
+scripts/node.sh npm run relay:check
+scripts/node.sh npm run lint
+scripts/node.sh npm run build
+scripts/test-standalone.sh
+scripts/test-standalone-browser.sh
+scripts/package-standalone.sh
+scripts/php.sh php standalone/tests/package.php
+```
+
+The artifact is `build/clog-standalone.tar.gz`. It contains compiled frontend
+assets, generated entity classes, the standalone server, checked-in dependencies,
+and hosting configuration. No Composer commands run during build or deployment.
+The PHP test wrapper currently uses the existing PHP build image; that image is
+only a development tool and is not installed on the Pi.
+
+## Run locally
+
+After building the client:
+
+```sh
+scripts/standalone-dev.sh install
+read -rsp 'Local password: ' CLOG_NEW_PASSWORD; echo
+printf '%s' "$CLOG_NEW_PASSWORD" | scripts/standalone-dev.sh user:add admin editor
+unset CLOG_NEW_PASSWORD
+scripts/standalone-dev.sh serve
+```
+
+Open `http://localhost:8280/auth/login`. This uses PHP's development server and
+stores the database/sessions in ignored `.standalone/`. Stop it with Ctrl+C.
+For frontend hot reload, use `CLOG_PROXY_TARGET=http://localhost:8280` with Vite
+on the host. Containerized Vite needs an origin it can reach from its network.
+Use nginx/FPM for production.
+
+## Native installation on the Pi
+
+Use a supported OS providing PHP **8.3 or newer**, PHP-FPM, PDO SQLite, mbstring,
+and OPcache. Package and service names depend on the OS/PHP version. The paths in
+these templates assume Debian-style `www-data`, `/etc/nginx`, and `/run/php`.
+nginx must have permission to connect to the FPM socket.
+
+1. Extract the artifact into `/opt/clog`. Keep application source owned by the
+   deployment account and read-only to the FPM user.
+2. Create private writable data directories:
+
+   ```sh
+   sudo install -d -o www-data -g www-data -m 0700 /var/lib/clog /var/lib/clog/sessions
+   ```
+
+3. Install the database and create an account. The password is read from stdin,
+   so it does not appear in command arguments:
+
+   ```sh
+   sudo -u www-data env CLOG_DB=/var/lib/clog/clog.sqlite \
+     php /opt/clog/server/standalone/cli.php install
+   read -rsp 'New password: ' CLOG_NEW_PASSWORD; echo
+   printf '%s' "$CLOG_NEW_PASSWORD" | sudo -u www-data env CLOG_DB=/var/lib/clog/clog.sqlite \
+     php /opt/clog/server/standalone/cli.php user:add admin editor
+   unset CLOG_NEW_PASSWORD
+   ```
+
+   Use `reader` instead of `editor` for a read-only account. Passwords must be
+   12–72 bytes. There is no public registration or email dependency.
+4. Copy `clog-fpm.conf` into the installed PHP-FPM `pool.d` directory. Set
+   `CLOG_ORIGIN` to the actual public HTTPS origin. Disable the distribution's
+   default pool if nothing else uses it; otherwise include its workers in the
+   host memory budget. Install `clog-php.ini` in FPM's `conf.d` directory.
+5. Install `clog-fastcgi.conf` as `/etc/nginx/snippets/clog-fastcgi.conf` and adapt
+   `clog-nginx.conf` for your hostname and existing TLS certificates. It belongs
+   in nginx's `http` context. If nginx already owns this hostname, merge the
+   locations into that server instead of adding a duplicate server.
+6. Validate nginx and PHP-FPM configuration with `nginx -t` and the installed
+   FPM binary's `-t` option, then reload their services. Open `/auth/login`.
+
+All requests reach a fixed front controller; arbitrary `.php` paths are never
+executed. Only `/clog/assets/` is served from disk. The database, vendor source and
+session files are outside the web document root. Login has an nginx rate limit;
+GraphQL requires a session, CSRF header, JSON POST, and bounded query depth/cost.
+Sessions expire after eight hours. Clean old session files with the OS's scheduled
+session cleanup, configured for `/var/lib/clog/sessions` (see tmpfiles template).
+
+## Database and backups
+
+SQLite uses WAL, full synchronous durability, a three-second busy timeout, a 2 MiB
+connection page cache, and foreign keys. Transactions acquire the writer lock
+before writes; nested transactions use savepoints. Keep the database on a local
+filesystem. Do not put it on an SMB/NFS share.
+
+Create a consistent live backup with the CLI (destination must not already exist):
+
+```sh
+sudo -u www-data env CLOG_DB=/var/lib/clog/clog.sqlite \
+  php /opt/clog/server/standalone/cli.php backup /var/lib/clog/backup-2026-09-26.sqlite
+```
+
+Copy backups off the Pi. The backup includes user password hashes. To restore,
+stop the Clog FPM pool, move the current database **and its `-wal`/`-shm` sidecars**
+into a recovery directory, install the backup as `clog.sqlite` owned by `www-data`,
+clear session files to sign everyone out, and restart FPM. Rehearse restoration
+before relying on backups. Never replace a database beneath running workers.
+
+The schema installer accepts an empty SQLite database or the current schema
+version. It refuses unknown schemas. It does not import an existing WordPress
+installation; Clog was previously documented as having no production data.
+
+## Updates and operation
+
+Build releases off-device. Stop the Clog pool, back up the database, replace the
+application artifact, run the explicit installer/migration command for that
+release, and restart FPM so OPcache sees the new code. Keep the previous artifact
+with the database backup. No plugin updater or unattended deployment is involved.
+
+`/healthz` checks that the database can open and has the expected schema version.
+Errors go to PHP-FPM logs; avoid logging request bodies or session tokens.
+
+Start with two on-demand workers and a 64 MiB PHP request allocation limit. The
+32 MiB OPcache is shared across workers. These are tuning defaults, not measured
+Pi memory figures or a process RSS cap. Measure idle and concurrent search/write
+load on the target host, including other FPM pools, OS services, and file cache.
+The development tests run on the workstation; Pi/ARM performance remains untested.
+
+## Development and remaining extraction work
+
+The source of the prototype dependencies and their versions are documented in
+`server/standalone/vendor/README.md`. Neither the old plugin packaging workflow nor
+old WordPress browser fixtures validate this standalone deployment. Use the new
+standalone workflow and tests.
+
+The next upstream work is a generic SQLite schema/migration generator, broader adapter
+conformance for edge cases and concurrency, and generation of standalone GraphQL manifests.
+SQLite's Unicode collation/search behavior needs an explicit contract: currently
+name/barcode uniqueness and ordering use Unicode lowercase comparison; SQLite LIKE
+uses its built-in ASCII case-insensitive matching. Accent folding is not provided.

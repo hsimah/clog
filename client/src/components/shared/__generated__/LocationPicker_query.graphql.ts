@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c498125fbfd9600ee6d2fa15fbb78705>>
+ * @generated SignedSource<<f3467f43f3600ee0dacc2e78e5ab5187>>
  * @lightSyntaxTransform
  */
 
@@ -15,8 +15,8 @@ export type LocationPicker_query$data = {
       readonly node: {
         readonly id: string;
         readonly name: string;
-      };
-    }>;
+      } | null | undefined;
+    } | null | undefined> | null | undefined;
   } | null | undefined;
   readonly " $fragmentType": "LocationPicker_query";
 };
@@ -147,7 +147,7 @@ return {
         {
           "alias": null,
           "args": null,
-          "concreteType": "RootQueryToClogLocationSearchConnectionPageInfo",
+          "concreteType": "PageInfo",
           "kind": "LinkedField",
           "name": "pageInfo",
           "plural": false,

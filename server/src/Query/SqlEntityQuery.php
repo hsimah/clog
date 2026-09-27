@@ -12,7 +12,7 @@ use Eleph\Runtime\Query\EntityQuery;
 use Eleph\Runtime\Storage\Cursor;
 use Eleph\Runtime\Storage\Offset;
 use Eleph\Runtime\Storage\Page;
-use Eleph\WordPress\Database\Database;
+use Eleph\SQLite\Database;
 
 /**
  * @implements EntityQuery<object>

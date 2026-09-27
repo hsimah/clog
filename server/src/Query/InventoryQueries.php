@@ -7,7 +7,7 @@ namespace Clog\Query;
 use Eleph\Runtime\Gateway\EntityGateway;
 use Eleph\Runtime\Identity\EntityId;
 use Eleph\Runtime\Policy\ViewerProvider;
-use Eleph\WordPress\Database\Database;
+use Eleph\SQLite\Database;
 use InvalidArgumentException;
 
 /** Fixed SQL identifiers, parameterized values, and no joins that duplicate entities. */
@@ -46,7 +46,7 @@ final readonly class InventoryQueries
                 $bindings[] = (string) $location;
             }
             if ('' !== $term) {
-                $stockWhere[] = '(e.name LIKE %s OR e.barcode LIKE %s OR l.name LIKE %s)';
+                $stockWhere[] = '(e.name LIKE %s ESCAPE \'\\\' OR e.barcode LIKE %s ESCAPE \'\\\' OR l.name LIKE %s ESCAPE \'\\\')';
                 array_push($bindings, $like, $like, $like);
             }
             $where[] = 'EXISTS (SELECT 1 FROM ' . $tables['Inventory'] . ' s INNER JOIN '
@@ -55,7 +55,7 @@ final readonly class InventoryQueries
             $from .= ' INNER JOIN ' . $tables['Item'] . ' i ON e.item_id = i.id'
                 . ' INNER JOIN ' . $tables['Location'] . ' l ON e.location_id = l.id';
             if ('' !== $term) {
-                $where[] = '(i.name LIKE %s OR i.barcode LIKE %s OR l.name LIKE %s)';
+                $where[] = '(i.name LIKE %s ESCAPE \'\\\' OR i.barcode LIKE %s ESCAPE \'\\\' OR l.name LIKE %s ESCAPE \'\\\')';
                 array_push($bindings, $like, $like, $like);
             }
             foreach (['item' => $item, 'location' => $location] as $edge => $id) {
@@ -66,7 +66,7 @@ final readonly class InventoryQueries
             }
         } else {
             if ('' !== $term) {
-                $where[] = 'Item' === $entity ? '(e.name LIKE %s OR e.barcode LIKE %s)' : 'e.name LIKE %s';
+                $where[] = 'Item' === $entity ? '(e.name LIKE %s ESCAPE \'\\\' OR e.barcode LIKE %s ESCAPE \'\\\')' : 'e.name LIKE %s ESCAPE \'\\\'';
                 $bindings[] = $like;
                 if ('Item' === $entity) {
                     $bindings[] = $like;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0f133147353cc87fb8ed6b4d74145c8f>>
+ * @generated SignedSource<<addacf24577bab0b2d5bc1d6d49766da>>
  * @lightSyntaxTransform
  */
 
@@ -15,8 +15,8 @@ export type StockUnits_query$data = {
       readonly node: {
         readonly dateAdded: string;
         readonly id: string;
-      };
-    }>;
+      } | null | undefined;
+    } | null | undefined> | null | undefined;
     readonly totalCount: number | null | undefined;
   } | null | undefined;
   readonly " $fragmentType": "StockUnits_query";
@@ -165,7 +165,7 @@ return {
         {
           "alias": null,
           "args": null,
-          "concreteType": "RootQueryToClogInventorySearchConnectionPageInfo",
+          "concreteType": "PageInfo",
           "kind": "LinkedField",
           "name": "pageInfo",
           "plural": false,

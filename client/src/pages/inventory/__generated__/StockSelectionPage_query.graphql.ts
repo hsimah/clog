@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<50ac240ce7e216846fca75a8c63610e3>>
+ * @generated SignedSource<<9e3211faf236681daa5930fcd8adc8b5>>
  * @lightSyntaxTransform
  */
 
@@ -15,8 +15,8 @@ export type StockSelectionPage_query$data = {
       readonly node: {
         readonly id: string;
         readonly " $fragmentSpreads": FragmentRefs<"InventoryDetails_inventory">;
-      };
-    }>;
+      } | null | undefined;
+    } | null | undefined> | null | undefined;
     readonly totalCount: number | null | undefined;
   } | null | undefined;
   readonly " $fragmentType": "StockSelectionPage_query";
@@ -163,7 +163,7 @@ return {
         {
           "alias": null,
           "args": null,
-          "concreteType": "RootQueryToClogInventorySearchConnectionPageInfo",
+          "concreteType": "PageInfo",
           "kind": "LinkedField",
           "name": "pageInfo",
           "plural": false,

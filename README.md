@@ -1,5 +1,17 @@
 # Clog (Cave Log)
 
+## Standalone SQLite development
+
+This feature branch is moving Clog to **nginx + PHP-FPM + SQLite**. Start with
+[the hosting and deployment guide](hosting/README.md). The standalone archive
+includes its dependencies; no Composer commands are needed. Use
+`scripts/test-standalone.sh` and `scripts/package-standalone.sh`.
+
+The WordPress instructions below describe the previous architecture and are kept
+for reference during the migration. The frontend now uses standalone authentication.
+
+---
+
 Clog is a React‑powered inventory management frontend that lives inside a WordPress plugin. The repo contains both the client application (`client/`) and the plugin/theme code under `server/`.
 
 ---

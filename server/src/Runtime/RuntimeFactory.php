@@ -28,7 +28,7 @@ final class RuntimeFactory
     public static function create(
         StorageAdaptor $storage,
         ViewerProvider $viewers,
-        \Eleph\WordPress\Database\Database $database,
+        \Eleph\SQLite\Database $database,
         LoggerInterface $logger = new NullLogger(),
     ): Runtime {
         $container = new Container();

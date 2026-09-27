@@ -47,3 +47,6 @@ client/tsconfig.e2e.tsbuildinfo
 
 # Reproducible plugin packaging output
 /build/
+
+# Standalone local SQLite database and sessions
+/.standalone/

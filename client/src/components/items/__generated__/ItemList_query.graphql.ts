@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<8e75e3cc7dce30add0d44b09d538b034>>
+ * @generated SignedSource<<047b4a5720b6d1bb9f7dad36191e2ecf>>
  * @lightSyntaxTransform
  */
 
@@ -18,8 +18,8 @@ export type ItemList_query$data = {
         readonly id: string;
         readonly name: string;
         readonly stockCount: number;
-      };
-    }>;
+      } | null | undefined;
+    } | null | undefined> | null | undefined;
     readonly totalCount: number | null | undefined;
   } | null | undefined;
   readonly " $fragmentType": "ItemList_query";
@@ -179,7 +179,7 @@ return {
         {
           "alias": null,
           "args": null,
-          "concreteType": "RootQueryToClogItemSearchConnectionPageInfo",
+          "concreteType": "PageInfo",
           "kind": "LinkedField",
           "name": "pageInfo",
           "plural": false,

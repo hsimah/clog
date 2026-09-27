@@ -34,7 +34,7 @@ export function SessionBoundary({ children }: { children: ReactNode }) {
       <Text as="h1" type="display-3">{session.status === 'checking' ? 'Checking your session…' : ended ? 'Session ended' : session.status === 'unavailable' ? 'Could not check your session' : 'Sign in to continue'}</Text>
       {session.status !== 'checking' && <>
         <p>{ended ? 'Reload to continue with the current account. Previous account data has been cleared.' : 'Your unsaved input stays in this tab. Sign in in another tab, then check your session here.'}</p>
-        <Link href={loginUrl} target="_blank" rel="noopener noreferrer">Open WordPress sign-in</Link>
+        <Link href={loginUrl} target="_blank" rel="noopener noreferrer">Open Clog sign-in</Link>
         <Button variant="secondary" label={ended ? 'Reload Clog' : 'Check session'} onClick={() => ended ? location.reload() : void refreshSession().catch(() => {})} />
       </>}
     </Stack></main>}

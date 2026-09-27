@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a3a2dd4bbf587cf671f135aa56c4b556>>
+ * @generated SignedSource<<30acfea06130c41e13254e09551ee193>>
  * @lightSyntaxTransform
  */
 
@@ -223,7 +223,7 @@ return {
               {
                 "alias": null,
                 "args": null,
-                "concreteType": "RootQueryToClogLocationSearchConnectionPageInfo",
+                "concreteType": "PageInfo",
                 "kind": "LinkedField",
                 "name": "pageInfo",
                 "plural": false,
