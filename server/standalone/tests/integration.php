@@ -13,6 +13,7 @@ function fails(callable $fn, string $message): void {
     try { $fn(); } catch (Throwable) { return; }
     throw new RuntimeException($message);
 }
+if (!str_starts_with((new ReflectionClass(Database::class))->getFileName(), realpath(dirname(__DIR__, 2) . '/vendor') . DIRECTORY_SEPARATOR)) throw new RuntimeException('SQLite must load from Composer dependencies.');
 $db = new Database(':memory:');
 Schema::install($db); Schema::install($db);
 $app = new Application($db, new Viewer('1', 'editor'));

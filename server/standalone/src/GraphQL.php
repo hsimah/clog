@@ -24,7 +24,7 @@ final class GraphQL
 
     public static function schema(Application $app): Schema
     {
-        $manifest = require dirname(__DIR__) . '/manifests/graphql.php';
+        $manifest = require dirname(__DIR__, 2) . '/generated/graphql/graphql-manifest.php';
         $builder = new SchemaBuilder();
         $registrar = new TypeRegistrar($manifest, $app->runtime);
         $builder->interface('Node', ['id' => ['type' => ['non_null' => 'ID']]], static function ($node) use ($builder, $manifest) {

@@ -1,6 +1,7 @@
 # Standalone Clog on nginx + PHP-FPM + SQLite
 
-The standalone application runs without WordPress, MySQL, Redis or Composer.
+The deployed application runs without WordPress, MySQL, Redis or Composer.
+Development and packaging use Composer to install the locked framework packages.
 This branch replaces the frontend session transport and GraphQL schema. The old
 plugin/dev files are retained as migration references; they are not the deployment
 path and are excluded from the standalone archive.
@@ -8,6 +9,10 @@ path and are excluded from the standalone archive.
 ## Build and verify elsewhere
 
 ```sh
+scripts/php.sh composer install --no-interaction --prefer-dist
+scripts/php.sh composer build-generators
+scripts/php.sh composer check-generated
+scripts/node.sh npm ci
 scripts/node.sh npm run relay:check
 scripts/node.sh npm run lint
 scripts/node.sh npm run build
@@ -18,21 +23,29 @@ scripts/php.sh php standalone/tests/package.php
 ```
 
 The artifact is `build/clog-standalone.tar.gz`. It contains compiled frontend
-assets, generated entity classes, the standalone server, checked-in dependencies,
-and hosting configuration. No Composer commands run during build or deployment.
+assets, generated entity classes/manifests, the standalone server, locked production
+dependencies, and hosting configuration. Packaging installs `--no-dev` dependencies
+in an isolated staging directory. No Composer command runs on the deployed host.
 The PHP test wrapper currently uses the existing PHP build image; that image is
 only a development tool and is not installed on the Pi.
 
 ## Run locally
 
-After building the client:
+After installing PHP dependencies and building the client:
 
 ```sh
 scripts/standalone-dev.sh install
-read -rsp 'Local password: ' CLOG_NEW_PASSWORD; echo
-printf '%s' "$CLOG_NEW_PASSWORD" | scripts/standalone-dev.sh user:add admin editor
-unset CLOG_NEW_PASSWORD
+bash -c 'read -r -s -p "Local password: " CLOG_NEW_PASSWORD; printf "\n"; printf "%s" "$CLOG_NEW_PASSWORD" | scripts/standalone-dev.sh user:add admin editor'
+# The command above handles account creation; start the server below.
 scripts/standalone-dev.sh serve
+```
+
+For fish, the account-creation command can instead be written as:
+
+```fish
+read -s -P 'Local password: ' CLOG_NEW_PASSWORD
+printf '%s' "$CLOG_NEW_PASSWORD" | scripts/standalone-dev.sh user:add admin editor
+set -e CLOG_NEW_PASSWORD
 ```
 
 Open `http://localhost:8280/auth/login`. This uses PHP's development server and
@@ -108,8 +121,10 @@ into a recovery directory, install the backup as `clog.sqlite` owned by `www-dat
 clear session files to sign everyone out, and restart FPM. Rehearse restoration
 before relying on backups. Never replace a database beneath running workers.
 
-The schema installer accepts an empty SQLite database or the current schema
-version. It refuses unknown schemas. It does not import an existing WordPress
+The installer creates fresh entity tables from the generated SQLite installer.
+It also upgrades version 1 prototype databases to version 2 without replacing
+records or accounts; back up first and rerun `install` before serving requests.
+A current version is a no-op. Unknown schemas are refused. It does not import an existing WordPress
 installation; Clog was previously documented as having no production data.
 
 ## Updates and operation
@@ -130,13 +145,14 @@ The development tests run on the workstation; Pi/ARM performance remains unteste
 
 ## Development and remaining extraction work
 
-The source of the prototype dependencies and their versions are documented in
-`server/standalone/vendor/README.md`. Neither the old plugin packaging workflow nor
-old WordPress browser fixtures validate this standalone deployment. Use the new
-standalone workflow and tests.
+The [dependency guide](../server/docs/dependencies.md) records the published packages,
+generator targets and upstream runtime-0.11 blockers. The handwritten manifests
+and checked-in prototype libraries have been removed. The standalone CI/release
+workflow installs the lock, verifies generation and the API schema, tests SQLite,
+HTTP and browser behavior, and checks the exact production archive.
 
-The next upstream work is a generic SQLite schema/migration generator, broader adapter
-conformance for edge cases and concurrency, and generation of standalone GraphQL manifests.
-SQLite's Unicode collation/search behavior needs an explicit contract: currently
-name/barcode uniqueness and ordering use Unicode lowercase comparison; SQLite LIKE
-uses its built-in ASCII case-insensitive matching. Accent folding is not provided.
+SQLite uniqueness and ordering use Clog's Unicode lowercase collation through
+application indexes and explicit query ordering. LIKE uses SQLite's built-in ASCII
+case-insensitive matching. Accent folding is not provided. Existing WordPress
+installations still require a separate import; this migration handles only the
+standalone prototype's SQLite database.

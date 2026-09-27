@@ -2,14 +2,8 @@ entity: Location
 description: Somewhere inventory can be kept.
 use:
   - ClogPost
-configure:
-  ClogPost:
-    visibility: private
-    adminMenu: clog
-    label: Location
-    pluralLabel: Locations
 integrations:
-  wpgraphql:
+  graphql:
     singular: ClogLocation
     plural: ClogLocations
 storage:
@@ -33,6 +27,6 @@ queries:
       type: Location
       cardinality: many
     integrations:
-      wpgraphql:
+      graphql:
         field: clogLocationSearch
     handler: true

@@ -13,21 +13,22 @@ use InvalidArgumentException;
 /** Fixed SQL identifiers, parameterized values, and no joins that duplicate entities. */
 final readonly class InventoryQueries
 {
+    /** @var array<string, string> Trusted, quoted names from the generated schema. */
+    private array $tables;
+
     public function __construct(private Database $db, private EntityGateway $gateway, private ViewerProvider $viewers)
     {
+        $manifest = require dirname(__DIR__, 2) . '/generated/sqlite/storage-manifest.php';
+        $tables = [];
+        foreach ($manifest->tables as $entity => $table) {
+            $tables[$entity] = Database::identifier($table->name);
+        }
+        $this->tables = $tables;
     }
 
     public function search(string $entity, ?string $term = null, ?EntityId $location = null, ?EntityId $item = null, bool $stockedOnly = false): SqlEntityQuery
     {
-        $prefix = $this->db->prefix();
-        if (!preg_match('/^[a-zA-Z0-9_]+$/', $prefix)) {
-            throw new InvalidArgumentException('Unsupported table prefix.');
-        }
-        $tables = [
-            'Item' => "`{$prefix}clog_item`",
-            'Location' => "`{$prefix}clog_location`",
-            'Inventory' => "`{$prefix}clog_inventory`",
-        ];
+        $tables = $this->tables;
         if (!isset($tables[$entity])) {
             throw new InvalidArgumentException('Unknown inventory entity.');
         }
@@ -42,11 +43,11 @@ final readonly class InventoryQueries
         if ($stockedOnly) {
             $stockWhere = ['s.item_id = e.id'];
             if (null !== $location) {
-                $stockWhere[] = 's.location_id = %s';
+                $stockWhere[] = 's.location_id = ?';
                 $bindings[] = (string) $location;
             }
             if ('' !== $term) {
-                $stockWhere[] = '(e.name LIKE %s ESCAPE \'\\\' OR e.barcode LIKE %s ESCAPE \'\\\' OR l.name LIKE %s ESCAPE \'\\\')';
+                $stockWhere[] = '(e.name LIKE ? ESCAPE \'\\\' OR e.barcode LIKE ? ESCAPE \'\\\' OR l.name LIKE ? ESCAPE \'\\\')';
                 array_push($bindings, $like, $like, $like);
             }
             $where[] = 'EXISTS (SELECT 1 FROM ' . $tables['Inventory'] . ' s INNER JOIN '
@@ -55,18 +56,18 @@ final readonly class InventoryQueries
             $from .= ' INNER JOIN ' . $tables['Item'] . ' i ON e.item_id = i.id'
                 . ' INNER JOIN ' . $tables['Location'] . ' l ON e.location_id = l.id';
             if ('' !== $term) {
-                $where[] = '(i.name LIKE %s ESCAPE \'\\\' OR i.barcode LIKE %s ESCAPE \'\\\' OR l.name LIKE %s ESCAPE \'\\\')';
+                $where[] = '(i.name LIKE ? ESCAPE \'\\\' OR i.barcode LIKE ? ESCAPE \'\\\' OR l.name LIKE ? ESCAPE \'\\\')';
                 array_push($bindings, $like, $like, $like);
             }
             foreach (['item' => $item, 'location' => $location] as $edge => $id) {
                 if (null !== $id) {
-                    $where[] = "e.{$edge}_id = %s";
+                    $where[] = "e.{$edge}_id = ?";
                     $bindings[] = (string) $id;
                 }
             }
         } else {
             if ('' !== $term) {
-                $where[] = 'Item' === $entity ? '(e.name LIKE %s ESCAPE \'\\\' OR e.barcode LIKE %s ESCAPE \'\\\')' : 'e.name LIKE %s ESCAPE \'\\\'';
+                $where[] = 'Item' === $entity ? '(e.name LIKE ? ESCAPE \'\\\' OR e.barcode LIKE ? ESCAPE \'\\\')' : 'e.name LIKE ? ESCAPE \'\\\'';
                 $bindings[] = $like;
                 if ('Item' === $entity) {
                     $bindings[] = $like;
@@ -76,11 +77,11 @@ final readonly class InventoryQueries
             if (null !== $id) {
                 $own = 'Item' === $entity ? 'item' : 'location';
                 $other = 'Item' === $entity ? 'location' : 'item';
-                $where[] = 'EXISTS (SELECT 1 FROM ' . $tables['Inventory'] . " s WHERE s.{$own}_id = e.id AND s.{$other}_id = %s)";
+                $where[] = 'EXISTS (SELECT 1 FROM ' . $tables['Inventory'] . " s WHERE s.{$own}_id = e.id AND s.{$other}_id = ?)";
                 $bindings[] = (string) $id;
             }
         }
         return new SqlEntityQuery($this->db, $this->gateway, $this->viewers, $entity, $from,
-            implode(' AND ', $where), $bindings, 'Inventory' === $entity ? 'e.date_added DESC, e.id ASC' : 'e.name ASC, e.id ASC');
+            implode(' AND ', $where), $bindings, 'Inventory' === $entity ? 'e.date_added DESC, e.id ASC' : 'e.name COLLATE CLOG_NOCASE ASC, e.id ASC');
     }
 }

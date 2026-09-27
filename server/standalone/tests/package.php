@@ -5,11 +5,14 @@ $dir = sys_get_temp_dir() . '/clog-release-' . bin2hex(random_bytes(5));
 mkdir($dir, 0700);
 try {
     (new PharData($root . '/build/clog-standalone.tar.gz'))->extractTo($dir);
-    foreach (['server/vendor','server/clog.php','server/generated/wordpress','server/standalone/vendor/elephentity/wordpress'] as $legacy) {
+    foreach (['server/standalone/vendor', 'server/standalone/manifests', 'server/clog.php', 'server/generated/wordpress', 'server/generated/wpgraphql', 'server/vendor/elephentity/wordpress', 'server/vendor/elephentity/wpgraphql', 'server/vendor/elephentity/cli', 'server/vendor/elephentity/schema', 'server/vendor/elephentity/codegen', 'server/vendor/elephentity/codegen-sqlite', 'server/vendor/elephentity/codegen-graphql-php', 'server/vendor/phpunit'] as $legacy) {
         if (file_exists($dir . '/' . $legacy)) throw new RuntimeException('Legacy code included: ' . $legacy);
     }
     $code = <<<'CODE'
 require $argv[1] . '/server/standalone/bootstrap.php';
+foreach (['elephentity/runtime', 'elephentity/sqlite', 'elephentity/graphql', 'webonyx/graphql-php'] as $package) {
+    if (!Composer\InstalledVersions::isInstalled($package)) throw new RuntimeException('Missing production dependency: ' . $package);
+}
 $db = new Eleph\SQLite\Database($argv[1] . '/database.sqlite');
 Clog\Standalone\Schema::install($db);
 $app = new Clog\Standalone\Application($db, new Clog\Standalone\Viewer('1','editor'));

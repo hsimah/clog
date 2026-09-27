@@ -18,7 +18,7 @@ final readonly class Application
     public function __construct(public Database $database, public Viewer $viewer)
     {
         Schema::requireReady($database);
-        $manifest = (require dirname(__DIR__) . '/manifests/storage.php')->withPrefix($database->prefix());
+        $manifest = require dirname(__DIR__, 2) . '/generated/sqlite/storage-manifest.php';
         $storage = new SQLiteAdaptor($database, $manifest->tables, new FieldMap($manifest->columns), $manifest->placements,
             new QueryCompiler(placements: $manifest->placements));
         $this->runtime = RuntimeFactory::create($storage, $viewer, $database);

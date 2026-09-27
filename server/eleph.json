@@ -7,13 +7,13 @@
             "namespace": "Clog\\Entity",
             "typeNamespace": "Clog\\Type"
         },
-        "wordpress": {
-            "builder": "vendor/bin/eleph-gen-wordpress",
-            "output": "generated/wordpress"
+        "sqlite": {
+            "builder": "vendor/bin/eleph-gen-sqlite",
+            "output": "generated/sqlite"
         },
-        "wpgraphql": {
-            "builder": "vendor/bin/eleph-gen-wpgraphql",
-            "output": "generated/wpgraphql"
+        "graphql-php": {
+            "builder": "vendor/bin/eleph-gen-graphql-php",
+            "output": "generated/graphql"
         }
     }
 }

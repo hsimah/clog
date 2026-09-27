@@ -1,26 +1,35 @@
 {
     "name": "hsimah/clog",
-    "description": "Clog (Cave Log) — WordPress plugin: inventory post types exposed via WPGraphQL.",
-    "type": "wordpress-plugin",
+    "description": "Clog (Cave Log) \u2014 standalone inventory application using Elephentity, SQLite and GraphQL.",
+    "type": "project",
     "license": "MIT",
     "require": {
         "php": ">=8.3",
+        "ext-mbstring": "*",
+        "ext-pdo": "*",
+        "ext-pdo_sqlite": "*",
         "elephentity/runtime": "^0.10.0",
-        "elephentity/wordpress": "^0.2.3",
-        "elephentity/wpgraphql": "^0.2.0",
-        "yahnis-elsts/plugin-update-checker": "^5.4"
+        "elephentity/sqlite": "^0.1@alpha",
+        "elephentity/graphql": "^0.1@alpha",
+        "psr/container": "^2.0",
+        "psr/log": "^3.0",
+        "webonyx/graphql-php": "^15.37"
     },
     "require-dev": {
         "elephentity/cli": "^0.11.0",
         "elephentity/codegen": "^0.6.0",
         "elephentity/codegen-php": "^0.6.0",
-        "elephentity/codegen-wordpress": "^0.4.0",
-        "elephentity/codegen-wpgraphql": "^0.3.0",
-        "phpunit/phpunit": "^11.0"
+        "elephentity/codegen-sqlite": "^0.1@alpha",
+        "elephentity/codegen-graphql-php": "^0.1@alpha"
     },
     "scripts": {
         "build-generators": "sh ../scripts/build-generators.sh",
-        "test": "phpunit",
+        "test": [
+            "@php standalone/tests/conformance.php",
+            "@php standalone/tests/schema-upgrade.php",
+            "@php standalone/tests/integration.php",
+            "@php standalone/tests/http.php"
+        ],
         "check-generated": [
             "eleph fmt",
             "eleph validate",
@@ -40,7 +49,8 @@
         "psr-4": {
             "Clog\\Entity\\": "generated/",
             "Clog\\Type\\": "src/Type/",
-            "Clog\\": "src/"
+            "Clog\\": "src/",
+            "Clog\\Standalone\\": "standalone/src/"
         }
     }
 }

@@ -1,8 +1,9 @@
 name: Standalone SQLite
 on:
+  workflow_call:
   workflow_dispatch:
   push:
-    branches: [feature/standalone-sqlite]
+    branches: [feature/sqlite-prototype-checkpoint]
 jobs:
   standalone:
     runs-on: ubuntu-latest
@@ -14,6 +15,27 @@ jobs:
           extensions: pdo_sqlite, mbstring
           coverage: none
           ini-values: opcache.jit=0, opcache.jit_buffer_size=0
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install locked PHP dependencies
+        working-directory: server
+        run: composer validate --strict && composer install --no-interaction --prefer-dist
+      - name: Cache generator builds
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            server/vendor/elephentity/codegen/target
+            server/vendor/elephentity/codegen-php/target
+            server/vendor/elephentity/codegen-sqlite/target
+            server/vendor/elephentity/codegen-graphql-php/target
+          key: ${{ runner.os }}-eleph-generators-${{ hashFiles('server/composer.lock') }}
+      - name: Verify generated entities and integration manifests
+        working-directory: server
+        run: |
+          composer build-generators
+          composer check-generated
+          git diff --exit-code -- spec generated
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -24,10 +46,8 @@ jobs:
       - run: php server/standalone/tests/export-schema.php --check
       - run: npm run relay:check && npm run lint && npm run build
         working-directory: client
-      - run: php server/standalone/tests/conformance.php
-      - run: php server/standalone/tests/integration.php
-      - run: php server/standalone/tests/http.php
-
+      - run: composer test
+        working-directory: server
       - run: npx playwright install --with-deps chromium
         working-directory: client
       - name: Browser smoke test
@@ -39,8 +59,10 @@ jobs:
           trap 'kill "$CLOG_PHP_PID"' EXIT
           cd client
           npx playwright test -c playwright.standalone.config.ts
-      - run: scripts/package-standalone.sh
-      - run: php server/standalone/tests/package.php
+      - name: Verify production archive with locked runtime dependencies
+        run: |
+          php scripts/package-standalone.php
+          php server/standalone/tests/package.php
       - uses: actions/upload-artifact@v4
         with:
           name: clog-standalone

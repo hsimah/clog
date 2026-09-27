@@ -1,13 +1,18 @@
 # Clog Codebase Rules
 
 Clog (Cave Log) tracks items, flat storage locations and individual stocked units.
-The React/TypeScript client lives in `client/`; the WordPress plugin in `server/`.
+The React/TypeScript client lives in `client/`; the standalone PHP application is
+in `server/standalone/`, using generated entities under `server/generated/`.
 
 ## Deployment
 
-- **space-needle**: The production home server, running pupyrus. CI/CD runs on GitHub-hosted runners, not on space-needle.
-- **pupyrus**: The WordPress Docker container running on space-needle
-- Publishing a GitHub release builds the plugin and attaches an installable zip to the release (`.github/workflows/deploy.yml`). Pupyrus is not touched automatically — its WordPress admin (`server/includes/updates.php`, backed by `yahnis-elsts/plugin-update-checker`) polls GitHub releases and shows an "Update available" prompt on the Plugins page; deploying is a manual "Update Now" click there.
+- Production uses existing nginx, PHP-FPM and local SQLite. See `hosting/README.md`.
+- Build off-device. `scripts/package-standalone.sh` stages source and compiled assets,
+  installs the production Composer lock in isolation, and produces
+  `build/clog-standalone.tar.gz`. Never strip the working `server/vendor`.
+- Releases upload the same archive that passed the standalone workflow. No workflow
+  automatically changes the host. WordPress/plugin deployment files are legacy references.
+- The deployed host needs neither Composer nor Rust. Dependencies are included in the archive.
 
 ## Client conventions
 
@@ -35,20 +40,19 @@ The React/TypeScript client lives in `client/`; the WordPress plugin in `server/
 - Store GraphQL dates as ISO strings; format only for presentation. Date-only
   stock edits preserve the entered calendar date as midnight UTC.
 - Run Relay generation/validation, lint and builds through `scripts/node.sh`.
-  Use `scripts/test-backend.sh --e2e` for meaningful flow changes.
+  Use `scripts/test-standalone-browser.sh` for meaningful flow changes.
 
 ## Release verification
 
-- Build `client/dist`, then run `scripts/package-plugin.sh [version]` and
-  `scripts/test-backend.sh --release`. Packaging stages separate production-only
-  dependencies; never strip the working `server/vendor` to prepare a release.
-- Release CI uploads the same ZIP that passed install/upgrade checks. Keep the
-  runtime allowlist, migration support and separate StyleX asset validation intact.
-- The owner confirmed Clog is not in use and has no real data; the first rollout
-  uses the fresh-install path. For future existing-data upgrades, rehearse the
-  actual backup, ZIP upgrade and restore. See `server/docs/release-verification.md`.
-- Run backend, schema, browser and release container suites sequentially; they
-  share one disposable Compose project and must not overlap.
+- Install locked PHP dependencies using `scripts/php.sh composer install` and build
+  the generators with `scripts/php.sh composer build-generators`.
+- Run `scripts/php.sh composer check-generated`, the standalone tests, Relay
+  validation, lint, client build and standalone browser tests.
+- Package with `scripts/package-standalone.sh`, then run
+  `scripts/php.sh php standalone/tests/package.php` against that exact archive.
+- SQLite prototype databases may now contain real test inventory/accounts. Preserve
+  data: `install` explicitly upgrades version 1 to version 2; never reset storage
+  during routine development or package updates. Migration tests use disposable databases.
 
 ## Git workflow
 
@@ -57,33 +61,28 @@ source and tests together; never hand-edit generated/vendor files.
 
 ## Elephentity runtime foundation
 
-- The current backend uses explicit runtime/WordPress/WPGraphQL packages, managed
-  timestamps, generated edge writes, and entity-only storage (no new post projections).
-- Specs and generated files are authoritative. Run `scripts/php.sh composer
-  build-generators` after installing/updating generator dependencies, then generate
-  and run `composer check-generated` through the same wrapper.
-- Read policies require login; writes require `edit_posts`. CLI commands need an
-  explicit `--user=<login>`; do not bypass policies just because WP_CLI is defined.
-- Inventory labels are derived on the server. Do not send managed timestamps.
-- Run `scripts/php.sh composer test` and `scripts/test-backend.sh` for backend changes.
-  The latter uses disposable MySQL/WordPress containers with no exposed ports.
-- Existing databases require the explicit #33 migration and a rehearsal using the
-  actual deployment export. Follow `server/docs/storage-upgrade.md`. Never bypass
-  a schema refusal or delete old projections to make boot pass.
-- All UI uses Astryx/StyleX and all application data flows use Relay. See `client/UI-MIGRATION.md` and `client/RELAY.md`.
-- Browser GraphQL requests use `client/src/lib/session.ts` with same-origin cookies
-  and a fresh WordPress GraphQL nonce. Reuse this fetch transport for Relay; wire
-  session-change cache disposal. Do not restore JWT
-  injection/localStorage or automatically retry failed mutations.
-- Use the generated `clog*Search` connections with `where` filters for paginated
-  screens, and `stockCount` / `clogSummary` for totals. Never count a loaded page
-  as the whole inventory. See `server/docs/graphql-contract.md` for ordering,
-  cursor reset and mutation invalidation rules.
-- `SignedInUsers::allows` is shared by SQL aggregate authorization and the entity
-  read policy. If introducing row-specific policies, update aggregate/query
-  authorization too; the current optimization relies on uniform signed-in reads.
-
-- `NullableUpdateDatabase` preserves SQL NULL for WordPress adapter 0.2.3's generated
-  UPDATE statements. Without it, clearing a barcode writes an empty string and can
-  break the unique nullable index. Keep the regression test until upstream fixes
-  its update compiler; never hand-edit generated/vendor files for this workaround.
+- Use published `elephentity/sqlite` and `elephentity/graphql` packages. The latter's
+  repository is `elephentity-graphql-php`. Runtime is currently 0.10 because both
+  integration alphas reject 0.11; see `server/docs/dependencies.md` and its upstream issues.
+- `server/composer.lock` is authoritative. No vendored forks, Composer aliases, or
+  patched dependency source. Alpha stability is allowed only for the new packages.
+- Specs and signed generated files are authoritative. Targets are `php`, `sqlite`
+  and `graphql-php`; the YAML integration key is `graphql`. Run generation after
+  changing specs and verify with `composer check-generated` through `scripts/php.sh`.
+- Read policies require login; writes require the `inventory.write` capability.
+  Application viewers map editor accounts to this capability. Keep authentication,
+  HTTP/CSRF/session handling and inventory aggregate queries in Clog.
+- Inventory labels and timestamps are derived/managed on the server. The generated
+  schema owns entity tables; `Clog\Standalone\Schema` owns accounts and reviewed upgrades.
+- Generated SQLite names already contain `app_clog_`. Do not add Database::prefix()
+  to them. Application queries read table names from the generated manifest.
+- Keep `DependentReadStorage` until a compatible upstream runtime fixes dependent
+  deletion reads. Tests must protect cascade/restrict rules and unrelated stock.
+- Use `scripts/test-standalone.sh` for conformance, migration, GraphQL and HTTP tests.
+  The old WordPress backend tests do not validate this application.
+- Preserve same-origin cookie/CSRF transport in `client/src/lib/session.ts`; never
+  automatically replay mutations after uncertain responses or session expiry.
+- All application data uses Relay. Use server-paginated searches and SQL totals;
+  read `client/UI-MIGRATION.md`, `client/RELAY.md` and the GraphQL contract first.
+- `SignedInUsers::allows` gates aggregates and entity reads. If adding row-specific
+  access, change SQL aggregate authorization too.

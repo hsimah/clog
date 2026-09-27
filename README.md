@@ -2,9 +2,11 @@
 
 ## Standalone SQLite development
 
-This feature branch is moving Clog to **nginx + PHP-FPM + SQLite**. Start with
+Clog runs on **nginx + PHP-FPM + SQLite**, using the published Elephentity packages. Start with
 [the hosting and deployment guide](hosting/README.md). The standalone archive
-includes its dependencies; no Composer commands are needed. Use
+includes locked production dependencies; Composer runs only during development
+and packaging. See [framework dependencies](server/docs/dependencies.md) for the
+alpha packages, generation commands and runtime compatibility blockers. Use
 `scripts/test-standalone.sh` and `scripts/package-standalone.sh`.
 
 The WordPress instructions below describe the previous architecture and are kept
