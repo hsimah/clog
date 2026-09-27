@@ -10,7 +10,9 @@ $db = new Database($dir . '/clog.sqlite'); Schema::install($db);
 $db->insert('clog_users', ['username'=>'editor','role'=>'editor','password_hash'=>password_hash('test-password-only', PASSWORD_DEFAULT)]);
 $db->insert('clog_users', ['username'=>'reader','role'=>'reader','password_hash'=>password_hash('test-password-only', PASSWORD_DEFAULT)]);
 $socket = stream_socket_server('tcp://127.0.0.1:0'); $address = stream_socket_get_name($socket, false); fclose($socket);
-$process = proc_open([PHP_BINARY, '-d', 'opcache.enable_cli=0', '-S', $address, dirname(__DIR__) . '/public/index.php'], [0=>['pipe','r'],1=>['file',$dir.'/http.log','a'],2=>['file',$dir.'/http.log','a']], $pipes, null,
+$command = [PHP_BINARY, '-S', $address, dirname(__DIR__) . '/public/index.php'];
+if (getenv('CLOG_TEST_GDB')) $command = ['gdb', '--batch', '-ex', 'run', '-ex', 'bt', '--args', ...$command];
+$process = proc_open($command, [0=>['pipe','r'],1=>['file',$dir.'/http.log','a'],2=>['file',$dir.'/http.log','a']], $pipes, null,
     [...getenv(), 'CLOG_DB'=>$dir.'/clog.sqlite','CLOG_SESSION_PATH'=>$dir,'CLOG_ORIGIN'=>'http://'.$address]);
 $cookies = [];
 function request(string $path, string $method = 'GET', ?string $body = null, array $headers = []): array {

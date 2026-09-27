@@ -25,7 +25,10 @@ jobs:
         working-directory: client
       - run: php server/standalone/tests/conformance.php
       - run: php server/standalone/tests/integration.php
+      - run: sudo apt-get update -qq && sudo apt-get install -y gdb
       - run: php server/standalone/tests/http.php
+        env:
+          CLOG_TEST_GDB: '1' 
       - run: npx playwright install --with-deps chromium
         working-directory: client
       - name: Browser smoke test
