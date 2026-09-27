@@ -14,10 +14,11 @@ $process = proc_open([PHP_BINARY, '-S', $address, dirname(__DIR__) . '/public/in
     [...getenv(), 'CLOG_DB'=>$dir.'/clog.sqlite','CLOG_SESSION_PATH'=>$dir,'CLOG_ORIGIN'=>'http://'.$address]);
 $cookies = [];
 function request(string $path, string $method = 'GET', ?string $body = null, array $headers = []): array {
-    global $address, $cookies;
+    global $address, $cookies, $process;
     $cookie = implode('; ', array_map(fn ($name, $value) => "$name=$value", array_keys($cookies), $cookies));
-    $context = stream_context_create(['http'=>['method'=>$method,'header'=>implode("\r\n", [...$headers, 'Cookie: '.$cookie]),'content'=>$body ?? '', 'ignore_errors'=>true,'follow_location'=>0,'timeout'=>10]]);
+    $context = stream_context_create(['http'=>['method'=>$method,'header'=>implode("\r\n", [...$headers, 'Cookie: '.$cookie, 'Connection: close']),'content'=>$body ?? '', 'ignore_errors'=>true,'follow_location'=>0,'timeout'=>10]]);
     $response = file_get_contents('http://'.$address.$path, false, $context);
+    if ($response === false || !isset($http_response_header[0])) throw new RuntimeException('No HTTP response for ' . $method . ' ' . $path . '; server=' . json_encode(proc_get_status($process)));
     foreach ($http_response_header as $header) if (preg_match('/^Set-Cookie: ([^=]+)=([^;]*)/i', $header, $m)) $cookies[$m[1]]=$m[2];
     preg_match('/\s(\d{3})\s/', $http_response_header[0], $m);
     return [(int)$m[1], $response, $http_response_header];
@@ -51,6 +52,9 @@ try {
     ensure(isset(json_decode($body,true)['errors']),'Reader mutation denied');
     ensure((int)$db->scalar('SELECT COUNT(*) FROM app_clog_item')===1,'Denied mutation persisted nothing');
     echo "PASS: HTTP login, cookies, CSRF, sessions, GraphQL, reader policy and compiled deep links\n";
+} catch (Throwable $error) {
+    fwrite(STDERR, file_get_contents($dir . '/http.log'));
+    throw $error;
 } finally {
     proc_terminate($process); proc_close($process);
     foreach (glob($dir.'/*') as $file) unlink($file); rmdir($dir);
