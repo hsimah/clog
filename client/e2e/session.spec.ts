@@ -78,7 +78,7 @@ test('a lost mutation response is not replayed and leaves input available', asyn
   await authenticate();
   let writes = 0;
   await page.route('**/graphql', async (route) => {
-    if (route.request().postDataJSON()?.operationName === 'ItemFormCreateMutation') {
+    if (route.request().postDataJSON()?.operationName === 'useItemFormCreateMutation') {
       writes++;
       await route.fetch(); // The server committed; only its response is lost.
       await route.abort('failed');

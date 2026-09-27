@@ -1,0 +1,292 @@
+{
+  "runtime": "@tsquid/routes",
+  "routes": [
+    {
+      "name": "Home",
+      "entryPoint": "src/components/home/Home.entrypoint.ts",
+      "path": "/",
+      "fields": {}
+    },
+    {
+      "name": "ItemIndex",
+      "entryPoint": "src/components/item/Item.entrypoint.ts",
+      "path": "/items",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        }
+      }
+    },
+    {
+      "name": "ItemNew",
+      "entryPoint": "src/components/item/Item.entrypoint.ts",
+      "path": "/items/new",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        },
+        "barcode": {
+          "kind": "string",
+          "optional": true
+        }
+      }
+    },
+    {
+      "name": "ItemDetail",
+      "entryPoint": "src/components/item/Item.entrypoint.ts",
+      "path": "/items/:id",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        },
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "ItemEdit",
+      "entryPoint": "src/components/item/Item.entrypoint.ts",
+      "path": "/items/:id/edit",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        },
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "LocationIndex",
+      "entryPoint": "src/components/location/Location.entrypoint.ts",
+      "path": "/locations",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        }
+      }
+    },
+    {
+      "name": "LocationNew",
+      "entryPoint": "src/components/location/Location.entrypoint.ts",
+      "path": "/locations/new",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        }
+      }
+    },
+    {
+      "name": "LocationDetail",
+      "entryPoint": "src/components/location/Location.entrypoint.ts",
+      "path": "/locations/:id",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        },
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "LocationEdit",
+      "entryPoint": "src/components/location/Location.entrypoint.ts",
+      "path": "/locations/:id/edit",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        },
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "InventoryIndex",
+      "entryPoint": "src/components/inventory/Inventory.entrypoint.ts",
+      "path": "/inventory",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        },
+        "location": {
+          "kind": "string",
+          "optional": true
+        }
+      }
+    },
+    {
+      "name": "InventoryNew",
+      "entryPoint": "src/components/inventory/Inventory.entrypoint.ts",
+      "path": "/inventory/new",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        },
+        "location": {
+          "kind": "string",
+          "optional": true
+        }
+      }
+    },
+    {
+      "name": "InventoryDetail",
+      "entryPoint": "src/components/inventory/Inventory.entrypoint.ts",
+      "path": "/inventory/:id",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        },
+        "location": {
+          "kind": "string",
+          "optional": true
+        },
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "InventoryEdit",
+      "entryPoint": "src/components/inventory/Inventory.entrypoint.ts",
+      "path": "/inventory/:id/edit",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        },
+        "location": {
+          "kind": "string",
+          "optional": true
+        },
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "InventoryItemDetail",
+      "entryPoint": "src/components/inventory/Inventory.entrypoint.ts",
+      "path": "/inventory/items/:id",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        },
+        "location": {
+          "kind": "string",
+          "optional": true
+        },
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "InventoryItemEdit",
+      "entryPoint": "src/components/inventory/Inventory.entrypoint.ts",
+      "path": "/inventory/items/:id/edit",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        },
+        "location": {
+          "kind": "string",
+          "optional": true
+        },
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "InventoryLocationDetail",
+      "entryPoint": "src/components/inventory/Inventory.entrypoint.ts",
+      "path": "/inventory/locations/:id",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        },
+        "location": {
+          "kind": "string",
+          "optional": true
+        },
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "InventoryLocationEdit",
+      "entryPoint": "src/components/inventory/Inventory.entrypoint.ts",
+      "path": "/inventory/locations/:id/edit",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        },
+        "location": {
+          "kind": "string",
+          "optional": true
+        },
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "InventoryStock",
+      "entryPoint": "src/components/inventory/Inventory.entrypoint.ts",
+      "path": "/inventory/stock/:itemId",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        },
+        "location": {
+          "kind": "string",
+          "optional": true
+        },
+        "itemId": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "InventoryStockLocation",
+      "entryPoint": "src/components/inventory/Inventory.entrypoint.ts",
+      "path": "/inventory/stock/:itemId/:locationId",
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true
+        },
+        "location": {
+          "kind": "string",
+          "optional": true
+        },
+        "itemId": {
+          "kind": "string"
+        },
+        "locationId": {
+          "kind": "string"
+        }
+      }
+    }
+  ]
+}

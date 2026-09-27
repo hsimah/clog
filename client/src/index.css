@@ -1,56 +1,6 @@
 @layer reset, astryx-base, astryx-theme;
 @import '@astryxdesign/core/reset.css';
 @import '@astryxdesign/core/astryx.css';
-@import '@astryxdesign/theme-neutral/theme.css';
+@import './theme/__generated__/clog.css';
 
-/* Black surfaces with W3.CSS deep-orange accents (#ff5722). */
-:root,
-[data-astryx-theme="neutral"] {
-  color-scheme: dark;
-  --clog-orange: #ff5722;
-  --clog-orange-soft: #42251b;
-  --clog-orange-text: #ffab91;
-  --color-background-body: #121212;
-  --color-background-surface: #1c1c1c;
-  --color-background-card: #1c1c1c;
-  --color-background-popover: #242424;
-  --color-background-muted: #161616;
-  --color-text-primary: #f5f5f5;
-  --color-text-secondary: #b3b3b3;
-  --color-text-disabled: #737373;
-  --color-accent: var(--clog-orange);
-  --color-accent-muted: #382018;
-  --color-text-accent: #ff8a65;
-  --color-icon-accent: #ff8a65;
-  --color-icon-primary: #f5f5f5;
-  --color-icon-secondary: var(--color-text-secondary);
-  --color-icon-disabled: var(--color-text-disabled);
-  --color-on-accent: #121212;
-  --color-on-dark: #f5f5f5;
-  --color-on-light: #121212;
-  --color-error: #ff8a80;
-  --color-error-muted: #351b1b;
-  --color-on-error: #121212;
-  --color-warning: #ffb74d;
-  --color-warning-muted: #352919;
-  --color-on-warning: #121212;
-  --color-border: #383838;
-  --color-border-emphasized: #626262;
-  --color-neutral: #ffffff14;
-  --color-skeleton: #383838;
-  --astryx-theme-neutral-color-status-fill-accent: var(--clog-orange);
-  --astryx-theme-neutral-color-status-muted-accent: var(--color-accent-muted);
-}
-
-.astryx-button[data-variant="secondary"] {
-  --color-neutral: var(--clog-orange-soft);
-  --color-text-primary: var(--clog-orange-text);
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: system-ui, sans-serif;
-  background: var(--color-background-body);
-  color: var(--color-text-primary);
-}
+body { margin: 0; min-height: 100vh; font-family: system-ui, sans-serif; background: var(--color-background-body); color: var(--color-text-primary); }

@@ -1,6 +1,6 @@
 # Relay in Clog
 
-The runtime/compiler are Relay 21.0.1. Astryx/StyleX are independent of data
+The runtime/compiler use Relay 21. Astryx/StyleX are independent of data
 ownership. All application data uses route-owned Relay queries; there is no
 Apollo cache or global collection provider.
 
@@ -11,16 +11,20 @@ Apollo cache or global collection provider.
 - `scripts/php.sh php standalone/tests/export-schema.php` refreshes the schema
   using an in-memory SQLite database. Pass `--check` to verify the snapshot.
 
-Routes own query references with `useRouteQuery`; memoize the variables, load on
-ID/filter changes, and read through `usePreloadedQuery` below Suspense. The hook
-explicitly disposes the previous reference on variable changes and unmount. This
-releases retention and cancels the request; Relay 21's `useQueryLoader` alone only
-releases ordinary queries and leaves their network work running. Error
-boundaries key off the query reference's fetch key, so retry replaces the failed
-reference and resets the boundary. Keep loading, not-found, empty and error states
-distinct. Feature components read colocated `useFragment` or
-`usePaginationFragment` data; do not duplicate query response shapes as handwritten
-entity models or load the whole inventory into application context.
+Tsquid entrypoints own initial query references and preload the complete route
+query graph on navigation and link hover/focus. `routes.json` defines the URL
+inputs; generated route contexts provide typed reads and scoped `updateURI`.
+Route roots read the references with `usePreloadedQuery` under Suspense, while
+feature components read colocated `useFragment` or `usePaginationFragment` data.
+
+`useRouteQuery` retains explicit list refreshes and on-demand picker/drilldown
+queries. Its optional initial reference comes from the entrypoint and is not
+loaded twice. References it creates are disposed on replacement and unmount,
+releasing retention and canceling network work. Query boundaries retry failed
+reads; the application boundary handles route parsing and entrypoint errors.
+Keep loading, not-found, empty, and error states distinct. Do not duplicate Relay
+response shapes as handwritten entity models or load whole collections into
+application context.
 
 The location list uses a 25-row `clogLocationSearch` connection and its `where`
 filter is part of the Relay connection identity. Totals are server counts. Search
@@ -37,7 +41,8 @@ the session boundary unmounts its authenticated children and requires a reload.
 Same-account session recovery preserves form state while the UI is hidden/inert.
 No Relay records or credentials are persisted in browser storage.
 
-Use `useSaveMutation` for writes. It exposes Relay's pending state, marks the store
+Each mutation document belongs in its own `use…Mutation.ts` hook, which calls
+`useSaveMutation` for writes. It exposes Relay's pending state, marks the store
 stale after a successful payload, and suppresses component callbacks after unmount.
 Request the fragments needed to normalize updated records. A successful write
 refreshes its owning list route; deletions use `@deleteRecord`. Disable duplicate

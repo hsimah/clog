@@ -14,9 +14,7 @@ scripts/php.sh composer install --no-interaction --prefer-dist
 scripts/php.sh composer build-generators
 scripts/php.sh composer check-generated
 scripts/node.sh npm ci
-scripts/node.sh npm run relay:check
-scripts/node.sh npm run lint
-scripts/node.sh npm run build
+scripts/node.sh npm run check
 scripts/test-standalone.sh
 scripts/test-standalone-browser.sh
 scripts/package-standalone.sh
