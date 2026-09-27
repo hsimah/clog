@@ -39,13 +39,13 @@ try {
         if ($method === 'POST') {
             if (!Session::validCsrf($_POST['csrf'] ?? null)) jsonResponse(['error' => 'Invalid session token.'], 403);
             if (Session::login($db, (string) ($_POST['username'] ?? ''), (string) ($_POST['password'] ?? ''))) {
-                session_write_close(); header('Location: /clog', true, 303); exit;
+                session_write_close(); header('Location: /', true, 303); exit;
             }
             http_response_code(401); $error = 'Could not sign in. Check your username and password.';
         }
         $csrf = escape($_SESSION['csrf']); session_write_close();
         header('Content-Type: text/html; charset=utf-8');
-        echo '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sign in · Clog</title><style>body{font:1rem system-ui;max-width:24rem;margin:10vh auto;padding:1rem}label,input,button{display:block;margin:.7rem 0}input,button{font:inherit;padding:.6rem;box-sizing:border-box;width:100%}</style><main><h1>Sign in to Clog</h1><p role="alert">' . escape($error) . '</p><form method="post" action="/auth/login"><input type="hidden" name="csrf" value="' . $csrf . '"><label for="username">Username</label><input id="username" name="username" autocomplete="username" required maxlength="100"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required><button>Sign in</button></form></main></html>';
+        echo '<!doctype html><html lang="en" data-theme="dark"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sign in · Clog</title><style>:root{color-scheme:dark;background:#121212;color:#f5f5f5}body{font:1rem system-ui;max-width:24rem;margin:10vh auto;padding:1rem}label,input,button{display:block;margin:.7rem 0}input,button{font:inherit;padding:.6rem;box-sizing:border-box;width:100%;border:1px solid #626262;border-radius:.4rem}input{background:#121212;color:#f5f5f5}button{background:#ff5722;color:#121212;border-color:#ff5722;font-weight:600;cursor:pointer}button:hover{filter:brightness(1.08)}:focus-visible{outline:2px solid #ff5722;outline-offset:3px}[role=alert]{color:#ff8a80}</style><main><h1>Sign in to Clog</h1><p role="alert">' . escape($error) . '</p><form method="post" action="/auth/login"><input type="hidden" name="csrf" value="' . $csrf . '"><label for="username">Username</label><input id="username" name="username" autocomplete="username" required maxlength="100"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required><button>Sign in</button></form></main></html>';
         exit;
     }
     if ($path === '/graphql') {
@@ -65,19 +65,18 @@ try {
         jsonResponse($result->toArray());
     }
     session_write_close();
-    if ($path === '/') { header('Location: /clog', true, 302); exit; }
-    if (($path === '/clog' || str_starts_with($path, '/clog/')) && $method === 'GET') {
+    if (preg_match('~^/(?:|items(?:/[^/]+(?:/edit)?)?|locations(?:/[^/]+(?:/edit)?)?|inventory(?:/.*)?)$~', $path) && $method === 'GET') {
         $dist = dirname(__DIR__, 3) . '/client/dist';
         $manifest = json_decode(file_get_contents($dist . '/.vite/manifest.json'), true, flags: JSON_THROW_ON_ERROR);
         $entry = $manifest['index.html'];
         $styles = array_unique([...($entry['css'] ?? []), 'assets/stylex.css']);
         header('Content-Type: text/html; charset=utf-8');
-        echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Clog</title>';
+        echo '<!doctype html><html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Clog</title>';
         foreach ($styles as $css) {
             if (!is_file($dist . '/' . $css)) throw new RuntimeException('Missing stylesheet. Build the client first.');
-            echo '<link rel="stylesheet" href="/clog/' . escape($css) . '?v=' . substr(hash_file('sha256', $dist . '/' . $css), 0, 12) . '">';
+            echo '<link rel="stylesheet" href="/' . escape($css) . '?v=' . substr(hash_file('sha256', $dist . '/' . $css), 0, 12) . '">';
         }
-        echo '</head><body><div id="root"></div><script type="module" src="/clog/' . escape($entry['file']) . '"></script></body></html>'; exit;
+        echo '</head><body><div id="root"></div><script type="module" src="/' . escape($entry['file']) . '"></script></body></html>'; exit;
     }
     jsonResponse(['error' => 'Not found.'], 404);
 } catch (Throwable $error) {

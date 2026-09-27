@@ -29,8 +29,8 @@ function ensure(bool $ok, string $label): void { if (!$ok) throw new RuntimeExce
 function signIn(string $username): string {
     [$status,$html] = request('/auth/login'); ensure($status===200,'Login page');
     preg_match('/name="csrf" value="([^"]+)"/', $html, $m);
-    [$status] = request('/auth/login','POST',http_build_query(['csrf'=>$m[1],'username'=>$username,'password'=>'test-password-only']),['Content-Type: application/x-www-form-urlencoded']);
-    ensure($status===303,'Login success');
+    [$status,,$headers] = request('/auth/login','POST',http_build_query(['csrf'=>$m[1],'username'=>$username,'password'=>'test-password-only']),['Content-Type: application/x-www-form-urlencoded']);
+    ensure($status===303 && in_array('Location: /', $headers, true),'Login redirects to root');
     [$status,$json] = request('/auth/session'); $session=json_decode($json,true);
     ensure($status===200 && $session['userId']!=='0','Authenticated session'); return $session['nonce'];
 }
@@ -46,7 +46,9 @@ try {
     ensure($status===200 && isset(json_decode($body,true)['data']['createClogItem']['clogItem']['id']),'HTTP mutation: '.$body);
     [$status]=request('/graphql','GET'); ensure($status===405,'GraphQL GET denied');
     [$status]=request('/graphql','POST','not-json',$headers); ensure($status===400,'Malformed JSON rejected');
-    [$status,$html]=request('/clog/inventory'); ensure($status===200 && str_contains($html,'/clog/assets/stylex.css') && str_contains($html,'type="module"'),'Compiled deep link shell');
+    [$status,$html]=request('/'); ensure($status===200 && str_contains($html,'type="module"'),'Root application shell');
+    [$status]=request('/unknown'); ensure($status===404,'Unknown server route');
+    [$status,$html]=request('/inventory'); ensure($status===200 && str_contains($html,'/assets/stylex.css') && str_contains($html,'type="module"'),'Compiled deep link shell');
     [$status]=request('/auth/logout','POST',null,['X-Clog-CSRF: '.$csrf]); ensure($status===200,'Logout');
     [$status,$body]=request('/auth/session'); ensure(json_decode($body,true)['userId']==='0','Session invalidated');
     $csrf=signIn('reader');

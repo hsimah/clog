@@ -31,11 +31,7 @@ export interface RouteConfig {
 export const routeMap: RouteConfig[] = [
   {
     path: '/',
-    element: InventoryPage,
-  },
-  {
-    path: '/home',
-    label: 'Home',
+    label: 'Overview',
     element: HomePage,
   },
   {
