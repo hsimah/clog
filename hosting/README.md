@@ -146,7 +146,7 @@ The development tests run on the workstation; Pi/ARM performance remains unteste
 ## Development and remaining extraction work
 
 The [dependency guide](../server/docs/dependencies.md) records the published packages,
-generator targets and upstream runtime-0.11 blockers. The handwritten manifests
+generator targets and runtime compatibility. The handwritten manifests
 and checked-in prototype libraries have been removed. The standalone CI/release
 workflow installs the lock, verifies generation and the API schema, tests SQLite,
 HTTP and browser behavior, and checks the exact production archive.

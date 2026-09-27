@@ -8,9 +8,9 @@
         "ext-mbstring": "*",
         "ext-pdo": "*",
         "ext-pdo_sqlite": "*",
-        "elephentity/runtime": "^0.10.0",
-        "elephentity/sqlite": "^0.1@alpha",
-        "elephentity/graphql": "^0.1@alpha",
+        "elephentity/runtime": "^0.11.0",
+        "elephentity/sqlite": "^0.1.0-alpha.2",
+        "elephentity/graphql": "^0.1.0-alpha.2",
         "psr/container": "^2.0",
         "psr/log": "^3.0",
         "webonyx/graphql-php": "^15.37"

@@ -9,9 +9,9 @@ The repository still commits signed generated PHP artifacts.
 
 | Package | Locked release | Role |
 | --- | --- | --- |
-| `elephentity/runtime` | 0.10.0 | Latest release permitted by the adapters; 0.11.0 is blocked below |
-| `elephentity/sqlite` | 0.1.0-alpha.1 | Runtime SQLite adapter |
-| `elephentity/graphql` | 0.1.0-alpha.1 | Runtime GraphQL integration; repository is `elephentity-graphql-php` |
+| `elephentity/runtime` | 0.11.0 | Runtime contracts and unit of work |
+| `elephentity/sqlite` | 0.1.0-alpha.2 | Runtime SQLite adapter |
+| `elephentity/graphql` | 0.1.0-alpha.2 | Runtime GraphQL integration; repository is `elephentity-graphql-php` |
 | `elephentity/cli` | 0.11.0 | Build-time commands |
 | `elephentity/schema` | 0.11.0 | Compiler, installed through CLI |
 | `elephentity/codegen` | 0.6.0 | Generator orchestrator |
@@ -24,12 +24,10 @@ retain stable constraints. `webonyx/graphql-php` is the separate GraphQL engine,
 currently locked at 15.37.2. The root `elephentity` package, memory adapter,
 WordPress integrations and their generators are not required by this application.
 
-Both integration alphas currently require runtime `^0.10`, excluding 0.11.0.
-A real `composer update --dry-run` with runtime `^0.11.0` fails resolution.
-Upstream blockers: [SQLite #1](https://github.com/hsimah-services/elephentity-sqlite/issues/1)
-and [GraphQL PHP #1](https://github.com/hsimah-services/elephentity-graphql-php/issues/1).
-Upgrade the runtime constraint when compatible integration releases are published;
-do not disguise runtime 0.11 as 0.10 with a Composer alias.
+Both integration adapters support runtime 0.11 as of alpha.2. The compatibility
+issues [SQLite #1](https://github.com/hsimah-services/elephentity-sqlite/issues/1)
+and [GraphQL PHP #1](https://github.com/hsimah-services/elephentity-graphql-php/issues/1)
+are resolved. The constraints require these compatible releases or newer.
 
 ## Generation
 
@@ -63,7 +61,7 @@ SQLite generator deliberately emits default SQLite collation. An interrupted
 fresh install can resume only if its generated schema matches exactly and contains
 no records; unknown or populated unversioned schemas are refused.
 
-The runtime 0.10 deletion-planner workaround in `DependentReadStorage` remains
+The runtime 0.10/0.11 deletion-planner workaround in `DependentReadStorage` remains
 application code, with cascade/restrict regressions. It is already described in
 [elephentity #89](https://github.com/hsimah-services/elephentity/issues/89).
 Remove it only when a compatible runtime release fixes those reads and the same

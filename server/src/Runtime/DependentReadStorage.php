@@ -15,7 +15,7 @@ use Eleph\Runtime\Storage\Write\WriteBatch;
 use Eleph\Runtime\Storage\Write\WriteResult;
 
 /**
- * Compatibility for runtime 0.10's DeletionPlanner.
+ * Compatibility for runtime 0.10/0.11's DeletionPlanner.
  *
  * It uses EdgeFilter::along while querying the dependent/declaring entity.
  * Inventory.item/location must instead be read backwards to select stock by

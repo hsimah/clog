@@ -62,8 +62,8 @@ source and tests together; never hand-edit generated/vendor files.
 ## Elephentity runtime foundation
 
 - Use published `elephentity/sqlite` and `elephentity/graphql` packages. The latter's
-  repository is `elephentity-graphql-php`. Runtime is currently 0.10 because both
-  integration alphas reject 0.11; see `server/docs/dependencies.md` and its upstream issues.
+  repository is `elephentity-graphql-php`. Runtime is 0.11 with integration adapters at alpha.2;
+  see `server/docs/dependencies.md` for the release set.
 - `server/composer.lock` is authoritative. No vendored forks, Composer aliases, or
   patched dependency source. Alpha stability is allowed only for the new packages.
 - Specs and signed generated files are authoritative. Targets are `php`, `sqlite`

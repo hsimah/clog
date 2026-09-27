@@ -6,7 +6,7 @@ Clog runs on **nginx + PHP-FPM + SQLite**, using the published Elephentity packa
 [the hosting and deployment guide](hosting/README.md). The standalone archive
 includes locked production dependencies; Composer runs only during development
 and packaging. See [framework dependencies](server/docs/dependencies.md) for the
-alpha packages, generation commands and runtime compatibility blockers. Use
+alpha packages, generation commands and runtime compatibility. Use
 `scripts/test-standalone.sh` and `scripts/package-standalone.sh`.
 
 The WordPress instructions below describe the previous architecture and are kept
