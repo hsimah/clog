@@ -42,7 +42,7 @@ for (const viewport of [
 }
 
 test('WordPress deep routes load the StyleX stylesheet and bundled logo', async ({ page, context }) => {
-  const base = process.env.WP_SHELL_URL || new URL(process.env.VITE_GRAPHQL_URL || 'http://localhost:8080').origin;
+  const base = process.env.WP_SHELL_URL || new URL(process.env.VITE_GRAPHQL_URL || 'http://localhost:8180').origin;
   await login(context.request, base);
   await page.goto(`${base}/clog/items/new`);
   await expect(page.getByRole('textbox', { name: /^Name/ })).toBeVisible();
@@ -81,7 +81,7 @@ test.describe('Navigation', () => {
 
 test('development and WordPress deep links deliver both favicon variants', async ({ page, context, authenticate }) => {
   await authenticate();
-  const wordpress = process.env.WP_SHELL_URL || new URL(process.env.VITE_GRAPHQL_URL || 'http://localhost:8080').origin;
+  const wordpress = process.env.WP_SHELL_URL || new URL(process.env.VITE_GRAPHQL_URL || 'http://localhost:8180').origin;
   await login(context.request, wordpress);
   for (const url of ['/clog/home', `${wordpress}/clog/items/new`]) {
     await page.goto(url);

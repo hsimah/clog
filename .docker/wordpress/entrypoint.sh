@@ -16,7 +16,7 @@ echo "WordPress files are ready."
 if ! wp core is-installed --allow-root --quiet 2>/dev/null; then
   echo "WordPress not installed — running wp core install..."
   wp core install \
-    --url="${WP_URL:-http://localhost:8080}" \
+    --url="${WP_URL:-http://localhost:8180}" \
     --title="${WP_TITLE:-Clog}" \
     --admin_user="${WP_ADMIN_USER:-admin}" \
     --admin_password="${WP_ADMIN_PASSWORD:-admin}" \
@@ -24,6 +24,13 @@ if ! wp core is-installed --allow-root --quiet 2>/dev/null; then
     --skip-email \
     --allow-root
   echo "WordPress installed successfully."
+fi
+
+# Keep persisted development installs on the configured host/port after a move.
+# Test stacks can omit WP_URL and keep their own installation URL.
+if [ -n "${WP_URL:-}" ]; then
+  wp option update home "$WP_URL" --allow-root
+  wp option update siteurl "$WP_URL" --allow-root
 fi
 
 # Copy object-cache.php drop-in to live directory if missing

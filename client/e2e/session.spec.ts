@@ -2,7 +2,7 @@ import { test, expect } from './fixtures';
 import { login } from './session';
 
 test('WordPress serves the built app using cookies without the JWT plugin', async ({ page, context }) => {
-  const base = process.env.WP_SHELL_URL || new URL(process.env.VITE_GRAPHQL_URL || 'http://localhost:8080').origin;
+  const base = process.env.WP_SHELL_URL || new URL(process.env.VITE_GRAPHQL_URL || 'http://localhost:8180').origin;
   await login(context.request, base);
   await page.goto(`${base}/clog/items`);
   await expect(page.getByText('Heinz Ketchup', { exact: true })).toBeVisible();

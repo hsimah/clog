@@ -96,7 +96,7 @@ Node all run inside containers, so nothing needs to be installed on the host.
 
 2. **The frontend**
 
-   The `client` service already runs Vite on http://localhost:3000 with `client/src`
+   The `client` service already runs Vite on http://localhost:3100 with `client/src`
    and `client/public` bind-mounted, so hot reload works against the files in your
    editor with no host-side Node install.
 
@@ -111,13 +111,31 @@ Node all run inside containers, so nothing needs to be installed on the host.
    The browser uses same-origin GraphQL and WordPress cookies. Vite proxies
    `/graphql`, `/wp-admin`, `/wp-login.php` and `/wp-includes` to WordPress.
    Set `WP_PROXY_TARGET` to the WordPress origin when running Vite on the host
-   (default `http://localhost:8080`); Compose uses `http://wordpress` internally.
+   (default `http://localhost:8180`); Compose uses `http://wordpress` internally.
    The old `VITE_GRAPHQL_URL` variable remains a proxy-target fallback for tests.
 
 3. **Access the app**
 
-   - **Frontend:** http://localhost:3000/clog
-   - **WordPress admin:** http://localhost:8080/wp-admin (use credentials from `.env`)
+   - **Frontend:** http://localhost:3100/clog
+   - **WordPress admin:** http://localhost:8180/wp-admin (use credentials from `.env`)
+
+   Clog uses separate host ports from Toroid, so both stacks can run together:
+
+   | Service | Host port |
+   | --- | --- |
+   | Client | 3100 |
+   | WordPress | 8180 |
+   | phpMyAdmin | 8181 |
+   | MySQL | 3406 |
+   | Redis | 6479 |
+   | Mailpit web / SMTP | 8125 / 1125 |
+
+   Container-to-container connections keep their standard ports. Vite still
+   listens on port 3000 inside its container; standalone Playwright uses 3000 too.
+   After pulling this change, update existing `.env` WordPress URLs from
+   `localhost:8080` to `localhost:8180`, then run `scripts/dev.sh up` to recreate
+   containers. Startup applies `WP_URL` to the saved WordPress home/site URLs
+   without resetting the database.
 
    Sign in to WordPress first, or use the app's sign-in link. An expired session
    hides inventory and preserves drafts in the current tab; sign in in another tab

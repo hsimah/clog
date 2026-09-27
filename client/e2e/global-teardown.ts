@@ -8,7 +8,7 @@ const TEST_PREFIX = 'Clog E2E ';
 
 dotenv.config({ path: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.env') });
 
-const BASE = new URL(process.env.WP_PROXY_TARGET || process.env.VITE_GRAPHQL_URL || 'http://localhost:8080').origin;
+const BASE = new URL(process.env.WP_PROXY_TARGET || process.env.VITE_GRAPHQL_URL || 'http://localhost:8180').origin;
 let api: APIRequestContext;
 
 async function graphql(query: string, variables: Record<string, unknown>) {

@@ -6,7 +6,7 @@ import path from 'path'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const target = new URL(env.CLOG_PROXY_TARGET || env.WP_PROXY_TARGET || env.VITE_GRAPHQL_URL || '/', 'http://localhost:8080').origin;
+  const target = new URL(env.CLOG_PROXY_TARGET || env.WP_PROXY_TARGET || env.VITE_GRAPHQL_URL || '/', 'http://localhost:8180').origin;
   const proxy = { target, changeOrigin: true, cookieDomainRewrite: '' };
   return {
     plugins: [stylex(), react(), relay],
