@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
   const proxy = { target, changeOrigin: true, cookieDomainRewrite: '' };
   return {
     plugins: [stylex(), react(), relay],
-    base: mode === 'production' ? './' : '/clog',
+    base: '/',
     build: { manifest: true },
     resolve: { alias: { '@': path.resolve(__dirname, './src') } },
     server: {

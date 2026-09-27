@@ -16,6 +16,14 @@ const query = graphql`
 `;
 const variables = {};
 const styles = stylex.create({
+  card: {
+    borderTopWidth: 3,
+    borderTopStyle: 'solid',
+    borderTopColor: '#ff5722',
+    backgroundImage: 'linear-gradient(145deg, #ff572212, transparent 60%)',
+  },
+  count: { color: '#ff7043', fontWeight: 700 },
+
   cards: {
     display: 'grid', gap: 'var(--spacing-4)',
     gridTemplateColumns: { default: 'minmax(0, 1fr)', '@media (min-width: 900px)': 'repeat(3, minmax(0, 1fr))' },
@@ -27,7 +35,7 @@ export function HomePage() {
   const reference = useRouteQuery<HomePageQuery>(query, variables, revision);
   return <Stack gap={6}>
     <Stack gap={2}>
-      <Text as="h1" type="display-2">Welcome to Clog</Text>
+      <Text as="h1" type="display-2">Overview</Text>
       <Text>Cave Log - Inventory Management System</Text>
     </Stack>
     <QueryBoundary key={reference?.fetchKey ?? 'initial'} retry={() => setRevision((value) => value + 1)}>
@@ -46,18 +54,18 @@ function Summary({ reference }: { reference: PreloadedQuery<HomePageQuery> }) {
     { title: 'Inventory', description: 'Track item quantities', count: clogSummary.inventory, label: 'Total items in stock', path: '/inventory' },
   ];
   return <div {...stylex.props(styles.cards)}>
-    {cards.map(({ title, description, count, label, path }) => <Card key={path} role="region" aria-label={title} padding={0}>
+    {cards.map(({ title, description, count, label, path }) => <Card key={path} role="region" aria-label={title} padding={0} xstyle={styles.card}>
       <Layout height="auto"
-        header={<LayoutHeader><Stack gap={2}>
+        header={<LayoutHeader padding={6}><Stack gap={2}>
           <Text as="h2" type="display-3">{title}</Text>
           <Text>{description}</Text>
         </Stack></LayoutHeader>}
-        content={<LayoutContent><Stack gap={2}>
-          <Text type="display-2" aria-label={label}>{count}</Text>
+        content={<LayoutContent padding={6}><Stack gap={2}>
+          <Text type="display-2" xstyle={styles.count} aria-label={label}>{count}</Text>
           <Text>{label}</Text>
         </Stack></LayoutContent>}
-        footer={<LayoutFooter><Stack direction="horizontal" gap={2} wrap="wrap">
-          <Button href={path} label="View All" />
+        footer={<LayoutFooter padding={6}><Stack direction="horizontal" gap={2} wrap="wrap">
+          <Button href={path} label="View All" variant="secondary" />
           <Button href={`${path}/new`} label="Add New" variant="secondary" isDisabled={!canWrite} />
         </Stack></LayoutFooter>}
       />

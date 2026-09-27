@@ -48,7 +48,7 @@ printf '%s' "$CLOG_NEW_PASSWORD" | scripts/standalone-dev.sh user:add admin edit
 set -e CLOG_NEW_PASSWORD
 ```
 
-Open `http://localhost:8280/auth/login`. This uses PHP's development server and
+Open `http://localhost:8280/`. Overview is the home page; routes and assets are served from the domain root. Production uses `https://clog.loft.hsimah.com/`. Sign in at `/auth/login`. This uses PHP's development server and
 stores the database/sessions in ignored `.standalone/`. Stop it with Ctrl+C.
 For frontend hot reload, use `CLOG_PROXY_TARGET=http://localhost:8280` with Vite
 on the host. Containerized Vite needs an origin it can reach from its network.
@@ -95,7 +95,7 @@ nginx must have permission to connect to the FPM socket.
    FPM binary's `-t` option, then reload their services. Open `/auth/login`.
 
 All requests reach a fixed front controller; arbitrary `.php` paths are never
-executed. Only `/clog/assets/` is served from disk. The database, vendor source and
+executed. Only `/assets/` is served from disk. The database, vendor source and
 session files are outside the web document root. Login has an nginx rate limit;
 GraphQL requires a session, CSRF header, JSON POST, and bounded query depth/cost.
 Sessions expire after eight hours. Clean old session files with the OS's scheduled

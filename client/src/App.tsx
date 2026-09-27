@@ -10,7 +10,7 @@ function App() {
   return (
     <SessionBoundary>
       <RelayEnvironmentProvider environment={environment}>
-        <BrowserRouter basename="/clog">
+        <BrowserRouter>
           <Layout>
             <Suspense fallback={<p role="status">Loading...</p>}>
               <Routes>
