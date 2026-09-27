@@ -36,7 +36,7 @@ final class RuntimeFactory
         $runtime = new Runtime(
             $storage,
             $catalogue,
-            new UnitOfWorkFactory(new DependentReadStorage($storage), $catalogue, new NullProcessorRegistry(), $logger),
+            new UnitOfWorkFactory($storage, $catalogue, new NullProcessorRegistry(), $logger),
             new ReadGate($catalogue, $viewers, $logger),
             new WriteGate($catalogue, $viewers),
         );

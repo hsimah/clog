@@ -197,10 +197,8 @@ file drift and GraphQL conformance.
 Items, locations and individual stock entries live in custom tables. The framework
 owns timestamps and relationship writes. Clog derives inventory display labels in
 a pre-commit contract; clients supply neither creation timestamps nor labels.
-Runtime 0.10's deletion planner reads Clog's dependent edges in the wrong
-direction. A narrow `DependentReadStorage` adapter corrects those reads inside
-the unit of work until upstream fixes it; integration tests protect both cascades
-and unrelated stock. There are no new WordPress post projections. Generated admin lists/details read
+The current standalone runtime requires 0.11.1, which fixes dependent deletion
+lookups upstream; no application storage wrapper is needed. There are no new WordPress post projections. Generated admin lists/details read
 the same entities as GraphQL; the application remains the editing interface.
 
 Signed-in users can read inventory. Writes require `edit_posts`, matching the

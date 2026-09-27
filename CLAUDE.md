@@ -62,7 +62,7 @@ source and tests together; never hand-edit generated/vendor files.
 ## Elephentity runtime foundation
 
 - Use published `elephentity/sqlite` and `elephentity/graphql` packages. The latter's
-  repository is `elephentity-graphql-php`. Runtime is 0.11 with integration adapters at alpha.2;
+  repository is `elephentity-graphql-php`. Runtime is 0.11.1 with integration adapters at alpha.2;
   see `server/docs/dependencies.md` for the release set.
 - `server/composer.lock` is authoritative. No vendored forks, Composer aliases, or
   patched dependency source. Alpha stability is allowed only for the new packages.
@@ -76,8 +76,8 @@ source and tests together; never hand-edit generated/vendor files.
   schema owns entity tables; `Clog\Standalone\Schema` owns accounts and reviewed upgrades.
 - Generated SQLite names already contain `app_clog_`. Do not add Database::prefix()
   to them. Application queries read table names from the generated manifest.
-- Keep `DependentReadStorage` until a compatible upstream runtime fixes dependent
-  deletion reads. Tests must protect cascade/restrict rules and unrelated stock.
+- Runtime 0.11.1 handles dependent deletion reads directly. Tests must protect
+  cascade/restrict rules, child deletion preserving parents, and unrelated stock.
 - Use `scripts/test-standalone.sh` for conformance, migration, GraphQL and HTTP tests.
   The old WordPress backend tests do not validate this application.
 - Preserve same-origin cookie/CSRF transport in `client/src/lib/session.ts`; never

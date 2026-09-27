@@ -9,7 +9,7 @@ The repository still commits signed generated PHP artifacts.
 
 | Package | Locked release | Role |
 | --- | --- | --- |
-| `elephentity/runtime` | 0.11.0 | Runtime contracts and unit of work |
+| `elephentity/runtime` | 0.11.1 | Runtime contracts and unit of work |
 | `elephentity/sqlite` | 0.1.0-alpha.2 | Runtime SQLite adapter |
 | `elephentity/graphql` | 0.1.0-alpha.2 | Runtime GraphQL integration; repository is `elephentity-graphql-php` |
 | `elephentity/cli` | 0.11.0 | Build-time commands |
@@ -61,11 +61,12 @@ SQLite generator deliberately emits default SQLite collation. An interrupted
 fresh install can resume only if its generated schema matches exactly and contains
 no records; unknown or populated unversioned schemas are refused.
 
-The runtime 0.10/0.11 deletion-planner workaround in `DependentReadStorage` remains
-application code, with cascade/restrict regressions. It is already described in
-[elephentity #89](https://github.com/hsimah-services/elephentity/issues/89).
-Remove it only when a compatible runtime release fixes those reads and the same
-regressions pass without the wrapper.
+Runtime 0.11.1 fixes relationship-aware deletion traversal
+([elephentity #91](https://github.com/hsimah-services/elephentity/issues/91)).
+Clog passes storage directly to the unit of work; the `DependentReadStorage`
+workaround has been removed. The runtime constraint requires the fixed release.
+Regression tests use mismatched and colliding IDs to verify parent cascades,
+child deletion preserving parents/siblings, and occupied-location restrictions.
 
 ## Packaging
 

@@ -33,7 +33,7 @@ try {
     foreach ([
         'server/composer.json', 'server/composer.lock', 'server/generated',
         'server/src/Contract', 'server/src/Query', 'server/src/Runtime/RuntimeFactory.php',
-        'server/src/Runtime/Container.php', 'server/src/Runtime/DependentReadStorage.php',
+        'server/src/Runtime/Container.php',
         'server/standalone/bootstrap.php', 'server/standalone/cli.php',
         'server/standalone/src', 'server/standalone/public', 'client/dist', 'hosting',
     ] as $path) {

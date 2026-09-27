@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a4d3f6d3975b11ecd8cb9caeff6fdeea",
+    "content-hash": "ec20a1762c01729516d2597922e8d028",
     "packages": [
         {
             "name": "elephentity/graphql",
@@ -44,16 +44,16 @@
         },
         {
             "name": "elephentity/runtime",
-            "version": "v0.11.0",
+            "version": "v0.11.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-runtime.git",
-                "reference": "f3190c28d60e3e2e5f463f59e7d0992d1f700efd"
+                "reference": "4f38126164dd38a5ac82c0ba59f3bb9a15919772"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-runtime/zipball/f3190c28d60e3e2e5f463f59e7d0992d1f700efd",
-                "reference": "f3190c28d60e3e2e5f463f59e7d0992d1f700efd",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-runtime/zipball/4f38126164dd38a5ac82c0ba59f3bb9a15919772",
+                "reference": "4f38126164dd38a5ac82c0ba59f3bb9a15919772",
                 "shasum": ""
             },
             "require": {
@@ -79,9 +79,9 @@
             "description": "Elephentity runtime contracts: storage port, unit of work, verification, loaders.",
             "support": {
                 "issues": "https://github.com/hsimah-services/elephentity-runtime/issues",
-                "source": "https://github.com/hsimah-services/elephentity-runtime/tree/v0.11.0"
+                "source": "https://github.com/hsimah-services/elephentity-runtime/tree/v0.11.1"
             },
-            "time": "2026-09-22T00:43:04+00:00"
+            "time": "2026-09-27T20:02:56+00:00"
         },
         {
             "name": "elephentity/sqlite",

@@ -68,3 +68,39 @@ $runtime->delete('Location', $location2->id);
 fails(fn () => $db->execute('UPDATE app_clog_inventory SET item_id = 999 WHERE id = ?', [$stock->id->raw()]) ?: $db->insert('app_clog_inventory', ['created_at'=>'x','updated_at'=>'x','name'=>'x','date_added'=>'x','item_id'=>999]), 'Foreign key enforcement');
 check($db->select('PRAGMA foreign_key_check') === [], 'Foreign key check');
 echo "PASS: SQLite CRUD, NULL, uniqueness, transactions, policies, GraphQL pagination/Node/mutations and cascades\n";
+
+// Distinct and colliding IDs expose using an item ID as an inventory ID.
+$db = new Database(':memory:');
+Schema::install($db);
+$app = new Application($db, new Viewer('1', 'editor'));
+$runtime = $app->runtime;
+$items = [];
+for ($i = 1; $i <= 9; $i++) $items[$i] = $runtime->create('Item', ['name' => 'Item ' . $i]);
+$location = $runtime->create('Location', ['name' => 'Deletion fixture']);
+$stocks = [];
+for ($i = 1; $i <= 21; $i++) {
+    $stocks[$i] = $runtime->create('Inventory', [
+        'dateAdded' => '2026-09-26T00:00:00Z',
+        'item' => (string) $items[$i >= 20 ? 5 : 9]->id,
+        'location' => (string) $location->id,
+    ]);
+}
+check((string) $items[5]->id === (string) $stocks[5]->id, 'Fixture has colliding entity IDs');
+$before = $db->select('SELECT * FROM app_clog_inventory ORDER BY id');
+fails(fn () => $runtime->delete('Location', $location->id), 'Occupied location is restricted');
+check($db->select('SELECT * FROM app_clog_inventory ORDER BY id') === $before, 'Rejected deletion preserves every stock row');
+check($runtime->find('Location', $location->id) !== null, 'Rejected deletion preserves location');
+$runtime->delete('Item', $items[5]->id);
+check($runtime->find('Item', $items[5]->id) === null, 'Parent item deleted');
+foreach ([20, 21] as $id) check($runtime->find('Inventory', $stocks[$id]->id) === null, 'Mismatched-ID dependent deleted');
+foreach (range(1, 19) as $id) check($runtime->find('Inventory', $stocks[$id]->id) !== null, 'Unrelated stock preserved');
+$runtime->delete('Inventory', $stocks[5]->id);
+check($runtime->find('Inventory', $stocks[5]->id) === null, 'Child deleted');
+check($runtime->find('Item', $items[9]->id) !== null, 'Child deletion preserves parent item');
+check($runtime->find('Location', $location->id) !== null, 'Child deletion preserves location');
+check($runtime->find('Inventory', $stocks[6]->id) !== null, 'Child deletion preserves sibling');
+$runtime->delete('Item', $items[9]->id);
+$runtime->delete('Location', $location->id);
+check($runtime->find('Location', $location->id) === null, 'Empty location deleted');
+check($db->select('PRAGMA foreign_key_check') === [], 'Deletion fixture has no orphaned references');
+echo "PASS: upstream deletion traversal with mismatched/colliding IDs and child-parent isolation\n";
