@@ -114,7 +114,7 @@ test('leaving a Relay route aborts its pending query', async ({ page, authentica
 });
 
 test('WordPress serves Relay location deep links after reload', async ({ page, context }, testInfo) => {
-  const base = process.env.WP_SHELL_URL || new URL(process.env.VITE_GRAPHQL_URL || 'http://localhost:8080').origin;
+  const base = process.env.WP_SHELL_URL || new URL(process.env.VITE_GRAPHQL_URL || 'http://localhost:8180').origin;
   await login(context.request, base);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${base}/clog/locations`);

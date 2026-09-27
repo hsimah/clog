@@ -122,12 +122,12 @@ cmd_up() {
 
 Clog is starting. First run pulls images and installs WordPress — give it a minute.
 
-  WordPress      http://localhost:8080
-  WP admin       http://localhost:8080/wp-admin   (credentials from .env)
-  Client (Vite)  http://localhost:3000/clog
-  GraphQL        http://localhost:8080/graphql
-  phpMyAdmin     http://localhost:8081
-  Mailpit        http://localhost:8025
+  WordPress      http://localhost:8180
+  WP admin       http://localhost:8180/wp-admin   (credentials from .env)
+  Client (Vite)  http://localhost:3100/clog
+  GraphQL        http://localhost:8180/graphql
+  phpMyAdmin     http://localhost:8181
+  Mailpit        http://localhost:8125
 
   Follow setup:  scripts/dev.sh logs wordpress
 EOM

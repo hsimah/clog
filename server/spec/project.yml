@@ -1,9 +1,6 @@
 project: Clog
 storage:
-  driver: wordpress
-  tablePrefix: clog_
+  driver: sqlite
+  tablePrefix: app_clog_
 integrations:
-  wordpress:
-    linkPosts: false
-    adminTemplates: true
-  wpgraphql:
+  graphql:

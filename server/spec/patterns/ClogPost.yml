@@ -1,38 +1,7 @@
 pattern: ClogPost
 description: >
-  Shared admin presentation and timestamps for authoritative inventory entities.
-  The historical pattern name is retained; records do not require linked posts.
-requires:
-  driver: wordpress
-config:
-  visibility:
-    type: enum
-    description: Whether the post type is publicly queryable.
-    values: [public, private]
-    default: private
-  showInAdmin:
-    type: bool
-    description: Whether wp-admin lists these at all.
-    default: true
-  adminMenu:
-    type: string
-    description: Parent menu slug to nest under, if any.
-    nullable: true
-  supports:
-    type: list
-    description: >
-      Post editor features. Empty by default: the post row is a projection of the
-      custom table, so anything editable here edits a copy.
-    of: string
-    default: []
-  label:
-    type: string
-    description: Singular label. Derived from the entity name when absent.
-    nullable: true
-  pluralLabel:
-    type: string
-    description: Plural label, for the words naive inflection gets wrong.
-    nullable: true
+  Shared timestamps and access policies for authoritative inventory entities.
+  The historical pattern name is retained to preserve generated PHP contracts.
 use:
   - Timestamps
 readPolicies:

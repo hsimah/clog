@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a27cfeb319eab243ac8ef0aed23199a3>>
+ * @generated SignedSource<<66f4346a55783d9bd9d7e3e73d14dc98>>
  * @lightSyntaxTransform
  */
 
@@ -26,7 +26,7 @@ export type InventoryContractQuery$data = {
       readonly location: {
         readonly id: string;
       } | null | undefined;
-    }>;
+    } | null | undefined> | null | undefined;
     readonly pageInfo: {
       readonly endCursor: string | null | undefined;
       readonly hasNextPage: boolean;
@@ -41,8 +41,8 @@ export type InventoryContractQuery$data = {
         readonly id: string;
         readonly name: string;
         readonly stockCount: number;
-      };
-    }>;
+      } | null | undefined;
+    } | null | undefined> | null | undefined;
     readonly pageInfo: {
       readonly endCursor: string | null | undefined;
       readonly hasNextPage: boolean;
@@ -54,7 +54,7 @@ export type InventoryContractQuery$data = {
       readonly id: string;
       readonly name: string;
       readonly stockCount: number;
-    }>;
+    } | null | undefined> | null | undefined;
     readonly pageInfo: {
       readonly endCursor: string | null | undefined;
       readonly hasNextPage: boolean;
@@ -69,8 +69,8 @@ export type InventoryContractQuery$data = {
         readonly id: string;
         readonly name: string;
         readonly stockCount: number;
-      };
-    }>;
+      } | null | undefined;
+    } | null | undefined> | null | undefined;
     readonly pageInfo: {
       readonly endCursor: string | null | undefined;
       readonly hasNextPage: boolean;
@@ -258,22 +258,31 @@ v17 = [
     "storageKey": null
   }
 ],
-v18 = [
-  {
-    "alias": null,
-    "args": null,
-    "kind": "ScalarField",
-    "name": "hasNextPage",
-    "storageKey": null
-  },
-  {
-    "alias": null,
-    "args": null,
-    "kind": "ScalarField",
-    "name": "endCursor",
-    "storageKey": null
-  }
-],
+v18 = {
+  "alias": null,
+  "args": null,
+  "concreteType": "PageInfo",
+  "kind": "LinkedField",
+  "name": "pageInfo",
+  "plural": false,
+  "selections": [
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "hasNextPage",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "endCursor",
+      "storageKey": null
+    }
+  ],
+  "storageKey": null
+},
 v19 = [
   (v15/*:: as any*/),
   {
@@ -286,16 +295,7 @@ v19 = [
     "selections": (v17/*:: as any*/),
     "storageKey": null
   },
-  {
-    "alias": null,
-    "args": null,
-    "concreteType": "RootQueryToClogItemSearchConnectionPageInfo",
-    "kind": "LinkedField",
-    "name": "pageInfo",
-    "plural": false,
-    "selections": (v18/*:: as any*/),
-    "storageKey": null
-  }
+  (v18/*:: as any*/)
 ],
 v20 = [
   (v15/*:: as any*/),
@@ -309,16 +309,7 @@ v20 = [
     "selections": (v17/*:: as any*/),
     "storageKey": null
   },
-  {
-    "alias": null,
-    "args": null,
-    "concreteType": "RootQueryToClogStockedItemsConnectionPageInfo",
-    "kind": "LinkedField",
-    "name": "pageInfo",
-    "plural": false,
-    "selections": (v18/*:: as any*/),
-    "storageKey": null
-  }
+  (v18/*:: as any*/)
 ],
 v21 = {
   "kind": "Literal",
@@ -369,16 +360,7 @@ v24 = {
       ],
       "storageKey": null
     },
-    {
-      "alias": null,
-      "args": null,
-      "concreteType": "RootQueryToClogLocationSearchConnectionPageInfo",
-      "kind": "LinkedField",
-      "name": "pageInfo",
-      "plural": false,
-      "selections": (v18/*:: as any*/),
-      "storageKey": null
-    }
+    (v18/*:: as any*/)
   ],
   "storageKey": null
 },
@@ -443,16 +425,7 @@ v26 = {
       ],
       "storageKey": null
     },
-    {
-      "alias": null,
-      "args": null,
-      "concreteType": "RootQueryToClogInventorySearchConnectionPageInfo",
-      "kind": "LinkedField",
-      "name": "pageInfo",
-      "plural": false,
-      "selections": (v18/*:: as any*/),
-      "storageKey": null
-    }
+    (v18/*:: as any*/)
   ],
   "storageKey": null
 },

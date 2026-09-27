@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c8d792d6b866cc7b6ff8cc2c99530962>>
+ * @generated SignedSource<<e4954475af6b8266ed5b22b9db1880eb>>
  * @lightSyntaxTransform
  */
 
@@ -17,8 +17,8 @@ export type LocationList_query$data = {
         readonly id: string;
         readonly name: string;
         readonly stockCount: number;
-      };
-    }>;
+      } | null | undefined;
+    } | null | undefined> | null | undefined;
     readonly totalCount: number | null | undefined;
   } | null | undefined;
   readonly " $fragmentType": "LocationList_query";
@@ -171,7 +171,7 @@ return {
         {
           "alias": null,
           "args": null,
-          "concreteType": "RootQueryToClogLocationSearchConnectionPageInfo",
+          "concreteType": "PageInfo",
           "kind": "LinkedField",
           "name": "pageInfo",
           "plural": false,

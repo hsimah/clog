@@ -12,7 +12,7 @@ use Eleph\Runtime\Query\EntityQuery;
 use Eleph\Runtime\Storage\Cursor;
 use Eleph\Runtime\Storage\Offset;
 use Eleph\Runtime\Storage\Page;
-use Eleph\WordPress\Database\Database;
+use Eleph\SQLite\Database;
 
 /**
  * @implements EntityQuery<object>
@@ -49,7 +49,7 @@ final readonly class SqlEntityQuery implements EntityQuery
         }
         $limit = max(1, min(100, $limit));
         $offset = Offset::fromCursor($after)->value;
-        $rows = $this->db->select("SELECT e.id FROM {$this->from} WHERE {$this->where} ORDER BY {$this->order} LIMIT %d OFFSET %d",
+        $rows = $this->db->select("SELECT e.id FROM {$this->from} WHERE {$this->where} ORDER BY {$this->order} LIMIT ? OFFSET ?",
             [...$this->bindings, $limit + 1, $offset]);
         $next = count($rows) > $limit ? (new Offset($offset + $limit))->toCursor() : null;
         $entities = [];

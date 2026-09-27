@@ -1,0 +1,69 @@
+name: Standalone SQLite
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+    branches: [feature/sqlite-prototype-checkpoint]
+jobs:
+  standalone:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_sqlite, mbstring
+          coverage: none
+          ini-values: opcache.jit=0, opcache.jit_buffer_size=0
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install locked PHP dependencies
+        working-directory: server
+        run: composer validate --strict && composer install --no-interaction --prefer-dist
+      - name: Cache generator builds
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            server/vendor/elephentity/codegen/target
+            server/vendor/elephentity/codegen-php/target
+            server/vendor/elephentity/codegen-sqlite/target
+            server/vendor/elephentity/codegen-graphql-php/target
+          key: ${{ runner.os }}-eleph-generators-${{ hashFiles('server/composer.lock') }}
+      - name: Verify generated entities and integration manifests
+        working-directory: server
+        run: |
+          composer build-generators
+          composer check-generated
+          git diff --exit-code -- spec generated
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+        working-directory: client
+      - run: php server/standalone/tests/export-schema.php --check
+      - run: npm run relay:check && npm run lint && npm run build
+        working-directory: client
+      - run: composer test
+        working-directory: server
+      - run: npx playwright install --with-deps chromium
+        working-directory: client
+      - name: Browser smoke test
+        run: |
+          export CLOG_DB=/tmp/clog-browser.sqlite CLOG_ORIGIN=http://127.0.0.1:8280
+          php server/standalone/tests/browser-fixture.php
+          php -S 127.0.0.1:8280 server/standalone/public/router.php > /tmp/clog-browser.log 2>&1 &
+          CLOG_PHP_PID=$!
+          trap 'kill "$CLOG_PHP_PID"' EXIT
+          cd client
+          npx playwright test -c playwright.standalone.config.ts
+      - name: Verify production archive with locked runtime dependencies
+        run: |
+          php scripts/package-standalone.php
+          php server/standalone/tests/package.php
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clog-standalone
+          path: build/clog-standalone.tar.gz

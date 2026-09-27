@@ -1,4 +1,4 @@
-// Shared fetch transport; usable by Apollo now and Relay after #36.
+// Same-origin transport for the standalone PHP backend.
 interface Session {
   userId: string;
   nonce: string | null;
@@ -9,12 +9,8 @@ interface Snapshot {
   userId: string | null;
   canWrite: boolean;
 }
-const configElement = document.getElementById('clog-config');
-const config: { ajaxUrl: string; graphqlUrl: string; loginUrl: string } = configElement?.textContent
-  ? JSON.parse(configElement.textContent)
-  : { ajaxUrl: '/wp-admin/admin-ajax.php', graphqlUrl: '/graphql', loginUrl: '/wp-login.php?redirect_to=/clog' };
-export const graphqlUrl = config.graphqlUrl;
-export const loginUrl = config.loginUrl;
+export const graphqlUrl = '/graphql';
+export const loginUrl = '/auth/login';
 let snapshot: Snapshot = { status: 'checking', userId: null, canWrite: false };
 let identity: string | null = null;
 let generation = 0;
@@ -33,11 +29,6 @@ function publish(status: Snapshot['status'], canWrite = false) {
   snapshot = { status, userId: identity, canWrite };
   listeners.forEach((listener) => listener());
 }
-function endpoint(action: string) {
-  const url = new URL(config.ajaxUrl, location.origin);
-  url.searchParams.set('action', action);
-  return url;
-}
 export async function refreshSession(): Promise<Session> {
   if (snapshot.status === 'changed' || snapshot.status === 'signed-out') {
     throw new Error('Reload to start a new session.');
@@ -46,7 +37,7 @@ export async function refreshSession(): Promise<Session> {
   const started = generation;
   pending = (async () => {
     try {
-      const response = await fetch(endpoint('clog_graphql_session'), { credentials: 'same-origin', cache: 'no-store' });
+      const response = await fetch('/auth/session', { credentials: 'same-origin', cache: 'no-store' });
       if (!response.ok) throw new Error('Could not check your session.');
       const session: Session = await response.json();
       if (started !== generation) throw new Error('Session changed.');
@@ -79,7 +70,7 @@ export async function sessionFetch(input: RequestInfo | URL, init?: RequestInit)
   const session = await refreshSession();
   const started = generation;
   const headers = new Headers(init?.headers);
-  headers.set('X-WP-Nonce', session.nonce!);
+  headers.set('X-Clog-CSRF', session.nonce!);
   const response = await fetch(input, { ...init, headers, credentials: 'same-origin', cache: 'no-store' });
   // Discard responses belonging to an account that signed out/switched in flight.
   await refreshSession();
@@ -90,9 +81,9 @@ export async function sessionFetch(input: RequestInfo | URL, init?: RequestInit)
 
 export async function logout(): Promise<void> {
   const session = await refreshSession();
-  const response = await fetch(endpoint('clog_logout'), {
+  const response = await fetch('/auth/logout', {
     method: 'POST', credentials: 'same-origin', cache: 'no-store',
-    body: new URLSearchParams({ _ajax_nonce: session.nonce! }),
+    headers: { 'X-Clog-CSRF': session.nonce! },
   });
   if (!response.ok) throw new Error('Could not sign out. Please try again.');
   generation++;

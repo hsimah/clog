@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a05b38fed2304b2c03b38b55988027a8>>
+ * @generated SignedSource<<eec19409d551f4f8c1a4cb863bfee831>>
  * @lightSyntaxTransform
  */
 
@@ -162,7 +162,7 @@ return {
           {
             "alias": null,
             "args": null,
-            "concreteType": "RootQueryToClogStockedItemsConnectionPageInfo",
+            "concreteType": "PageInfo",
             "kind": "LinkedField",
             "name": "pageInfo",
             "plural": false,

@@ -9,10 +9,10 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   graphql-manifest.php
- * digest: sha256:fe8a97167d21599de29713619cb619c238e6a254404e9951bb788b5b74b53d5c
+ * digest: sha256:da000abf85687728023ab1654ca2f85af324e0cc5fae7855de24264f1fe39181
  */
 
-namespace Eleph\WPGraphQL\Manifest;
+namespace Eleph\GraphQL\Manifest;
 
 /**
  * The compiled GraphQL surface.

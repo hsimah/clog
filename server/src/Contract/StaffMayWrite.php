@@ -10,14 +10,14 @@ use Eleph\Runtime\Policy\PolicyDecision;
 use Eleph\Runtime\Policy\Viewer;
 use Eleph\Runtime\Policy\WriteContext;
 
-/** Match the existing Clog admin menu's edit_posts capability. */
+/** Editors may change inventory in any hosting integration. */
 final readonly class StaffMayWrite implements ClogPostStaffWritePolicy
 {
     public function decide(?ClogPost $entity, WriteContext $context, Viewer $viewer): PolicyDecision
     {
-        return $viewer->isAuthenticated() && $viewer->can('edit_posts')
+        return $viewer->isAuthenticated() && $viewer->can('inventory.write')
             ? PolicyDecision::allow()
-            : PolicyDecision::deny('Inventory changes require edit_posts.');
+            : PolicyDecision::deny('Inventory changes require editor access.');
     }
 }
 

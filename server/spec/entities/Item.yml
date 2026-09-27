@@ -2,14 +2,8 @@ entity: Item
 description: A thing that can be stocked, identified by its barcode.
 use:
   - ClogPost
-configure:
-  ClogPost:
-    visibility: private
-    adminMenu: clog
-    label: Item
-    pluralLabel: Items
 integrations:
-  wpgraphql:
+  graphql:
     singular: ClogItem
     plural: ClogItems
 storage:
@@ -42,7 +36,7 @@ queries:
       type: Item
       cardinality: many
     integrations:
-      wpgraphql:
+      graphql:
         field: clogItemSearch
     handler: true
   stocked:
@@ -54,6 +48,6 @@ queries:
       type: Item
       cardinality: many
     integrations:
-      wpgraphql:
+      graphql:
         field: clogStockedItems
     handler: true

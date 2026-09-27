@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<90366d150917d73561e2b1b8ec011bda>>
+ * @generated SignedSource<<67531a4761e80842041f6b5c6805ee92>>
  * @lightSyntaxTransform
  */
 
@@ -15,8 +15,8 @@ export type ItemPicker_query$data = {
       readonly node: {
         readonly id: string;
         readonly name: string;
-      };
-    }>;
+      } | null | undefined;
+    } | null | undefined> | null | undefined;
   } | null | undefined;
   readonly " $fragmentType": "ItemPicker_query";
 };
@@ -147,7 +147,7 @@ return {
         {
           "alias": null,
           "args": null,
-          "concreteType": "RootQueryToClogItemSearchConnectionPageInfo",
+          "concreteType": "PageInfo",
           "kind": "LinkedField",
           "name": "pageInfo",
           "plural": false,

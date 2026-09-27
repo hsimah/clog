@@ -28,7 +28,7 @@ final class RuntimeFactory
     public static function create(
         StorageAdaptor $storage,
         ViewerProvider $viewers,
-        \Eleph\WordPress\Database\Database $database,
+        \Eleph\SQLite\Database $database,
         LoggerInterface $logger = new NullLogger(),
     ): Runtime {
         $container = new Container();
@@ -36,7 +36,7 @@ final class RuntimeFactory
         $runtime = new Runtime(
             $storage,
             $catalogue,
-            new UnitOfWorkFactory(new DependentReadStorage($storage), $catalogue, new NullProcessorRegistry(), $logger),
+            new UnitOfWorkFactory($storage, $catalogue, new NullProcessorRegistry(), $logger),
             new ReadGate($catalogue, $viewers, $logger),
             new WriteGate($catalogue, $viewers),
         );

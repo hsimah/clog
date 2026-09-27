@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<964aba9d80edbf1257c349981824ebec>>
+ * @generated SignedSource<<f7274ad306b2cfa25e1c9df635a67794>>
  * @lightSyntaxTransform
  */
 
@@ -16,8 +16,8 @@ export type InventoryList_query$data = {
         readonly id: string;
         readonly name: string;
         readonly stockCount: number;
-      };
-    }>;
+      } | null | undefined;
+    } | null | undefined> | null | undefined;
     readonly totalCount: number | null | undefined;
   } | null | undefined;
   readonly " $fragmentType": "InventoryList_query";
@@ -176,7 +176,7 @@ return {
         {
           "alias": null,
           "args": null,
-          "concreteType": "RootQueryToClogStockedItemsConnectionPageInfo",
+          "concreteType": "PageInfo",
           "kind": "LinkedField",
           "name": "pageInfo",
           "plural": false,

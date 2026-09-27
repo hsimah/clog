@@ -2,14 +2,8 @@ entity: Inventory
 description: One stocked instance of an item, in a location.
 use:
   - ClogPost
-configure:
-  ClogPost:
-    visibility: private
-    adminMenu: clog
-    label: Inventory Entry
-    pluralLabel: Inventory
 integrations:
-  wpgraphql:
+  graphql:
     singular: ClogInventory
     plural: ClogInventoryEntries
 storage:
@@ -54,7 +48,7 @@ queries:
       type: Inventory
       cardinality: many
     integrations:
-      wpgraphql:
+      graphql:
         field: clogInventorySearch
     handler: true
 

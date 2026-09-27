@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<33af128fa31821d9c08ef4e770034ac7>>
+ * @generated SignedSource<<aa532b8296269abb241780b939500008>>
  * @lightSyntaxTransform
  */
 
@@ -15,8 +15,8 @@ export type InventoryLocations_query$data = {
       readonly node: {
         readonly id: string;
         readonly name: string;
-      };
-    }>;
+      } | null | undefined;
+    } | null | undefined> | null | undefined;
   } | null | undefined;
   readonly " $fragmentType": "InventoryLocations_query";
 };
@@ -130,7 +130,7 @@ return {
         {
           "alias": null,
           "args": null,
-          "concreteType": "RootQueryToClogLocationSearchConnectionPageInfo",
+          "concreteType": "PageInfo",
           "kind": "LinkedField",
           "name": "pageInfo",
           "plural": false,

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c8b4426548fcc6b742a141814705981d>>
+ * @generated SignedSource<<874899f5dbddbb1131f86166a05ab0aa>>
  * @lightSyntaxTransform
  */
 
@@ -148,7 +148,7 @@ return {
           {
             "alias": null,
             "args": null,
-            "concreteType": "RootQueryToClogInventorySearchConnectionPageInfo",
+            "concreteType": "PageInfo",
             "kind": "LinkedField",
             "name": "pageInfo",
             "plural": false,
