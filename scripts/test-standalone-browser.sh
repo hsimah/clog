@@ -18,4 +18,4 @@ trap cleanup EXIT
     -v "$ROOT:/work/clog:z" -w /work/clog/client \
     -e CLOG_TEST_URL=http://backend:8080 \
     mcr.microsoft.com/playwright:v1.58.2-noble \
-    npx playwright test -c playwright.standalone.config.ts
+    npx playwright test -c playwright.config.ts "$@"

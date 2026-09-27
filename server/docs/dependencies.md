@@ -21,8 +21,7 @@ The repository still commits signed generated PHP artifacts.
 
 Only the four new integration/generator packages allow alpha releases. The rest
 retain stable constraints. `webonyx/graphql-php` is the separate GraphQL engine,
-currently locked at 15.37.2. The root `elephentity` package, memory adapter,
-WordPress integrations and their generators are not required by this application.
+currently locked at 15.37.2. Production installs only the runtime packages.
 
 Both integration adapters support runtime 0.11 as of alpha.2. The compatibility
 issues [SQLite #1](https://github.com/hsimah-services/elephentity-sqlite/issues/1)
@@ -73,7 +72,7 @@ child deletion preserving parents/siblings, and occupied-location restrictions.
 The standalone packager copies an allowlist into staging, installs the exact lock
 with `--no-dev --classmap-authoritative --no-scripts --no-plugins`, checks platform
 requirements, and archives the result. It never modifies the working vendor tree.
-The target Pi receives `server/vendor/autoload.php` and production dependencies;
+The target host receives `server/vendor/autoload.php` and production dependencies;
 it needs neither Composer nor Rust nor the Elephentity compiler/generators.
-Tests unpack the actual archive in isolation, confirm build/WordPress packages
-are absent, and exercise install, a write, GraphQL and backup/restore.
+Tests unpack the actual archive in isolation, confirm only the expected application files and production dependencies
+are included, and exercise install, a write, GraphQL and backup/restore.

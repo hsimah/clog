@@ -1,6 +1,0 @@
-services:
-  wordpress:
-    environment:
-      CLOG_EXPORT_SCHEMA: "1"
-    volumes:
-      - ../../client:/exports:z

@@ -8,7 +8,7 @@ export const test = base.extend<{
   waitForData: async ({}, use) => {
     await use(async (page) => {
       if (!page) return;
-      await expect(page.getByText('Loading...')).toBeHidden();
+      await expect(page.getByText('Loading...', { exact: true })).toHaveCount(0);
     });
   },
 

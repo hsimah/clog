@@ -3,10 +3,10 @@ import { test, expect } from './fixtures';
 test.describe('Home Page', () => {
   test('displays welcome heading and seed data counts', async ({ page, waitForData, authenticate }) => {
     await authenticate();
-    await page.goto('/clog/home');
+    await page.goto('/');
     await waitForData(page);
 
-    await expect(page.getByRole('heading', { name: 'Welcome to Clog' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Overview' })).toBeVisible();
     await expect(page.getByText('Cave Log - Inventory Management System')).toBeVisible();
 
     // Verify each card shows the correct count from seed data
@@ -22,44 +22,44 @@ test.describe('Home Page', () => {
 
   test('navigates to items page via View All button', async ({ page, waitForData, authenticate }) => {
     await authenticate();
-    await page.goto('/clog/home');
+    await page.goto('/');
     await waitForData(page);
 
-    await page.locator('a[href="/clog/items"]:has-text("View All")').click();
+    await page.locator('a[href="/items"]:has-text("View All")').click();
 
-    await expect(page).toHaveURL('/clog/items');
+    await expect(page).toHaveURL('/items');
     await expect(page.getByRole('heading', { name: 'Items' })).toBeVisible();
   });
 
   test('navigates to locations page via View All button', async ({ page, waitForData, authenticate }) => {
     await authenticate();
-    await page.goto('/clog/home');
+    await page.goto('/');
     await waitForData(page);
 
-    await page.locator('a[href="/clog/locations"]:has-text("View All")').click();
+    await page.locator('a[href="/locations"]:has-text("View All")').click();
 
-    await expect(page).toHaveURL('/clog/locations');
+    await expect(page).toHaveURL('/locations');
     await expect(page.getByRole('heading', { name: 'Locations' })).toBeVisible();
   });
 
   test('navigates to inventory page via View All button', async ({ page, waitForData, authenticate }) => {
     await authenticate();
-    await page.goto('/clog/home');
+    await page.goto('/');
     await waitForData(page);
 
-    await page.locator('a[href="/clog/inventory"]:has-text("View All")').click();
+    await page.locator('a[href="/inventory"]:has-text("View All")').click();
 
-    await expect(page).toHaveURL('/clog/inventory');
+    await expect(page).toHaveURL('/inventory');
     await expect(page.getByRole('heading', { name: 'Inventory' })).toBeVisible();
   });
 });
 
 test('dashboard reads authoritative totals above 100 without fetching collections', async ({ page, context, authenticate }) => {
   await authenticate();
-  const session = await (await context.request.get('/wp-admin/admin-ajax.php?action=clog_graphql_session')).json();
+  const session = await (await context.request.get('/auth/session')).json();
   async function execute(query: string) {
     const response = await context.request.post('/graphql', {
-      headers: { 'X-WP-Nonce': session.nonce }, data: { query },
+      headers: { 'X-Clog-CSRF': session.nonce }, data: { query },
     });
     const body = await response.json();
     expect(body.errors).toBeUndefined();
@@ -79,7 +79,7 @@ test('dashboard reads authoritative totals above 100 without fetching collection
     page.on('request', (request) => {
       if (request.url().endsWith('/graphql')) operations.push(request.postDataJSON()?.operationName);
     });
-    await page.goto('/clog/home');
+    await page.goto('/');
     await expect(page.getByRole('region', { name: 'Items', exact: true }).getByLabel('Total items', { exact: true })).toHaveText(String(clogSummary.items));
     await expect(page.getByRole('region', { name: 'Locations', exact: true }).getByLabel('Total locations', { exact: true })).toHaveText(String(clogSummary.locations));
     await expect(page.getByRole('region', { name: 'Inventory', exact: true }).getByLabel('Total items in stock', { exact: true })).toHaveText(String(clogSummary.inventory));
@@ -100,7 +100,7 @@ test('dashboard retries a failed summary and fits narrow and portrait screens', 
       await route.fulfill({ json: { errors: [{ message: 'Totals temporarily unavailable' }] } });
     } else await route.continue();
   });
-  await page.goto('/clog/home');
+  await page.goto('/');
   await expect(page.getByRole('alert')).toHaveText('Totals temporarily unavailable');
   await page.getByRole('button', { name: 'Try again' }).click();
   await expect(page.getByRole('region', { name: 'Inventory', exact: true })).toBeVisible();

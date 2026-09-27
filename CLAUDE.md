@@ -6,12 +6,13 @@ in `server/standalone/`, using generated entities under `server/generated/`.
 
 ## Deployment
 
-- Production uses existing nginx, PHP-FPM and local SQLite. See `hosting/README.md`.
+- Deployment is managed externally. The app uses PHP and local SQLite;
+  `hosting/README.md` supplies optional nginx/PHP-FPM examples.
 - Build off-device. `scripts/package-standalone.sh` stages source and compiled assets,
   installs the production Composer lock in isolation, and produces
   `build/clog-standalone.tar.gz`. Never strip the working `server/vendor`.
 - Releases upload the same archive that passed the standalone workflow. No workflow
-  automatically changes the host. WordPress/plugin deployment files are legacy references.
+  automatically changes the host. Keep hostnames and infrastructure outside application code.
 - The deployed host needs neither Composer nor Rust. Dependencies are included in the archive.
 
 ## Client conventions
@@ -79,7 +80,6 @@ source and tests together; never hand-edit generated/vendor files.
 - Runtime 0.11.1 handles dependent deletion reads directly. Tests must protect
   cascade/restrict rules, child deletion preserving parents, and unrelated stock.
 - Use `scripts/test-standalone.sh` for conformance, migration, GraphQL and HTTP tests.
-  The old WordPress backend tests do not validate this application.
 - Preserve same-origin cookie/CSRF transport in `client/src/lib/session.ts`; never
   automatically replay mutations after uncertain responses or session expiry.
 - All application data uses Relay. Use server-paginated searches and SQL totals;

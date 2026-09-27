@@ -5,8 +5,12 @@ $dir = sys_get_temp_dir() . '/clog-release-' . bin2hex(random_bytes(5));
 mkdir($dir, 0700);
 try {
     (new PharData($root . '/build/clog-standalone.tar.gz'))->extractTo($dir);
-    foreach (['server/standalone/vendor', 'server/standalone/manifests', 'server/clog.php', 'server/generated/wordpress', 'server/generated/wpgraphql', 'server/vendor/elephentity/wordpress', 'server/vendor/elephentity/wpgraphql', 'server/vendor/elephentity/cli', 'server/vendor/elephentity/schema', 'server/vendor/elephentity/codegen', 'server/vendor/elephentity/codegen-sqlite', 'server/vendor/elephentity/codegen-graphql-php', 'server/vendor/phpunit'] as $legacy) {
-        if (file_exists($dir . '/' . $legacy)) throw new RuntimeException('Legacy code included: ' . $legacy);
+    $serverEntries = array_values(array_diff(scandir($dir . '/server'), ['.', '..']));
+    if ($serverEntries !== ['composer.json', 'composer.lock', 'generated', 'src', 'standalone', 'vendor']) {
+        throw new RuntimeException('Unexpected files in production server.');
+    }
+    foreach (['server/standalone/vendor', 'server/standalone/manifests', 'server/vendor/elephentity/cli', 'server/vendor/elephentity/schema', 'server/vendor/elephentity/codegen', 'server/vendor/elephentity/codegen-sqlite', 'server/vendor/elephentity/codegen-graphql-php', 'server/vendor/phpunit'] as $development) {
+        if (file_exists($dir . '/' . $development)) throw new RuntimeException('Development code included: ' . $development);
     }
     $code = <<<'CODE'
 require $argv[1] . '/server/standalone/bootstrap.php';

@@ -2,31 +2,28 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Clog: Start dev stack",
+      "label": "Clog: Serve locally",
       "type": "shell",
-      "command": "${workspaceFolder}/scripts/dev.sh up",
-      "isBackground": true,
-      "problemMatcher": [],
-      "presentation": { "reveal": "always", "panel": "dedicated" },
-      "runOptions": { "runOn": "folderOpen" }
-    },
-    {
-      "label": "Clog: Stop dev stack",
-      "type": "shell",
-      "command": "${workspaceFolder}/scripts/dev.sh down",
-      "problemMatcher": []
-    },
-    {
-      "label": "Clog: Tail WordPress logs",
-      "type": "shell",
-      "command": "${workspaceFolder}/scripts/dev.sh logs wordpress",
+      "command": "${workspaceFolder}/scripts/standalone-dev.sh serve",
       "isBackground": true,
       "problemMatcher": []
     },
     {
-      "label": "Clog: Reset database (destructive)",
+      "label": "Clog: Build client",
       "type": "shell",
-      "command": "${workspaceFolder}/scripts/dev.sh reset",
+      "command": "${workspaceFolder}/scripts/node.sh npm run build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Clog: Test backend",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/test-standalone.sh",
+      "problemMatcher": []
+    },
+    {
+      "label": "Clog: Test browser",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/test-standalone-browser.sh",
       "problemMatcher": []
     }
   ]

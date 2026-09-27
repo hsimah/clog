@@ -2,8 +2,8 @@
 
 The generated Elephentity types remain `ClogItem`, `ClogLocation`, and
 `ClogInventory`. The app should use the search connections below, not compute
-counts from its loaded page. All reads require a signed-in WordPress viewer;
-writes require `edit_posts` and use the generated mutations.
+counts from its loaded page. All reads require a signed-in account;
+writes require the `inventory.write` capability (the editor role) and use the generated mutations.
 
 ## Queries for screens and selectors
 
@@ -17,8 +17,8 @@ writes require `edit_posts` and use the generated mutations.
 Item search matches name **or** barcode, including leading zeroes and numeric item
 names. Inventory search matches item name/barcode or location name. Location
 search matches its name. Terms are trimmed and capped at 200 characters; `%`, `_`
-and backslash are literal, not SQL wildcards. Matching uses the storage schema's
-case-insensitive collation. Omitted/null filters mean no restriction.
+and backslash are literal, not SQL wildcards. Search uses SQLite LIKE with ASCII case-insensitive matching;
+uniqueness and ordering use the application's Unicode lowercase collation. Omitted/null filters mean no restriction.
 
 The inventory workspace uses `clogStockedItems`: it excludes items without stock,
 returns each item once, and searches item name/barcode **or** the names of locations
@@ -85,7 +85,7 @@ it must not search a previously loaded collection page.
 
 Legacy numeric links can resolve with `clogItem(id:)`, `clogLocation(id:)` or
 `clogInventory(id:)`, then use the returned canonical global ID. `node(id:)`
-expects a global ID. Do not encode WordPress post IDs or infer entity IDs from them.
+expects a global ID. IDs refer directly to the entity tables.
 Search filter IDs and `stockCount` arguments accept raw database IDs for transition,
 but reject a global ID for the wrong entity type.
 
@@ -108,21 +108,19 @@ must dispose of the Relay store using the shared session subscription from #34.
 ## Reproduce the contract
 
 ```sh
-scripts/test-backend.sh --schema
+scripts/test-standalone.sh
+scripts/php.sh php standalone/tests/export-schema.php
 scripts/node.sh npm run relay:contract
 scripts/node.sh npm run relay:check
 ```
 
-The first command runs isolated WordPress 7.1.2 / WPGraphQL 2.23.1 / MySQL tests,
-then exports the actual schema to `client/schema.graphql`. It never contacts the
-live inventory. Tests cover more than 100 items/units, full pagination, filters,
-literal searches, totals, detail lookup, typed IDs, mutations and access gates.
-The compiler fixture in `client/relay-contract` proves a Relay connection query
-compiles against that exact schema. CI regenerates the schema, checks its diff,
-and validates the checked-in Relay artifact.
+The backend tests use isolated SQLite databases; the exporter builds the actual
+schema in memory and writes `client/schema.graphql`. Pass `--check` to verify it
+without writing. The compiler fixture in `client/relay-contract` proves a Relay
+connection query compiles against that schema. CI verifies the snapshot and the
+checked-in Relay artifacts. Browser tests cover pagination beyond 100 units,
+filters, totals, detail lookup, writes, and account/session behavior.
 
-Two narrow compatibility adaptations live in `InventoryFields::connectionConfig`:
-WPGraphQL's `where` envelope must be flattened for Elephentity WPGraphQL 0.2, and
-runtime 0.10 query arguments need conversion to `EntityId` for generated finders.
-Recheck these when upgrading the locked packages; do not edit generated or vendor
-files. The adapter also enforces the forward-only paging contract.
+`Clog\Standalone\GraphQL` combines the generated schema with application search
+and aggregate fields. It validates typed IDs and forward-only pagination before
+calling the application queries. Never edit generated or vendor files.

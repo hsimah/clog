@@ -18,7 +18,7 @@ test('initial stock reports partial completion without recreating the saved item
     }
     await route.continue();
   });
-  await page.goto('/clog/items/new');
+  await page.goto('/items/new');
   await page.getByRole('textbox', { name: /^Name/ }).fill('Clog E2E Partial stock');
   await page.getByLabel('Count', { exact: true }).fill('3');
   await page.getByRole('textbox', { name: /^Name/ }).click(); // Commit the numeric input.
@@ -37,14 +37,14 @@ test('initial stock reports partial completion without recreating the saved item
 
 test('barcodes preserve leading zeroes, report duplicates, and clear to null', async ({ page, authenticate }) => {
   await authenticate();
-  await page.goto('/clog/items/new');
+  await page.goto('/items/new');
   await page.getByRole('textbox', { name: /^Name/ }).fill('Clog E2E Leading zero');
   await page.getByPlaceholder('Enter barcode').fill('0000420099');
   await page.getByRole('button', { name: 'Create', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Clog E2E Leading zero' })).toBeVisible();
   const detail = page.url();
   await expect(page.getByRole('complementary')).toContainText('0000420099');
-  await page.goto('/clog/items/new');
+  await page.goto('/items/new');
   await page.getByRole('textbox', { name: /^Name/ }).fill('Clog E2E Duplicate barcode');
   await page.getByPlaceholder('Enter barcode').fill('0000420099');
   await page.getByRole('button', { name: 'Create', exact: true }).click();
@@ -59,9 +59,11 @@ test('barcodes preserve leading zeroes, report duplicates, and clear to null', a
 test('denied camera access offers manual barcode entry', async ({ page, authenticate }) => {
   await authenticate();
   await page.addInitScript(() => {
-    Object.defineProperty(navigator.mediaDevices, 'getUserMedia', { value: async () => { throw new DOMException('Permission denied', 'NotAllowedError'); } });
+    Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: {
+      getUserMedia: async () => { throw new DOMException('Permission denied', 'NotAllowedError'); },
+    } });
   });
-  await page.goto('/clog/items/new');
+  await page.goto('/items/new');
   await page.getByRole('button', { name: 'Scan barcode', exact: true }).click();
   await expect(page.getByRole('dialog').getByRole('alert')).toContainText('manually');
   await page.getByRole('textbox', { name: 'Manual barcode', exact: true }).fill('0000012345');
@@ -84,7 +86,7 @@ for (const mode of ['detect', 'late', 'expire']) {
         async detect() { return mode === 'detect' ? [{ rawValue: '0000076543' }] : []; }
       }, configurable: true });
       const gate = new Promise<void>((resolve) => { state.release = resolve; });
-      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', { value: async () => {
+      Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getUserMedia: async () => {
         state.opened++;
         const stream = document.createElement('canvas').captureStream();
         for (const track of stream.getTracks()) {
@@ -93,9 +95,9 @@ for (const mode of ['detect', 'late', 'expire']) {
         }
         if (mode === 'late') await gate;
         return stream;
-      } });
+      } } });
     }, mode);
-    await page.goto('/clog/items/new');
+    await page.goto('/items/new');
     await page.getByRole('button', { name: 'Scan barcode', exact: true }).click();
     if (delayed) {
       await expect.poll(() => page.evaluate(() => (window as unknown as { scannerTest: { opened: number } }).scannerTest.opened)).toBeGreaterThan(0);
@@ -119,10 +121,10 @@ for (const mode of ['detect', 'late', 'expire']) {
 
 test('initial stock can select a location beyond the first page', async ({ page, context, authenticate }) => {
   await authenticate();
-  const session = await (await context.request.get('/wp-admin/admin-ajax.php?action=clog_graphql_session')).json();
+  const session = await (await context.request.get('/auth/session')).json();
   const names = Array.from({ length: 26 }, (_, index) => `Clog E2E Picker ${String(index + 1).padStart(2, '0')}`);
   const response = await context.request.post('/graphql', {
-    headers: { 'X-WP-Nonce': session.nonce },
+    headers: { 'X-Clog-CSRF': session.nonce },
     data: { query: `mutation { ${names.map((name, index) => `l${index}: createClogLocation(input: {name: ${JSON.stringify(name)}}) { clogLocation { id } }`).join('\n')} }` },
   });
   const body = await response.json();
@@ -130,7 +132,7 @@ test('initial stock can select a location beyond the first page', async ({ page,
   const ids = Object.values(body.data as Record<string, { clogLocation: { id: string } }>).map((entry) => entry.clogLocation.id);
   let itemId: string | undefined;
   try {
-  await page.goto('/clog/items/new');
+  await page.goto('/items/new');
   await page.getByRole('textbox', { name: /^Name/ }).fill('Clog E2E Off-page initial stock');
   await page.getByLabel('Count', { exact: true }).fill('1');
   await page.getByRole('textbox', { name: /^Name/ }).click();
@@ -143,7 +145,7 @@ test('initial stock can select a location beyond the first page', async ({ page,
   itemId = decodeURIComponent(new URL(page.url()).pathname.split('/').pop()!);
   } finally {
     const cleanup = await context.request.post('/graphql', {
-      headers: { 'X-WP-Nonce': session.nonce },
+      headers: { 'X-Clog-CSRF': session.nonce },
       data: { query: `mutation { ${itemId ? `item: deleteClogItem(input: {id: ${JSON.stringify(itemId)}}) { deletedId }` : ''} ${ids.map((id, index) => `l${index}: deleteClogLocation(input: {id: ${JSON.stringify(id)}}) { deletedId }`).join(' ')} }` },
     });
     expect((await cleanup.json()).errors).toBeUndefined();

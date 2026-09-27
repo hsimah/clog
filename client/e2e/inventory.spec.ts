@@ -3,7 +3,7 @@ import { test, expect } from './fixtures';
 test.describe('Inventory', () => {
   test('lists seed inventory grouped by item', async ({ page, waitForData, authenticate }) => {
     await authenticate();
-    await page.goto('/clog/inventory');
+    await page.goto('/inventory');
     await waitForData(page);
 
     await expect(page.getByRole('heading', { name: 'Inventory' })).toBeVisible();
@@ -14,7 +14,7 @@ test.describe('Inventory', () => {
 
   test('search filters inventory', async ({ page, waitForData, authenticate }) => {
     await authenticate();
-    await page.goto('/clog/inventory');
+    await page.goto('/inventory');
     await waitForData(page);
 
     await page.getByPlaceholder('Search inventory...').fill('ketchup');
@@ -24,7 +24,7 @@ test.describe('Inventory', () => {
 
   test('expands item row to show location breakdown', async ({ page, waitForData, authenticate }) => {
     await authenticate();
-    await page.goto('/clog/inventory');
+    await page.goto('/inventory');
     await waitForData(page);
 
     await page.getByRole('button', { name: 'Show locations for Heinz Ketchup' }).click();
@@ -34,7 +34,7 @@ test.describe('Inventory', () => {
 
   test('shows no results message for empty search', async ({ page, waitForData, authenticate }) => {
     await authenticate();
-    await page.goto('/clog/inventory');
+    await page.goto('/inventory');
     await waitForData(page);
 
     await page.getByPlaceholder('Search inventory...').fill('nonexistent xyz');
@@ -44,7 +44,7 @@ test.describe('Inventory', () => {
 
 test('location tabs, grouped details and browser history preserve workspace filters', async ({ page, authenticate }) => {
   await authenticate();
-  await page.goto('/clog/inventory?term=ketchup');
+  await page.goto('/inventory?term=ketchup');
   await page.getByRole('navigation', { name: 'Inventory locations' }).getByRole('button', { name: 'Kitchen Cabinet', exact: true }).click();
   await expect(page).toHaveURL(/term=ketchup&location=/);
   const filtered = page.url();
@@ -74,9 +74,9 @@ test('location tabs, grouped details and browser history preserve workspace filt
 test('workspace pages groups and physical units beyond the first page, then edits and deletes stock', async ({ page, context, authenticate }, testInfo) => {
   test.setTimeout(60_000);
   await authenticate();
-  const session = await (await context.request.get('/wp-admin/admin-ajax.php?action=clog_graphql_session')).json();
+  const session = await (await context.request.get('/auth/session')).json();
   async function execute(query: string) {
-    const result = await (await context.request.post('/graphql', { headers: { 'X-WP-Nonce': session.nonce }, data: { query } })).json();
+    const result = await (await context.request.post('/graphql', { headers: { 'X-Clog-CSRF': session.nonce }, data: { query } })).json();
     expect(result.errors).toBeUndefined(); return result.data;
   }
   const names = Array.from({ length: 26 }, (_, index) => `Clog E2E Workspace ${String(index + 1).padStart(2, '0')}`);
@@ -91,7 +91,7 @@ test('workspace pages groups and physical units beyond the first page, then edit
     await execute(`mutation { ${Array.from({ length: 104 }, (_, index) => `s${index}: createClogInventory(input: {item: ${JSON.stringify(ids[0])}, location: ${JSON.stringify(location)}, dateAdded: "2026-01-02T00:00:00Z"}) { clogInventory { id } }`).join('\n')} }`);
     const operations: string[] = [];
     page.on('request', (request) => { if (request.url().endsWith('/graphql')) operations.push(request.postDataJSON()?.operationName); });
-    await page.goto('/clog/inventory?term=Clog+E2E+Workspace');
+    await page.goto('/inventory?term=Clog+E2E+Workspace');
     await expect(page.getByText('26 stocked items', { exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: names[25], exact: true })).toHaveCount(0);
     await page.getByRole('button', { name: 'Load more stocked items' }).click();
@@ -154,9 +154,9 @@ test('workspace pages groups and physical units beyond the first page, then edit
 
 test('uncertain stock additions retain an explicit error and never replay', async ({ page, context, authenticate }) => {
   await authenticate();
-  const session = await (await context.request.get('/wp-admin/admin-ajax.php?action=clog_graphql_session')).json();
+  const session = await (await context.request.get('/auth/session')).json();
   async function execute(query: string) {
-    const result = await (await context.request.post('/graphql', { headers: { 'X-WP-Nonce': session.nonce }, data: { query } })).json();
+    const result = await (await context.request.post('/graphql', { headers: { 'X-Clog-CSRF': session.nonce }, data: { query } })).json();
     expect(result.errors).toBeUndefined(); return result.data;
   }
   const created = await execute(`mutation {
@@ -179,7 +179,7 @@ test('uncertain stock additions retain an explicit error and never replay', asyn
         await route.abort('failed');
       } else await route.continue();
     });
-    await page.goto(`/clog/inventory/${encodeURIComponent(id)}?term=Clog+E2E+Uncertain+stock`);
+    await page.goto(`/inventory/${encodeURIComponent(id)}?term=Clog+E2E+Uncertain+stock`);
     const panel = page.getByRole('complementary', { name: 'Inventory details' });
     await panel.getByRole('button', { name: 'Add one here' }).click();
     await expect(panel.getByRole('button', { name: 'Add one here' })).toBeDisabled();
