@@ -33,8 +33,8 @@ in `server/standalone/`, using generated entities under `server/generated/`.
 - Stock actions belong in the detail panel. Tables expose expansion and details
   navigation. Paginate groups and units independently; use server totals.
 - Use outlet contexts for refresh, close and detail paths. Workspace item/location
-  edits must stay inside `/inventory` and retain its search parameters. RouterLink
-  owns `/clog`; do not prepend that basename to app-relative links yourself.
+  edits must stay inside `/inventory` and retain its search parameters. Routes use
+  the domain root; pass app-relative paths through RouterLink. Overview lives at `/`.
 - Put narrow-screen panels before lists, constrain wide-screen panels, and keep
   table overflow local. Focus the panel heading or first form field on entry.
 - Store GraphQL dates as ISO strings; format only for presentation. Date-only

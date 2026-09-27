@@ -9,20 +9,20 @@ Use component props first, then Stack/Grid/Section for layout, then
 Use the documented Astryx tokens for colors, spacing and typography. Do not add
 new Tailwind utilities or duplicate Astryx components with bespoke styled HTML.
 
-The root Theme uses neutralTheme in light mode. `index.css` imports the reset,
-core and theme CSS once in the documented layer order. There are no Tailwind
+The root Theme uses neutralTheme in dark mode with orange accents. `index.css` imports the reset,
+core and theme CSS once in the documented layer order and defines the color overrides. There are no Tailwind
 utilities, compatibility layers, or local UI wrappers.
 
-React Router owns the `/clog` basename. Pass app-relative paths (`/items`) through
+React Router serves routes from the domain root. Pass app-relative paths (`/items`) through
 LinkProvider/RouterLink; use normal anchors for external links and hashes. AppShell
 owns the main landmark, skip link, scroll frame and mobile drawer. TopNav marks
-Inventory selected at both `/` and `/inventory`; nested routes keep their section
-selected. Import logos from `src/assets` so Vite bundles URLs for WordPress.
+Overview selected at `/` and Inventory at `/inventory`; nested routes keep their section
+selected. Import logos from `src/assets` so Vite bundles their URLs.
 
 `unplugin-stylex` runs before React in Vite. Its separate `assets/stylex.css` is
-absent from Vite's manifest; `clog_get_vite_assets()` includes it with a content
-hash query parameter. Keep the WordPress deep-route browser test: dev-only checks
-will not catch missing extracted CSS in the plugin's custom HTML shell.
+absent from Vite's manifest; the standalone PHP shell includes it with a content
+hash query parameter. Keep the standalone deep-route browser tests: dev-only checks
+will not catch missing extracted CSS in the production HTML shell.
 
 ## Component migration map
 
@@ -42,7 +42,7 @@ Migrate screen composition directly rather than recreating the old wrapper APIs.
 
 Preserve labels, focus restoration, unsaved input on session expiry, and route
 back/forward behavior as each screen migrates. The browser suite checks the frame
-at 390×844, 1080×1920 and 1440×900, plus the WordPress-served build.
+using the compiled standalone build, including Overview at 390px and 1280px widths.
 
 For all screens, keep table overflow inside its own container, keep the
 name/detail link visible, and move row actions into the detail view (#11). On a

@@ -55,8 +55,8 @@ a selected location fetches its own count directly. The details carousel pages
 Location tabs are paginated; an off-page selected location is fetched directly.
 Search and location filters live in URL parameters. Nested item/location/stock
 routes keep those parameters through open, edit, save, close, reload and browser
-history. The root `/` remains an inventory alias; nested workspace links use
-`/inventory`. Standalone item and location pages retain their own route contexts.
+history. The root `/` displays Overview; workspace links use `/inventory`.
+Standalone item and location pages retain their own route contexts.
 
 Inventory creation uses paginated item/location selectors and creates one physical
 unit. Date editing does not change its item or location. Lost write responses are
