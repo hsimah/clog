@@ -8,8 +8,8 @@ Apollo cache or global collection provider.
   `client/schema.graphql`. Commit them with their source operations.
 - `scripts/node.sh npm run relay:check` validates both the application artifacts
   and the API contract fixture. CI/release builds run this without a live server.
-- `scripts/test-backend.sh --schema` refreshes the schema from a real disposable
-  WordPress install. Never generate against the production database.
+- `scripts/php.sh php standalone/tests/export-schema.php` refreshes the schema
+  using an in-memory SQLite database. Pass `--check` to verify the snapshot.
 
 Routes own query references with `useRouteQuery`; memoize the variables, load on
 ID/filter changes, and read through `usePreloadedQuery` below Suspense. The hook

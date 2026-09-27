@@ -71,7 +71,7 @@ try {
         $entry = $manifest['index.html'];
         $styles = array_unique([...($entry['css'] ?? []), 'assets/stylex.css']);
         header('Content-Type: text/html; charset=utf-8');
-        echo '<!doctype html><html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Clog</title>';
+        echo '<!doctype html><html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Clog</title><link rel="icon" type="image/png" href="/assets/clog-white.png" media="(prefers-color-scheme: dark)"><link rel="icon" type="image/png" href="/assets/clog.png" media="(prefers-color-scheme: light)">';
         foreach ($styles as $css) {
             if (!is_file($dist . '/' . $css)) throw new RuntimeException('Missing stylesheet. Build the client first.');
             echo '<link rel="stylesheet" href="/' . escape($css) . '?v=' . substr(hash_file('sha256', $dist . '/' . $css), 0, 12) . '">';

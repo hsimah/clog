@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="vendor/autoload.php" cacheDirectory=".phpunit.cache" failOnWarning="true">
-  <testsuites>
-    <testsuite name="Clog"><directory>tests/unit</directory></testsuite>
-  </testsuites>
-</phpunit>

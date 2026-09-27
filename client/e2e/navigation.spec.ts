@@ -9,7 +9,7 @@ for (const viewport of [
   test(`navigation and compiled styles at ${viewport.width}x${viewport.height}`, async ({ page, authenticate }, testInfo) => {
     await page.setViewportSize(viewport);
     await authenticate();
-    await page.goto('/clog');
+    await page.goto('/');
     const nav = page.getByRole('navigation', { name: 'Main navigation' });
     await expect(nav).toBeVisible();
     const logo = nav.locator('img');
@@ -31,22 +31,22 @@ for (const viewport of [
       await toggle.click();
     }
     const items = page.getByRole('link', { name: 'Items', exact: true });
-    await expect(items).toHaveAttribute('href', '/clog/items');
+    await expect(items).toHaveAttribute('href', '/items');
     await items.focus();
     await page.keyboard.press('Enter');
-    await expect(page).toHaveURL(/\/clog\/items$/);
+    await expect(page).toHaveURL(/\/items$/);
     await expect(page.getByRole('dialog')).toHaveCount(0);
     await page.goBack();
-    await expect(page).toHaveURL(/\/clog(?:#.*)?$/);
+    await expect(page).toHaveURL(/\/(?:#.*)?$/);
   });
 }
 
-test('WordPress deep routes load the StyleX stylesheet and bundled logo', async ({ page, context }) => {
-  const base = process.env.WP_SHELL_URL || new URL(process.env.VITE_GRAPHQL_URL || 'http://localhost:8180').origin;
+test('Standalone PHP deep routes load the StyleX stylesheet and bundled logo', async ({ page, context }) => {
+  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:8280';
   await login(context.request, base);
-  await page.goto(`${base}/clog/items/new`);
+  await page.goto(`${base}/items/new`);
   await expect(page.getByRole('textbox', { name: /^Name/ })).toBeVisible();
-  const stylesheet = page.locator('link[rel="stylesheet"][href*="stylex.css?ver="]');
+  const stylesheet = page.locator('link[rel="stylesheet"][href*="stylex.css?v="]');
   await expect(stylesheet).toHaveCount(1);
   expect((await context.request.get((await stylesheet.getAttribute('href'))!)).ok()).toBe(true);
   const logo = page.getByRole('navigation', { name: 'Main navigation' }).locator('img');
@@ -58,32 +58,32 @@ test('WordPress deep routes load the StyleX stylesheet and bundled logo', async 
 test.describe('Navigation', () => {
   test('header navigation links work correctly', async ({ page, waitForData, authenticate }) => {
     await authenticate();
-    await page.goto('/clog');
+    await page.goto('/');
     await waitForData(page);
 
     // Navigate to Items
     await page.getByRole('navigation').getByRole('link', { name: 'Items' }).click();
-    await expect(page).toHaveURL('/clog/items');
+    await expect(page).toHaveURL('/items');
 
     // Navigate to Locations
     await page.getByRole('navigation').getByRole('link', { name: 'Locations' }).click();
-    await expect(page).toHaveURL('/clog/locations');
+    await expect(page).toHaveURL('/locations');
 
     // Navigate to Inventory
     await page.getByRole('navigation').getByRole('link', { name: 'Inventory' }).click();
-    await expect(page).toHaveURL('/clog/inventory');
+    await expect(page).toHaveURL('/inventory');
 
     // Navigate Home via logo
     await page.getByRole('link', { name: 'Clog' }).click();
-    await expect(page).toHaveURL('/clog');
+    await expect(page).toHaveURL('/');
   });
 });
 
-test('development and WordPress deep links deliver both favicon variants', async ({ page, context, authenticate }) => {
+test('compiled home and deep links deliver both favicon variants', async ({ page, context, authenticate }) => {
   await authenticate();
-  const wordpress = process.env.WP_SHELL_URL || new URL(process.env.VITE_GRAPHQL_URL || 'http://localhost:8180').origin;
-  await login(context.request, wordpress);
-  for (const url of ['/clog/home', `${wordpress}/clog/items/new`]) {
+  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:8280';
+  await login(context.request, base);
+  for (const url of ['/', `${base}/items/new`]) {
     await page.goto(url);
     await expect(page.getByRole('main')).toBeVisible();
     const icons = page.locator('link[rel="icon"]');

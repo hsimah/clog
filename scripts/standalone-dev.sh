@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Local standalone server, using the existing PHP tool image. No WordPress services.
+# Local SQLite application, using the PHP development image.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 COMMAND="${1:-serve}"
@@ -8,9 +8,9 @@ mkdir -p "$ROOT/.standalone/sessions"
 chmod 700 "$ROOT/.standalone" "$ROOT/.standalone/sessions"
 ENGINE=podman
 command -v podman >/dev/null 2>&1 || ENGINE=docker
+# Ensure the development image exists for both CLI and server commands.
+"$ROOT/scripts/php.sh" php -v >/dev/null
 if [ "$COMMAND" != serve ]; then
-    # Ensure the existing development PHP image is available, without Composer.
-    "$ROOT/scripts/php.sh" php -v >/dev/null
     exec "$ENGINE" run --rm -i -v "$ROOT:/work/clog:z" -w /work/clog/server \
         -e CLOG_DB=/work/clog/.standalone/clog.sqlite \
         clog-php:8.3-rust php standalone/cli.php "$COMMAND" "$@"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Run a build-time PHP command against Clog's server plugin, in a throwaway container.
+# Run a build-time PHP command against Clog's PHP application, in a throwaway container.
 #
 #   scripts/php.sh composer install
 #   scripts/php.sh vendor/bin/eleph-codegen doctor --project .
@@ -8,8 +8,7 @@
 #   scripts/php.sh bash                       # interactive shell
 #
 # There is no host PHP and generation needs 8.3, so this is how the eleph commands
-# get run. It is deliberately not part of docker-compose.yml: generating code is a
-# build step and must not require the runtime stack to be up. The container is
+# get run. Generation is a build step and requires no running application. The container is
 # removed on exit (--rm) and podman has no daemon, so nothing is left running.
 #
 # The working directory inside the container is `server/`, which is where eleph.json
