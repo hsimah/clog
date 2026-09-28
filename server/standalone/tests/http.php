@@ -26,10 +26,10 @@ function request(string $path, string $method = 'GET', ?string $body = null, arr
     return [(int)$m[1], $response, $http_response_header];
 }
 function ensure(bool $ok, string $label): void { if (!$ok) throw new RuntimeException($label); }
-function signIn(string $username): string {
+function signIn(string $username, string $password = 'test-password-only'): string {
     [$status,$html] = request('/auth/login'); ensure($status===200,'Login page');
     preg_match('/name="csrf" value="([^"]+)"/', $html, $m);
-    [$status,,$headers] = request('/auth/login','POST',http_build_query(['csrf'=>$m[1],'username'=>$username,'password'=>'test-password-only']),['Content-Type: application/x-www-form-urlencoded']);
+    [$status,,$headers] = request('/auth/login','POST',http_build_query(['csrf'=>$m[1],'username'=>$username,'password'=>$password]),['Content-Type: application/x-www-form-urlencoded']);
     ensure($status===303 && in_array('Location: /', $headers, true),'Login redirects to root');
     [$status,$json] = request('/auth/session'); $session=json_decode($json,true);
     ensure($status===200 && $session['userId']!=='0','Authenticated session'); return $session['nonce'];
@@ -55,6 +55,19 @@ try {
     [$status,$body]=request('/graphql','POST',json_encode(['query'=>'mutation {createClogItem(input:{name:"Denied"}){clogItem{id}}}']),['Content-Type: application/json','X-Clog-CSRF: '.$csrf]);
     ensure(isset(json_decode($body,true)['errors']),'Reader mutation denied');
     ensure((int)$db->scalar('SELECT COUNT(*) FROM app_clog_item')===1,'Denied mutation persisted nothing');
+    $passwordAction = json_encode(['query' => 'mutation($input:ChangeClogUserPasswordInput!){changeClogUserPassword(input:$input){clogUser{id}}}', 'variables' => ['input' => [
+        'id' => '2', 'currentPassword' => 'test-password-only', 'newPassword' => 'reader-new-password',
+    ]]]);
+    [$status] = request('/graphql', 'POST', $passwordAction, ['Content-Type: application/json']);
+    ensure($status === 403, 'Password action requires CSRF token');
+    [$status, $body] = request('/graphql', 'POST', $passwordAction, ['Content-Type: application/json', 'X-Clog-CSRF: ' . $csrf]);
+    ensure($status === 200 && !isset(json_decode($body, true)['errors']), 'Reader changes own password over HTTP: ' . $body);
+    request('/auth/logout', 'POST', null, ['X-Clog-CSRF: ' . $csrf]);
+    [$status, $html] = request('/auth/login');
+    preg_match('/name="csrf" value="([^"]+)"/', $html, $m);
+    [$status] = request('/auth/login', 'POST', http_build_query(['csrf' => $m[1], 'username' => 'reader', 'password' => 'test-password-only']), ['Content-Type: application/x-www-form-urlencoded']);
+    ensure($status === 401, 'Old password no longer signs in');
+    signIn('reader', 'reader-new-password');
     echo "PASS: HTTP login, cookies, CSRF, sessions, GraphQL, reader policy and compiled deep links\n";
 } catch (Throwable $error) {
     fwrite(STDERR, file_get_contents($dir . '/http.log'));

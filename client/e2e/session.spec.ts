@@ -53,7 +53,8 @@ test('logout is nonce protected and clears inventory in other tabs', async ({ pa
   await other.goto('/items');
   await expect(other.getByText('Heinz Ketchup', { exact: true })).toBeVisible();
   page.on('dialog', (dialog) => dialog.accept());
-  await page.getByRole('button', { name: 'Sign out' }).click();
+  await page.getByRole('button', { name: 'Account menu' }).click();
+  await page.getByRole('menuitem', { name: 'Sign out' }).click();
   for (const tab of [page, other]) {
     await expect(tab.getByRole('heading', { name: 'Session ended' })).toBeVisible();
     await expect(tab.getByText('Heinz Ketchup', { exact: true })).toHaveCount(0);

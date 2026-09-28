@@ -1,7 +1,5 @@
-import { Text } from "@astryxdesign/core/Text";
-import { useState } from "react";
 import { useLocation } from "react-router";
-import { Button } from "@astryxdesign/core/Button";
+import { UserMenu } from "../user/UserMenu";
 import { TopNav, TopNavHeading, TopNavItem } from "@astryxdesign/core/TopNav";
 import * as stylex from "@stylexjs/stylex";
 import {
@@ -10,7 +8,6 @@ import {
   LocationIndexURI,
   InventoryIndexURI,
 } from "../../routes/__generated__/routes";
-import { SESSION } from "../../lib/session";
 import clogLogo from "../../assets/clog-white.png";
 
 const NAV_ITEMS = [
@@ -21,7 +18,7 @@ const NAV_ITEMS = [
 ];
 
 export function NavigationHeader() {
-  const { pathname, error, signOut } = useNavigationHeader();
+  const { pathname } = useLocation();
   return (
     <>
       <TopNav
@@ -50,31 +47,10 @@ export function NavigationHeader() {
             }
           />
         ))}
-        endContent={
-          <Button label="Sign out" variant="ghost" onClick={signOut} />
-        }
+        endContent={<UserMenu />}
       />
-      {error && <Text role="alert">{error}</Text>}
     </>
   );
-}
-
-function useNavigationHeader() {
-  const { pathname } = useLocation();
-  const [error, setError] = useState("");
-
-  function signOut() {
-    if (
-      window.confirm(
-        "Sign out? Unsaved changes in Clog tabs will be discarded.",
-      )
-    ) {
-      void SESSION.logout().catch(() =>
-        setError("Could not sign out. Please try again."),
-      );
-    }
-  }
-  return { pathname, error, signOut };
 }
 
 const styles = stylex.create({

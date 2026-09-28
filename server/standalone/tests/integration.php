@@ -104,3 +104,40 @@ $runtime->delete('Location', $location->id);
 check($runtime->find('Location', $location->id) === null, 'Empty location deleted');
 check($db->select('PRAGMA foreign_key_check') === [], 'Deletion fixture has no orphaned references');
 echo "PASS: upstream deletion traversal with mismatched/colliding IDs and child-parent isolation\n";
+
+// Account actions use their own self-only policy, independent of inventory roles.
+foreach (['editor', 'reader'] as $role) {
+    $db->insert('clog_users', ['username' => $role, 'role' => $role, 'password_hash' => password_hash('original-password', PASSWORD_DEFAULT)]);
+}
+$passwordMutation = 'mutation($input:ChangeClogUserPasswordInput!){changeClogUserPassword(input:$input){clogUser{id} clientMutationId}}';
+$changePassword = static function (Viewer $viewer, string $id, string $current = 'original-password', string $new = 'replacement-password') use ($db, $passwordMutation): array {
+    return GraphQL::executeQuery(API::schema(new Application($db, $viewer)), $passwordMutation, variableValues: ['input' => [
+        'id' => $id, 'currentPassword' => $current, 'newPassword' => $new, 'clientMutationId' => 'password-test',
+    ]])->toArray();
+};
+$originalHashes = $db->select('SELECT password_hash FROM clog_users ORDER BY id');
+foreach ([
+    [new Viewer(), '1'],
+    [new Viewer('1', 'editor'), '2'],
+    [new Viewer('2', 'reader'), '1'],
+    [new Viewer('1', 'editor'), '1', 'wrong-password'],
+    [new Viewer('1', 'editor'), '1', 'original-password', 'short'],
+    [new Viewer('1', 'editor'), '1', 'original-password', str_repeat('a', 73)],
+    [new Viewer('1', 'editor'), '1', 'original-password', str_repeat('é', 37)],
+    [new Viewer('1', 'editor'), '1', 'original-password', "invalid\0password"],
+    [new Viewer('1', 'editor'), base64_encode('eleph:ClogItem:1')],
+] as $arguments) {
+    check(isset($changePassword(...$arguments)['errors']), 'Invalid or unauthorized password action rejected');
+    check($db->select('SELECT password_hash FROM clog_users ORDER BY id') === $originalHashes, 'Rejected action leaves credentials unchanged');
+}
+foreach (['1' => 'editor', '2' => 'reader'] as $id => $role) {
+    $result = $changePassword(new Viewer((string) $id, $role), base64_encode('eleph:ClogUser:' . $id));
+    check(!isset($result['errors']), 'Both roles can change their own password: ' . json_encode($result));
+    check($result['data']['changeClogUserPassword']['clogUser']['id'] === base64_encode('eleph:ClogUser:' . $id), 'Password action returns User identity');
+    $hash = $db->scalar('SELECT password_hash FROM clog_users WHERE id = ?', [$id]);
+    check(password_verify('replacement-password', $hash) && !password_verify('original-password', $hash), 'Only new password verifies');
+    check(isset($changePassword(new Viewer((string) $id, $role), (string) $id)['errors']), 'Old password cannot authorize another change');
+}
+$db->execute('UPDATE clog_users SET enabled = 0 WHERE id = 2');
+check(isset($changePassword(new Viewer('2', 'reader'), '2', 'replacement-password')['errors']), 'Disabled account denied');
+echo "PASS: User password action ownership, validation, reader access and credential replacement\n";

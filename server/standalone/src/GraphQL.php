@@ -85,6 +85,22 @@ final class GraphQL
                 return $app->queries->search('Inventory', location: $filter === 'location' ? $id : $node->getId(), item: $filter === 'item' ? $id : $node->getId())->count();
             }]);
         }
+        $builder->object('ClogUser', ['fields' => [
+            'id' => ['type' => ['non_null' => 'ID'], 'resolve' => fn (User $user) => GlobalId::encode('ClogUser', $user->id)],
+        ]]);
+        $builder->mutation('changeClogUserPassword', [
+            'inputFields' => [
+                'id' => ['type' => ['non_null' => 'ID']],
+                'currentPassword' => ['type' => ['non_null' => 'String']],
+                'newPassword' => ['type' => ['non_null' => 'String']],
+            ],
+            'outputFields' => ['clogUser' => ['type' => ['non_null' => 'ClogUser']]],
+            'mutateAndGetPayload' => static function (array $input) use ($app): array {
+                $user = new User((string) self::id($input['id'], 'ClogUser'));
+                $user->changePassword($app->database, $app->viewer, $input['currentPassword'], $input['newPassword']);
+                return ['clogUser' => $user];
+            },
+        ]);
         return $builder->build();
     }
 }
