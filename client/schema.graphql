@@ -38,6 +38,7 @@ type RootMutation {
   updateClogInventory(input: UpdateClogInventoryInput!): UpdateClogInventoryPayload
   updateClogItem(input: UpdateClogItemInput!): UpdateClogItemPayload
   updateClogLocation(input: UpdateClogLocationInput!): UpdateClogLocationPayload
+  changeClogUserPassword(input: ChangeClogUserPasswordInput!): ChangeClogUserPasswordPayload
 }
 
 type PageInfo {
@@ -374,4 +375,20 @@ type ClogSummary {
   items: Int!
   locations: Int!
   inventory: Int!
+}
+
+type ClogUser {
+  id: ID!
+}
+
+input ChangeClogUserPasswordInput {
+  id: ID!
+  currentPassword: String!
+  newPassword: String!
+  clientMutationId: String
+}
+
+type ChangeClogUserPasswordPayload {
+  clogUser: ClogUser!
+  clientMutationId: String
 }

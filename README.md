@@ -30,6 +30,11 @@ Local databases and sessions live in ignored `.standalone/`; `install` preserves
 existing supported databases. Use `reader` for a read-only account. See the
 [setup guide](hosting/README.md#run-locally) for fish shell instructions and Vite.
 
+Signed-in users can open the avatar menu and choose **Change password** or
+**Sign out**. Changing a password requires the current password and a new password
+of 12–72 bytes. Both readers and editors can change only their own password;
+existing sessions remain signed in.
+
 ## Verify and package
 
 ```sh
