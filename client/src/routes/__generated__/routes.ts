@@ -22,6 +22,9 @@ export enum RouteName {
   InventoryLocationEdit = "InventoryLocationEdit",
   InventoryStock = "InventoryStock",
   InventoryStockLocation = "InventoryStockLocation",
+  UserIndex = "UserIndex",
+  UserNew = "UserNew",
+  UserDetail = "UserDetail",
 }
 
 export type HomeInputType = {
@@ -161,6 +164,22 @@ export type InventoryStockLocationInputType = {
 export const InventoryStockLocationURI = createURI<InventoryStockLocationInputType>("/inventory/stock/:itemId/:locationId", {"itemId":{"kind":"string","optional":false},"location":{"kind":"string","optional":true},"locationId":{"kind":"string","optional":false},"term":{"kind":"string","optional":true}});
 
 
+export type UserIndexInputType = {
+};
+export const UserIndexURI = createURI<UserIndexInputType>("/users", {});
+
+
+export type UserNewInputType = {
+};
+export const UserNewURI = createURI<UserNewInputType>("/users/new", {});
+
+
+export type UserDetailInputType = {
+  id: string;
+};
+export const UserDetailURI = createURI<UserDetailInputType>("/users/:id", {"id":{"kind":"string","optional":false}});
+
+
 export type RouteContextType =
   RouteContextValue<HomeInputType, RouteName.Home>
   | RouteContextValue<ItemIndexInputType, RouteName.ItemIndex>
@@ -180,7 +199,10 @@ export type RouteContextType =
   | RouteContextValue<InventoryLocationDetailInputType, RouteName.InventoryLocationDetail>
   | RouteContextValue<InventoryLocationEditInputType, RouteName.InventoryLocationEdit>
   | RouteContextValue<InventoryStockInputType, RouteName.InventoryStock>
-  | RouteContextValue<InventoryStockLocationInputType, RouteName.InventoryStockLocation>;
+  | RouteContextValue<InventoryStockLocationInputType, RouteName.InventoryStockLocation>
+  | RouteContextValue<UserIndexInputType, RouteName.UserIndex>
+  | RouteContextValue<UserNewInputType, RouteName.UserNew>
+  | RouteContextValue<UserDetailInputType, RouteName.UserDetail>;
 
 const ROUTE_CONTEXT = createRouteContextRegistry<RouteContextType>();
 export const HomeRouteContext = ROUTE_CONTEXT.forRoute(RouteName.Home);
@@ -202,6 +224,9 @@ export const InventoryLocationDetailRouteContext = ROUTE_CONTEXT.forRoute(RouteN
 export const InventoryLocationEditRouteContext = ROUTE_CONTEXT.forRoute(RouteName.InventoryLocationEdit);
 export const InventoryStockRouteContext = ROUTE_CONTEXT.forRoute(RouteName.InventoryStock);
 export const InventoryStockLocationRouteContext = ROUTE_CONTEXT.forRoute(RouteName.InventoryStockLocation);
+export const UserIndexRouteContext = ROUTE_CONTEXT.forRoute(RouteName.UserIndex);
+export const UserNewRouteContext = ROUTE_CONTEXT.forRoute(RouteName.UserNew);
+export const UserDetailRouteContext = ROUTE_CONTEXT.forRoute(RouteName.UserDetail);
 
 export type HomeRouteContextType = Extract<RouteContextType, { currentRoute: RouteName.Home }>;
 export function useHomeRouteContext(): HomeRouteContextType {
@@ -263,5 +288,19 @@ export function useLocationRouteContext(): LocationRouteContextType {
       return context;
     default:
       throw new Error('useLocationRouteContext requires the Location entrypoint; current route is ' + currentRoute);
+  }
+}
+
+export type UserRouteContextType = Extract<RouteContextType, { currentRoute: RouteName.UserIndex | RouteName.UserNew | RouteName.UserDetail }>;
+export function useUserRouteContext(): UserRouteContextType {
+  const context = ROUTE_CONTEXT.useRouteContext();
+  const currentRoute = context.currentRoute;
+  switch (context.currentRoute) {
+    case RouteName.UserIndex:
+    case RouteName.UserNew:
+    case RouteName.UserDetail:
+      return context;
+    default:
+      throw new Error('useUserRouteContext requires the User entrypoint; current route is ' + currentRoute);
   }
 }

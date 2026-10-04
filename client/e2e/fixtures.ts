@@ -3,7 +3,7 @@ import { login } from './session';
 
 export const test = base.extend<{
   waitForData: (page?: import('@playwright/test').Page) => Promise<void>;
-  authenticate: () => Promise<void>;
+  authenticate: (username?: string) => Promise<void>;
 }>({
   waitForData: async ({}, use) => {
     await use(async (page) => {
@@ -13,8 +13,8 @@ export const test = base.extend<{
   },
 
   authenticate: async ({ context }, use) => {
-    await use(async () => {
-      await login(context.request);
+    await use(async (username?: string) => {
+      await login(context.request, undefined, username);
     });
   },
 });

@@ -21,13 +21,15 @@ scripts/standalone-dev.sh install
 Create a local account; the password is read from stdin:
 
 ```sh
-bash -c 'read -r -s -p "Local password: " CLOG_NEW_PASSWORD; printf "\n"; printf "%s" "$CLOG_NEW_PASSWORD" | scripts/standalone-dev.sh user:add admin editor'
+bash -c 'read -r -s -p "Local password: " CLOG_NEW_PASSWORD; printf "\n"; printf "%s" "$CLOG_NEW_PASSWORD" | scripts/standalone-dev.sh user:add admin editor --admin'
 scripts/standalone-dev.sh serve
 ```
 
 Open <http://localhost:8280/auth/login>. Stop the server with Ctrl+C.
 Local databases and sessions live in ignored `.standalone/`; `install` preserves
-existing supported databases. Use `reader` for a read-only account. See the
+existing supported databases. Use `reader` for a read-only account. `--admin` lets
+the account manage users from the account menu; grant an existing account with
+`scripts/standalone-dev.sh user:admin USERNAME`. See the
 [setup guide](hosting/README.md#run-locally) for fish shell instructions and Vite.
 
 Signed-in users can open the avatar menu and choose **Change password** or

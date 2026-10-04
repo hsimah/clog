@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useNavigate } from "react-router";
 import { Avatar } from "@astryxdesign/core/Avatar";
 import { DropdownMenu } from "@astryxdesign/core/DropdownMenu";
 import { Text } from "@astryxdesign/core/Text";
 import { SESSION } from "../../lib/session";
+import { UserIndexURI } from "../../routes/__generated__/routes";
 import { UserPasswordDialog } from "./UserPasswordDialog";
 
 export function UserMenu() {
-  const { open, setOpen, message, completed, signOut, session, triggerRef } = useUserMenu();
+  const { open, setOpen, message, completed, session, triggerRef, items } =
+    useUserMenu();
   return (
     <>
       <DropdownMenu
@@ -20,10 +23,7 @@ export function UserMenu() {
         hasChevron={false}
         presentation="popover"
         alignment="end"
-        items={[
-          { label: "Change password", onClick: () => setOpen(true) },
-          { label: "Sign out", onClick: signOut },
-        ]}
+        items={items}
       />
       {message && <Text role="status">{message}</Text>}
       {open && session.status === "active" && session.userId && (
@@ -38,6 +38,7 @@ export function UserMenu() {
 }
 
 function useUserMenu() {
+  const navigate = useNavigate();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const wasOpen = useRef(false);
   const [open, setOpen] = useState(false);
@@ -57,10 +58,17 @@ function useUserMenu() {
     setOpen(false);
     setMessage("Password changed.");
   }
+  const items = [
+    ...(session.isAdmin
+      ? [{ label: "Manage users", onClick: () => navigate(UserIndexURI.getURI({})) }]
+      : []),
+    { label: "Change password", onClick: () => setOpen(true) },
+    { label: "Sign out", onClick: signOut },
+  ];
   function signOut() {
     if (window.confirm("Sign out? Unsaved changes in Clog tabs will be discarded.")) {
       void SESSION.logout().catch(() => setMessage("Could not sign out. Please try again."));
     }
   }
-  return { open, setOpen, message, completed, signOut, session, triggerRef };
+  return { open, setOpen, message, completed, session, triggerRef, items };
 }

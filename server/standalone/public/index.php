@@ -26,7 +26,7 @@ try {
     Session::start();
     $viewer = Session::viewer($db);
     if ($path === '/auth/session' && $method === 'GET') {
-        $body = ['userId' => $viewer->id() ?? '0', 'nonce' => $viewer->isAuthenticated() ? $_SESSION['csrf'] : null, 'canWrite' => $viewer->can('inventory.write')];
+        $body = ['userId' => $viewer->id() ?? '0', 'nonce' => $viewer->isAuthenticated() ? $_SESSION['csrf'] : null, 'canWrite' => $viewer->can('inventory.write'), 'isAdmin' => $viewer->isAdmin()];
         session_write_close(); jsonResponse($body);
     }
     if ($path === '/auth/logout' && $method === 'POST') {
@@ -65,7 +65,7 @@ try {
         jsonResponse($result->toArray());
     }
     session_write_close();
-    if (preg_match('~^/(?:|items(?:/[^/]+(?:/edit)?)?|locations(?:/[^/]+(?:/edit)?)?|inventory(?:/.*)?)$~', $path) && $method === 'GET') {
+    if (preg_match('~^/(?:|items(?:/[^/]+(?:/edit)?)?|locations(?:/[^/]+(?:/edit)?)?|inventory(?:/.*)?|users(?:/[^/]+)?)$~', $path) && $method === 'GET') {
         $dist = dirname(__DIR__, 3) . '/client/dist';
         $manifest = json_decode(file_get_contents($dist . '/.vite/manifest.json'), true, flags: JSON_THROW_ON_ERROR);
         $entry = $manifest['index.html'];

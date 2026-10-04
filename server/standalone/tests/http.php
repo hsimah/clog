@@ -9,6 +9,7 @@ $dir = sys_get_temp_dir() . '/clog-http-' . bin2hex(random_bytes(5)); mkdir($dir
 $db = new Database($dir . '/clog.sqlite'); Schema::install($db);
 $db->insert('clog_users', ['username'=>'editor','role'=>'editor','password_hash'=>password_hash('test-password-only', PASSWORD_DEFAULT)]);
 $db->insert('clog_users', ['username'=>'reader','role'=>'reader','password_hash'=>password_hash('test-password-only', PASSWORD_DEFAULT)]);
+$db->insert('clog_users', ['username'=>'admin','role'=>'editor','admin'=>1,'password_hash'=>password_hash('test-password-only', PASSWORD_DEFAULT)]);
 $socket = stream_socket_server('tcp://127.0.0.1:0'); $address = stream_socket_get_name($socket, false); fclose($socket);
 $command = [PHP_BINARY, '-S', $address, dirname(__DIR__) . '/public/index.php'];
 if (getenv('CLOG_TEST_GDB')) $command = ['gdb', '--batch', '-ex', 'run', '-ex', 'bt', '--args', ...$command];
@@ -68,7 +69,18 @@ try {
     [$status] = request('/auth/login', 'POST', http_build_query(['csrf' => $m[1], 'username' => 'reader', 'password' => 'test-password-only']), ['Content-Type: application/x-www-form-urlencoded']);
     ensure($status === 401, 'Old password no longer signs in');
     signIn('reader', 'reader-new-password');
-    echo "PASS: HTTP login, cookies, CSRF, sessions, GraphQL, reader policy and compiled deep links\n";
+    [, $body] = request('/auth/session'); ensure(json_decode($body, true)['isAdmin'] === false, 'Reader session is not administrative');
+    [$status, $html] = request('/users/2'); ensure($status === 200 && str_contains($html, 'type="module"'), 'Account deep link shell');
+    // Deleting an account ends its existing sessions on their next request.
+    $readerCookies = $cookies; $cookies = [];
+    $csrf = signIn('admin');
+    [, $body] = request('/auth/session'); ensure(json_decode($body, true)['isAdmin'] === true, 'Administrator session');
+    $deleteAction = json_encode(['query' => 'mutation($input:DeleteClogUserInput!){deleteClogUser(input:$input){deletedId}}', 'variables' => ['input' => ['id' => '2']]]);
+    [$status, $body] = request('/graphql', 'POST', $deleteAction, ['Content-Type: application/json', 'X-Clog-CSRF: ' . $csrf]);
+    ensure($status === 200 && !isset(json_decode($body, true)['errors']), 'Administrator deletes account over HTTP: ' . $body);
+    $cookies = $readerCookies;
+    [, $body] = request('/auth/session'); ensure(json_decode($body, true)['userId'] === '0', 'Deleted account session ended');
+    echo "PASS: HTTP login, cookies, CSRF, sessions, GraphQL, reader policy, account administration and compiled deep links\n";
 } catch (Throwable $error) {
     fwrite(STDERR, file_get_contents($dir . '/http.log'));
     throw $error;

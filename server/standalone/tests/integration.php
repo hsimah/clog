@@ -141,3 +141,68 @@ foreach (['1' => 'editor', '2' => 'reader'] as $id => $role) {
 $db->execute('UPDATE clog_users SET enabled = 0 WHERE id = 2');
 check(isset($changePassword(new Viewer('2', 'reader'), '2', 'replacement-password')['errors']), 'Disabled account denied');
 echo "PASS: User password action ownership, validation, reader access and credential replacement\n";
+
+// Account administration requires the admin flag, independent of inventory roles.
+$db->insert('clog_users', ['username' => 'boss', 'role' => 'reader', 'admin' => 1, 'password_hash' => password_hash('original-password', PASSWORD_DEFAULT)]);
+$admin = new Viewer('3', 'reader', true);
+$account = static function (Viewer $viewer, string $query, array $variables = []) use ($db): array {
+    return GraphQL::executeQuery(API::schema(new Application($db, $viewer)), $query, variableValues: $variables)->toArray();
+};
+$listQuery = '{clogUsers(first:2){totalCount edges{node{id username role isAdmin isEnabled isViewer}} pageInfo{hasNextPage endCursor}}}';
+$editor = new Viewer('1', 'editor');
+check($account($editor, $listQuery)['data']['clogUsers'] === null, 'Non-administrators cannot list accounts');
+check($account($editor, 'query($id:ID!){clogUser(id:$id){username}}', ['id' => '3'])['data']['clogUser'] === null, 'Non-administrators cannot read other accounts');
+check($account($editor, 'query($id:ID!){clogUser(id:$id){username}}', ['id' => '1'])['data']['clogUser']['username'] === 'editor', 'Accounts can read themselves');
+$page = $account($admin, $listQuery)['data']['clogUsers'];
+check($page['totalCount'] === 3 && $page['pageInfo']['hasNextPage'], 'Administrators page accounts with totals');
+check(array_column(array_column($page['edges'], 'node'), 'username') === ['boss', 'editor'], 'Accounts are ordered by username');
+check($page['edges'][0]['node']['isAdmin'] && $page['edges'][0]['node']['isViewer'] && $page['edges'][0]['node']['role'] === 'READER', 'Account fields');
+$rest = $account($admin, 'query($after:String){clogUsers(first:2,after:$after){edges{node{username isEnabled}} pageInfo{hasNextPage}}}', ['after' => $page['pageInfo']['endCursor']])['data']['clogUsers'];
+check($rest['edges'] === [['node' => ['username' => 'reader', 'isEnabled' => false]]] && !$rest['pageInfo']['hasNextPage'], 'Account pagination');
+check(isset($account($admin, '{clogUsers(last:1){totalCount}}')['errors']), 'Account pagination is forward only');
+
+$create = 'mutation($input:CreateClogUserInput!){createClogUser(input:$input){clogUser{id username role isAdmin}}}';
+$newAccount = ['username' => 'helper', 'password' => 'helper-password', 'role' => 'EDITOR', 'isAdmin' => false];
+$accounts = $db->select('SELECT * FROM clog_users ORDER BY id');
+foreach ([
+    [$editor, $newAccount],
+    [$admin, ['username' => 'bad name'] + $newAccount],
+    [$admin, ['username' => 'EDITOR'] + $newAccount],
+    [$admin, ['password' => 'short'] + $newAccount],
+    [$admin, ['password' => str_repeat('a', 73)] + $newAccount],
+] as [$viewer, $input]) {
+    check(isset($account($viewer, $create, ['input' => $input])['errors']), 'Invalid or unauthorized account creation rejected');
+    check($db->select('SELECT * FROM clog_users ORDER BY id') === $accounts, 'Rejected creation leaves accounts unchanged');
+}
+$created = $account($admin, $create, ['input' => $newAccount]);
+check(!isset($created['errors']) && $created['data']['createClogUser']['clogUser']['username'] === 'helper', 'Administrator creates account: ' . json_encode($created));
+check($created['data']['createClogUser']['clogUser']['role'] === 'EDITOR' && !$created['data']['createClogUser']['clogUser']['isAdmin'], 'Created account role');
+$helperId = $created['data']['createClogUser']['clogUser']['id'];
+check(password_verify('helper-password', $db->scalar("SELECT password_hash FROM clog_users WHERE username = 'helper'")), 'Created account password');
+
+$reset = 'mutation($input:ResetClogUserPasswordInput!){resetClogUserPassword(input:$input){clogUser{id}}}';
+$accounts = $db->select('SELECT * FROM clog_users ORDER BY id');
+foreach ([
+    [$editor, ['id' => $helperId, 'newPassword' => 'another-password']],
+    [$admin, ['id' => '3', 'newPassword' => 'another-password']],
+    [$admin, ['id' => $helperId, 'newPassword' => 'short']],
+    [$admin, ['id' => '999', 'newPassword' => 'another-password']],
+    [$admin, ['id' => base64_encode('eleph:ClogItem:1'), 'newPassword' => 'another-password']],
+] as [$viewer, $input]) {
+    check(isset($account($viewer, $reset, ['input' => $input])['errors']), 'Invalid or unauthorized reset rejected');
+    check($db->select('SELECT * FROM clog_users ORDER BY id') === $accounts, 'Rejected reset leaves credentials unchanged');
+}
+check(!isset($account($admin, $reset, ['input' => ['id' => $helperId, 'newPassword' => 'another-password']])['errors']), 'Administrator resets password');
+check(password_verify('another-password', $db->scalar("SELECT password_hash FROM clog_users WHERE username = 'helper'")), 'Reset password verifies');
+
+$delete = 'mutation($input:DeleteClogUserInput!){deleteClogUser(input:$input){deletedId}}';
+$stockBefore = $app->queries->search('Inventory')->count();
+foreach ([[$editor, $helperId], [$admin, '3'], [$admin, '999']] as [$viewer, $id]) {
+    check(isset($account($viewer, $delete, ['input' => ['id' => $id]])['errors']), 'Invalid or unauthorized deletion rejected');
+}
+check((int) $db->scalar('SELECT COUNT(*) FROM clog_users') === 4, 'Rejected deletion keeps accounts');
+$deleted = $account($admin, $delete, ['input' => ['id' => $helperId]]);
+check(($deleted['data']['deleteClogUser']['deletedId'] ?? null) === $helperId, 'Administrator deletes account: ' . json_encode($deleted));
+check($db->scalar("SELECT COUNT(*) FROM clog_users WHERE username = 'helper'") === 0, 'Deleted account removed');
+check($app->queries->search('Inventory')->count() === $stockBefore, 'Account deletion leaves inventory unchanged');
+echo "PASS: Account administration authorization, validation, pagination, reset and deletion\n";

@@ -5,6 +5,7 @@ if (!$path || !str_starts_with($path, '/tmp/clog-')) throw new RuntimeException(
 $db = new Eleph\SQLite\Database($path);
 Clog\Standalone\Schema::install($db);
 foreach (['editor', 'reader'] as $role) $db->insert('clog_users', ['username'=>$role,'role'=>$role,'password_hash'=>password_hash('test-password-only', PASSWORD_DEFAULT)]);
+$db->insert('clog_users', ['username'=>'admin','role'=>'editor','admin'=>1,'password_hash'=>password_hash('test-password-only', PASSWORD_DEFAULT)]);
 
 $app = new Clog\Standalone\Application($db, new Clog\Standalone\Viewer('1', 'editor'));
 $items = [];

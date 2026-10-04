@@ -6,6 +6,7 @@ function createSession() {
     userId: string;
     nonce: string | null;
     canWrite: boolean;
+    isAdmin: boolean;
   }
   interface Snapshot {
     status:
@@ -17,6 +18,7 @@ function createSession() {
       | "signed-out";
     userId: string | null;
     canWrite: boolean;
+    isAdmin: boolean;
   }
   const graphqlUrl = "/graphql";
   const loginUrl = "/auth/login";
@@ -24,6 +26,7 @@ function createSession() {
     status: "checking",
     userId: null,
     canWrite: false,
+    isAdmin: false,
   };
   let identity: string | null = null;
   let generation = 0;
@@ -39,9 +42,18 @@ function createSession() {
       LISTENERS.delete(listener);
     };
   }
-  function publish(status: Snapshot["status"], canWrite = false) {
-    if (snapshot.status === status && snapshot.canWrite === canWrite) return;
-    snapshot = { status, userId: identity, canWrite };
+  function publish(
+    status: Snapshot["status"],
+    canWrite = false,
+    isAdmin = false,
+  ) {
+    if (
+      snapshot.status === status &&
+      snapshot.canWrite === canWrite &&
+      snapshot.isAdmin === isAdmin
+    )
+      return;
+    snapshot = { status, userId: identity, canWrite, isAdmin };
     LISTENERS.forEach((listener) => listener());
   }
   async function refreshSession(): Promise<Session> {
@@ -61,7 +73,8 @@ function createSession() {
         if (started !== generation) throw new Error("Session changed.");
         if (
           typeof session.userId !== "string" ||
-          typeof session.canWrite !== "boolean"
+          typeof session.canWrite !== "boolean" ||
+          typeof session.isAdmin !== "boolean"
         ) {
           throw new Error("Invalid session response.");
         }
@@ -77,7 +90,7 @@ function createSession() {
           throw new Error("The signed-in account changed. Reload to continue.");
         }
         identity = session.userId;
-        publish("active", session.canWrite);
+        publish("active", session.canWrite, session.isAdmin);
         return session;
       } catch (error) {
         if (

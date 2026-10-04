@@ -55,6 +55,8 @@ integration supplies the schema builder and entity resolvers.
 `Schema` invokes the generated entity installer on fresh storage, then installs
 Clog's users and application indexes. Version 1 prototype databases upgrade to
 version 2 without rebuilding tables or changing rows, passwords, IDs or links.
+Version 3 only adds the accounts' `admin` column, defaulting existing accounts to
+non-administrators.
 Case-insensitive uniqueness and name ordering remain Clog policy: the generic
 SQLite generator deliberately emits default SQLite collation. An interrupted
 fresh install can resume only if its generated schema matches exactly and contains
