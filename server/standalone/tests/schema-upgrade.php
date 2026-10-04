@@ -39,7 +39,7 @@ Schema::install($db);
 Schema::requireReady($db);
 checkUpgrade(snapshot($db) === $before, 'Upgrade changed existing records or accounts.');
 checkUpgrade((int) $db->scalar('PRAGMA user_version') === Schema::VERSION, 'Upgrade did not reach the current version.');
-checkUpgrade($db->select('SELECT admin FROM clog_users') === [['admin' => 0]], 'Upgrade granted administrator access.');
+checkUpgrade($db->select('SELECT admin, session_version FROM clog_users') === [['admin' => 0, 'session_version' => 0]], 'Upgrade granted administrator access or changed sessions.');
 Schema::install($db);
 checkUpgrade(snapshot($db) === $before, 'Repeated installation changed data.');
 $app = new Application($db, new Viewer('4', 'editor'));
@@ -53,11 +53,11 @@ $v2 = new Database(':memory:');
 $v2->pdo->exec(file_get_contents(__DIR__ . '/fixtures/prototype-v1.sql'));
 $v2->insert('clog_users', ['id' => 6, 'username' => 'deployed', 'password_hash' => password_hash('fixture-password', PASSWORD_DEFAULT), 'role' => 'reader', 'enabled' => 0]);
 Schema::install($v2);
-$v2->pdo->exec('ALTER TABLE clog_users DROP COLUMN admin; PRAGMA user_version = 2;');
+$v2->pdo->exec('ALTER TABLE clog_users DROP COLUMN admin; ALTER TABLE clog_users DROP COLUMN session_version; PRAGMA user_version = 2;');
 $v2Before = snapshot($v2);
 Schema::install($v2);
 checkUpgrade(snapshot($v2) === $v2Before && (int) $v2->scalar('PRAGMA user_version') === 3, 'Version 2 upgrade changed data or version.');
-checkUpgrade($v2->select('SELECT admin FROM clog_users') === [['admin' => 0]], 'Version 2 upgrade granted administrator access.');
+checkUpgrade($v2->select('SELECT admin, session_version FROM clog_users') === [['admin' => 0, 'session_version' => 0]], 'Version 2 upgrade granted administrator access or changed sessions.');
 refused(fn () => $v2->execute('UPDATE clog_users SET admin = 2'));
 
 // New installs use the generated DDL, with Clog's Unicode uniqueness retained.

@@ -44,10 +44,12 @@ final class Schema
         if ($version < 2) self::upgradeToVersion2($db, $version);
         $db->transaction(static function () use ($db): void {
             // v3 adds account administration. Existing accounts keep their role and
-            // stay non-administrators until granted with `user:admin`.
+            // stay non-administrators until granted with `user:admin`. Sessions
+            // remember session_version at login; bumping it signs the account out.
             $db->select('SELECT id, username, password_hash, role, enabled FROM clog_users LIMIT 0');
             $db->pdo->exec(<<<'SQL'
 ALTER TABLE clog_users ADD COLUMN admin INTEGER NOT NULL DEFAULT 0 CHECK(admin IN (0, 1));
+ALTER TABLE clog_users ADD COLUMN session_version INTEGER NOT NULL DEFAULT 0;
 PRAGMA user_version = 3;
 SQL);
         });

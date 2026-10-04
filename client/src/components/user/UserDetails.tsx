@@ -124,7 +124,7 @@ function useUserDetails({ userRef }: { userRef: UserDetails_user$key }) {
       () => {
         setPassword("");
         setConfirmation("");
-        setMessage(`Password reset for ${user.username}.`);
+        setMessage(`Password reset for ${user.username}. They have been signed out.`);
       },
       (failure) =>
         setError(

@@ -35,21 +35,24 @@ test('administrator adds a user, resets their password and deletes them', async 
   await expect(panel.getByText('Access: Editor', { exact: true })).toBeVisible();
   await expect(page.getByRole('row').filter({ hasText: username })).toBeVisible();
 
-  // A reset replaces the old password; the helper can then sign in with the new one.
-  await panel.getByLabel(/^New password/).fill('test-password-only');
-  await panel.getByLabel(/^Confirm new password/).fill('test-password-only');
-  await panel.getByRole('button', { name: 'Reset password' }).click();
-  await expect(panel.getByRole('status').filter({ hasText: 'Password reset' })).toHaveText(`Password reset for ${username}.`);
-  await expect(panel.getByLabel(/^New password/)).toHaveValue('');
+  // A reset signs the helper out everywhere; only the new password signs in.
+  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:8280';
   const helper = await playwrightRequest.newContext();
   try {
-    await login(helper, undefined, username);
+    await login(helper, base, username, 'initial-password-only');
+    await panel.getByLabel(/^New password/).fill('test-password-only');
+    await panel.getByLabel(/^Confirm new password/).fill('test-password-only');
+    await panel.getByRole('button', { name: 'Reset password' }).click();
+    await expect(panel.getByRole('status').filter({ hasText: 'Password reset' })).toHaveText(`Password reset for ${username}. They have been signed out.`);
+    await expect(panel.getByLabel(/^New password/)).toHaveValue('');
+    expect((await (await helper.get(`${base}/auth/session`)).json()).userId).toBe('0');
+    await login(helper, base, username);
     page.once('dialog', dialog => dialog.accept());
     await panel.getByRole('button', { name: 'Delete user' }).click();
     await expect(page).toHaveURL(/\/users$/);
     await expect(page.getByRole('row').filter({ hasText: username })).toHaveCount(0);
     // Deletion ends the helper's existing session.
-    const session = await (await helper.get(`${process.env.CLOG_TEST_URL || 'http://127.0.0.1:8280'}/auth/session`)).json();
+    const session = await (await helper.get(`${base}/auth/session`)).json();
     expect(session.userId).toBe('0');
   } finally {
     await helper.dispose();

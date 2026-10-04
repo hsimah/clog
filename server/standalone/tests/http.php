@@ -71,10 +71,19 @@ try {
     signIn('reader', 'reader-new-password');
     [, $body] = request('/auth/session'); ensure(json_decode($body, true)['isAdmin'] === false, 'Reader session is not administrative');
     [$status, $html] = request('/users/2'); ensure($status === 200 && str_contains($html, 'type="module"'), 'Account deep link shell');
-    // Deleting an account ends its existing sessions on their next request.
+    // An administrator's reset or deletion ends the account's existing sessions.
     $readerCookies = $cookies; $cookies = [];
     $csrf = signIn('admin');
     [, $body] = request('/auth/session'); ensure(json_decode($body, true)['isAdmin'] === true, 'Administrator session');
+    $resetAction = json_encode(['query' => 'mutation($input:ResetClogUserPasswordInput!){resetClogUserPassword(input:$input){clogUser{id}}}', 'variables' => ['input' => ['id' => '2', 'newPassword' => 'reader-reset-password']]]);
+    [$status, $body] = request('/graphql', 'POST', $resetAction, ['Content-Type: application/json', 'X-Clog-CSRF: ' . $csrf]);
+    ensure($status === 200 && !isset(json_decode($body, true)['errors']), 'Administrator resets password over HTTP: ' . $body);
+    [, $body] = request('/auth/session'); ensure(json_decode($body, true)['userId'] === '3', 'Reset keeps the administrator signed in');
+    $adminCookies = $cookies; $cookies = $readerCookies;
+    [, $body] = request('/auth/session'); ensure(json_decode($body, true)['userId'] === '0', 'Reset ended the existing session');
+    $cookies = [];
+    signIn('reader', 'reader-reset-password');
+    $readerCookies = $cookies; $cookies = $adminCookies;
     $deleteAction = json_encode(['query' => 'mutation($input:DeleteClogUserInput!){deleteClogUser(input:$input){deletedId}}', 'variables' => ['input' => ['id' => '2']]]);
     [$status, $body] = request('/graphql', 'POST', $deleteAction, ['Content-Type: application/json', 'X-Clog-CSRF: ' . $csrf]);
     ensure($status === 200 && !isset(json_decode($body, true)['errors']), 'Administrator deletes account over HTTP: ' . $body);

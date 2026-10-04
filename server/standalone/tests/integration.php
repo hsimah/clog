@@ -194,6 +194,8 @@ foreach ([
 }
 check(!isset($account($admin, $reset, ['input' => ['id' => $helperId, 'newPassword' => 'another-password']])['errors']), 'Administrator resets password');
 check(password_verify('another-password', $db->scalar("SELECT password_hash FROM clog_users WHERE username = 'helper'")), 'Reset password verifies');
+check((int) $db->scalar("SELECT session_version FROM clog_users WHERE username = 'helper'") === 1, 'Reset ends existing sessions');
+check((int) $db->scalar("SELECT session_version FROM clog_users WHERE username = 'editor'") === 0, 'Self-service password changes keep sessions');
 
 $delete = 'mutation($input:DeleteClogUserInput!){deleteClogUser(input:$input){deletedId}}';
 $stockBefore = $app->queries->search('Inventory')->count();

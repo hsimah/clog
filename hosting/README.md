@@ -126,7 +126,8 @@ before relying on backups. Never replace a database beneath running workers.
 
 The installer creates fresh entity tables from the generated SQLite installer.
 It also upgrades version 1 and 2 databases to version 3 without replacing
-records or accounts (version 3 adds a non-administrator `admin` flag to accounts); back up first and rerun `install` before serving requests.
+records or accounts (version 3 adds a non-administrator `admin` flag and a session version to accounts;
+existing sessions stay signed in); back up first and rerun `install` before serving requests.
 A current version is a no-op. Unknown schemas are refused. Importing data from
 other systems requires a separate, reviewed migration.
 

@@ -84,13 +84,18 @@ final readonly class User
         });
     }
 
-    /** Administrators set another account's password without knowing the old one. */
+    /**
+     * Administrators set another account's password without knowing the old one.
+     * Bumping session_version signs that account out everywhere on its next request.
+     */
     public static function resetPassword(Database $db, Viewer $viewer, string $id, string $newPassword): self
     {
         self::assertAdmin($viewer);
         if ($viewer->id() === $id) throw new UserError('Use Change password for your own account.');
         self::assertPassword($newPassword, 'New password');
-        $updated = $db->execute('UPDATE clog_users SET password_hash = ? WHERE id = ?', [password_hash($newPassword, PASSWORD_DEFAULT), $id]);
+        $updated = $db->execute('UPDATE clog_users SET password_hash = ?, session_version = session_version + 1 WHERE id = ?', [
+            password_hash($newPassword, PASSWORD_DEFAULT), $id,
+        ]);
         if ($updated !== 1) throw new UserError('Account not found.');
         return self::find($db, $id);
     }

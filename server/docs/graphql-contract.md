@@ -119,8 +119,9 @@ from the reader/editor inventory role.
   administrator. Usernames are 1–100 of `[A-Za-z0-9_.@-]` and unique ignoring
   case; passwords are 12–72 bytes without null characters.
 - Administrators cannot reset or delete their own account, so at least one
-  administrator always remains. Deletion ends that account's sessions on their
-  next request; account IDs are never reused.
+  administrator always remains. A reset or deletion ends all of that account's
+  sessions on their next request; account IDs are never reused. A self-service
+  password change keeps the current session signed in.
 
 ## Reproduce the contract
 
