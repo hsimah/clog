@@ -5,7 +5,7 @@ import * as stylex from "@stylexjs/stylex";
 import { UserList } from "./UserList";
 import { QueryBoundary } from "../../relay/QueryBoundary";
 import { useRouteQuery } from "../../relay/useRouteQuery";
-import { useIsAdmin } from "../../relay/useIsAdmin";
+import { useIsAdminDenied } from "../../relay/useIsAdminDenied";
 import { WORKSPACE_CONTEXT } from "../../app/WorkspaceContext";
 import { useWorkspaceActions } from "../../app/useWorkspaceActions";
 import type { UserPageQuery } from "./__generated__/UserPageQuery.graphql";
@@ -25,7 +25,7 @@ export function UserPage({
   detail: ReactNode;
 }) {
   const state = useUserPage(reference);
-  if (!state.isAdmin) {
+  if (state.isAdminDenied) {
     return (
       <Stack gap={4}>
         <Text as="h1" type="display-2">
@@ -80,8 +80,8 @@ function useUserPage(initial: PreloadedQuery<UserPageQuery>) {
     initial,
   )!;
   const actions = useWorkspaceActions("user", {}, refresh);
-  const isAdmin = useIsAdmin();
-  return { reference, refresh, actions, isAdmin };
+  const isAdminDenied = useIsAdminDenied();
+  return { reference, refresh, actions, isAdminDenied };
 }
 
 function UserPage_Results({

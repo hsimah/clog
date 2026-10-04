@@ -48,16 +48,29 @@ $new = $app->runtime->create('Item', ['name' => 'New torch']);
 checkUpgrade((int) $new->id->raw() > 8, 'Upgrade reset the identity sequence.');
 refused(fn () => $app->runtime->create('Location', ['name' => 'étagère']));
 
-// Deployed version 2 databases gain only the admin column.
+// Deployed version 2 databases gain only the admin and session columns.
 $v2 = new Database(':memory:');
-$v2->pdo->exec(file_get_contents(__DIR__ . '/fixtures/prototype-v1.sql'));
+$v2->pdo->exec(file_get_contents(__DIR__ . '/fixtures/prototype-v2.sql'));
+$v2->insert('app_clog_item', ['id' => 21, 'created_at' => $time, 'updated_at' => $time, 'name' => 'Deployed lantern', 'barcode' => 'LaNt-1']);
+$v2->insert('app_clog_location', ['id' => 30, 'created_at' => $time, 'updated_at' => $time, 'name' => 'Cellier']);
+$v2->insert('app_clog_inventory', ['id' => 40, 'created_at' => $time, 'updated_at' => $time, 'name' => 'Deployed lantern at Cellier', 'date_added' => $time, 'item_id' => 21, 'location_id' => 30]);
 $v2->insert('clog_users', ['id' => 6, 'username' => 'deployed', 'password_hash' => password_hash('fixture-password', PASSWORD_DEFAULT), 'role' => 'reader', 'enabled' => 0]);
+$v2->insert('clog_users', ['id' => 7, 'username' => 'Writer', 'password_hash' => password_hash('fixture-password', PASSWORD_DEFAULT), 'role' => 'editor']);
+// Every object except the upgraded accounts table, plus identity sequences, must survive.
+$v2Schema = fn () => [
+    $v2->select("SELECT type, name, sql FROM sqlite_master WHERE name <> 'clog_users' ORDER BY name"),
+    $v2->select('SELECT name, seq FROM sqlite_sequence ORDER BY name'),
+];
+$v2Before = [snapshot($v2), $v2Schema()];
+checkUpgrade((int) $v2->scalar('PRAGMA user_version') === 2, 'Version 2 fixture has the wrong version.');
 Schema::install($v2);
-$v2->pdo->exec('ALTER TABLE clog_users DROP COLUMN admin; ALTER TABLE clog_users DROP COLUMN session_version; PRAGMA user_version = 2;');
-$v2Before = snapshot($v2);
-Schema::install($v2);
-checkUpgrade(snapshot($v2) === $v2Before && (int) $v2->scalar('PRAGMA user_version') === 3, 'Version 2 upgrade changed data or version.');
-checkUpgrade($v2->select('SELECT admin, session_version FROM clog_users') === [['admin' => 0, 'session_version' => 0]], 'Version 2 upgrade granted administrator access or changed sessions.');
+checkUpgrade([snapshot($v2), $v2Schema()] === $v2Before && (int) $v2->scalar('PRAGMA user_version') === 3, 'Version 2 upgrade changed data, schema objects, sequences or version.');
+checkUpgrade($v2->select('SELECT admin, session_version FROM clog_users') === [['admin' => 0, 'session_version' => 0], ['admin' => 0, 'session_version' => 0]], 'Version 2 upgrade granted administrator access or changed sessions.');
+Schema::requireReady($v2);
+$v2App = new Application($v2, new Viewer('7', 'editor'));
+checkUpgrade($v2App->queries->search('Inventory')->count() === 1, 'Existing v2 stock cannot be read after upgrade.');
+checkUpgrade((int) $v2App->runtime->create('Item', ['name' => 'New lantern'])->id->raw() > 21, 'Version 2 upgrade reset the identity sequence.');
+refused(fn () => $v2App->runtime->create('Item', ['name' => 'Duplicate lantern', 'barcode' => 'lant-1']));
 refused(fn () => $v2->execute('UPDATE clog_users SET admin = 2'));
 
 // New installs use the generated DDL, with Clog's Unicode uniqueness retained.

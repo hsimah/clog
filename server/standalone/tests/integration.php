@@ -163,16 +163,22 @@ check(isset($account($admin, '{clogUsers(last:1){totalCount}}')['errors']), 'Acc
 
 $create = 'mutation($input:CreateClogUserInput!){createClogUser(input:$input){clogUser{id username role isAdmin}}}';
 $newAccount = ['username' => 'helper', 'password' => 'helper-password', 'role' => 'EDITOR', 'isAdmin' => false];
+// Each rejection must be the intended user-facing error, not an incidental failure.
+$rejected = static function (array $result, string $field, string $message, string $case): void {
+    $errors = $result['errors'] ?? [];
+    check(count($errors) === 1 && $errors[0]['message'] === $message && ($errors[0]['path'] ?? null) === [$field] && ($result['data'][$field] ?? null) === null, $case . ': ' . json_encode($result));
+};
 $accounts = $db->select('SELECT * FROM clog_users ORDER BY id');
 foreach ([
-    [$editor, $newAccount],
-    [$admin, ['username' => 'bad name'] + $newAccount],
-    [$admin, ['username' => 'EDITOR'] + $newAccount],
-    [$admin, ['password' => 'short'] + $newAccount],
-    [$admin, ['password' => str_repeat('a', 73)] + $newAccount],
-] as [$viewer, $input]) {
-    check(isset($account($viewer, $create, ['input' => $input])['errors']), 'Invalid or unauthorized account creation rejected');
-    check($db->select('SELECT * FROM clog_users ORDER BY id') === $accounts, 'Rejected creation leaves accounts unchanged');
+    'non-administrator' => [$editor, $newAccount, 'Administrator access is required to manage accounts.'],
+    'invalid username' => [$admin, ['username' => 'bad name'] + $newAccount, 'Username must be 1–100 letters, digits, or . _ @ - characters.'],
+    'case-insensitive duplicate' => [$admin, ['username' => 'EDITOR'] + $newAccount, 'That username is already in use.'],
+    'short password' => [$admin, ['password' => 'short'] + $newAccount, 'Password must be 12–72 bytes and contain no null characters.'],
+    'long password' => [$admin, ['password' => str_repeat('a', 73)] + $newAccount, 'Password must be 12–72 bytes and contain no null characters.'],
+    'null in password' => [$admin, ['password' => "helper\0password"] + $newAccount, 'Password must be 12–72 bytes and contain no null characters.'],
+] as $case => [$viewer, $input, $message]) {
+    $rejected($account($viewer, $create, ['input' => $input]), 'createClogUser', $message, "Creation rejects $case");
+    check($db->select('SELECT * FROM clog_users ORDER BY id') === $accounts, "Rejected creation ($case) leaves accounts unchanged");
 }
 $created = $account($admin, $create, ['input' => $newAccount]);
 check(!isset($created['errors']) && $created['data']['createClogUser']['clogUser']['username'] === 'helper', 'Administrator creates account: ' . json_encode($created));
@@ -183,14 +189,14 @@ check(password_verify('helper-password', $db->scalar("SELECT password_hash FROM 
 $reset = 'mutation($input:ResetClogUserPasswordInput!){resetClogUserPassword(input:$input){clogUser{id}}}';
 $accounts = $db->select('SELECT * FROM clog_users ORDER BY id');
 foreach ([
-    [$editor, ['id' => $helperId, 'newPassword' => 'another-password']],
-    [$admin, ['id' => '3', 'newPassword' => 'another-password']],
-    [$admin, ['id' => $helperId, 'newPassword' => 'short']],
-    [$admin, ['id' => '999', 'newPassword' => 'another-password']],
-    [$admin, ['id' => base64_encode('eleph:ClogItem:1'), 'newPassword' => 'another-password']],
-] as [$viewer, $input]) {
-    check(isset($account($viewer, $reset, ['input' => $input])['errors']), 'Invalid or unauthorized reset rejected');
-    check($db->select('SELECT * FROM clog_users ORDER BY id') === $accounts, 'Rejected reset leaves credentials unchanged');
+    'non-administrator' => [$editor, ['id' => $helperId, 'newPassword' => 'another-password'], 'Administrator access is required to manage accounts.'],
+    'own account' => [$admin, ['id' => '3', 'newPassword' => 'another-password'], 'Use Change password for your own account.'],
+    'short password' => [$admin, ['id' => $helperId, 'newPassword' => 'short'], 'New password must be 12–72 bytes and contain no null characters.'],
+    'missing account' => [$admin, ['id' => '999', 'newPassword' => 'another-password'], 'Account not found.'],
+    'non-account ID' => [$admin, ['id' => base64_encode('eleph:ClogItem:1'), 'newPassword' => 'another-password'], 'Expected an ID for ClogUser.'],
+] as $case => [$viewer, $input, $message]) {
+    $rejected($account($viewer, $reset, ['input' => $input]), 'resetClogUserPassword', $message, "Reset rejects $case");
+    check($db->select('SELECT * FROM clog_users ORDER BY id') === $accounts, "Rejected reset ($case) leaves credentials unchanged");
 }
 check(!isset($account($admin, $reset, ['input' => ['id' => $helperId, 'newPassword' => 'another-password']])['errors']), 'Administrator resets password');
 check(password_verify('another-password', $db->scalar("SELECT password_hash FROM clog_users WHERE username = 'helper'")), 'Reset password verifies');
@@ -199,10 +205,15 @@ check((int) $db->scalar("SELECT session_version FROM clog_users WHERE username =
 
 $delete = 'mutation($input:DeleteClogUserInput!){deleteClogUser(input:$input){deletedId}}';
 $stockBefore = $app->queries->search('Inventory')->count();
-foreach ([[$editor, $helperId], [$admin, '3'], [$admin, '999']] as [$viewer, $id]) {
-    check(isset($account($viewer, $delete, ['input' => ['id' => $id]])['errors']), 'Invalid or unauthorized deletion rejected');
+$accounts = $db->select('SELECT * FROM clog_users ORDER BY id');
+foreach ([
+    'non-administrator' => [$editor, $helperId, 'Administrator access is required to manage accounts.'],
+    'own account' => [$admin, '3', 'You cannot delete your own account.'],
+    'missing account' => [$admin, '999', 'Account not found.'],
+] as $case => [$viewer, $id, $message]) {
+    $rejected($account($viewer, $delete, ['input' => ['id' => $id]]), 'deleteClogUser', $message, "Deletion rejects $case");
+    check($db->select('SELECT * FROM clog_users ORDER BY id') === $accounts, "Rejected deletion ($case) keeps accounts");
 }
-check((int) $db->scalar('SELECT COUNT(*) FROM clog_users') === 4, 'Rejected deletion keeps accounts');
 $deleted = $account($admin, $delete, ['input' => ['id' => $helperId]]);
 check(($deleted['data']['deleteClogUser']['deletedId'] ?? null) === $helperId, 'Administrator deletes account: ' . json_encode($deleted));
 check($db->scalar("SELECT COUNT(*) FROM clog_users WHERE username = 'helper'") === 0, 'Deleted account removed');
