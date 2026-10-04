@@ -22,6 +22,13 @@ final class GraphQL
         return EntityId::of($raw);
     }
 
+    private static function assertForwardPage(array $args): void
+    {
+        if (isset($args['last']) || isset($args['before'])) throw new UserError('Only forward pagination is supported.');
+        if (isset($args['first']) && ($args['first'] < 1 || $args['first'] > 100)) throw new UserError('first must be between 1 and 100.');
+        if (isset($args['after']) && !preg_match('/^offset:[0-9]+$/D', base64_decode($args['after'], true) ?: '')) throw new UserError('Invalid pagination cursor.');
+    }
+
     public static function schema(Application $app): Schema
     {
         $manifest = require dirname(__DIR__, 2) . '/generated/graphql/graphql-manifest.php';
@@ -48,9 +55,7 @@ final class GraphQL
         foreach ($registrar->connectionConfigs() as $config) {
             $resolve = $config['resolve'];
             $config['resolve'] = static function ($source, array $args) use ($resolve) {
-                if (isset($args['last']) || isset($args['before'])) throw new UserError('Only forward pagination is supported.');
-                if (isset($args['first']) && ($args['first'] < 1 || $args['first'] > 100)) throw new UserError('first must be between 1 and 100.');
-                if (isset($args['after']) && !preg_match('/^offset:[0-9]+$/D', base64_decode($args['after'], true) ?: '')) throw new UserError('Invalid pagination cursor.');
+                self::assertForwardPage($args);
                 $filters = $args['where'] ?? [];
                 foreach (['item' => 'ClogItem', 'location' => 'ClogLocation'] as $field => $type) {
                     if (isset($filters[$field])) $filters[$field] = self::id($filters[$field], $type);
@@ -85,9 +90,28 @@ final class GraphQL
                 return $app->queries->search('Inventory', location: $filter === 'location' ? $id : $node->getId(), item: $filter === 'item' ? $id : $node->getId())->count();
             }]);
         }
+        $builder->enum('ClogUserRole', ['values' => ['READER' => ['value' => 'reader'], 'EDITOR' => ['value' => 'editor']]]);
         $builder->object('ClogUser', ['fields' => [
             'id' => ['type' => ['non_null' => 'ID'], 'resolve' => fn (User $user) => GlobalId::encode('ClogUser', $user->id)],
+            'username' => ['type' => ['non_null' => 'String'], 'resolve' => fn (User $user) => $user->username],
+            'role' => ['type' => ['non_null' => 'ClogUserRole'], 'resolve' => fn (User $user) => $user->role],
+            'isAdmin' => ['type' => ['non_null' => 'Boolean'], 'resolve' => fn (User $user) => $user->admin],
+            'isEnabled' => ['type' => ['non_null' => 'Boolean'], 'resolve' => fn (User $user) => $user->enabled],
+            'isViewer' => ['type' => ['non_null' => 'Boolean'], 'resolve' => fn (User $user) => $user->id === $app->viewer->id()],
         ]]);
+        // Account administration is application-owned; non-administrators receive null.
+        $builder->connection([
+            'fromType' => 'RootQuery', 'toType' => 'ClogUser', 'fromFieldName' => 'clogUsers',
+            'connectionFields' => ['totalCount' => ['type' => 'Int']],
+            'resolve' => static function ($source, array $args) use ($app): ?array {
+                self::assertForwardPage($args);
+                return User::page($app->database, $app->viewer, $args['first'] ?? 10, $args['after'] ?? null);
+            },
+        ]);
+        $builder->field('RootQuery', 'clogUser', ['type' => 'ClogUser', 'args' => ['id' => ['type' => ['non_null' => 'ID']]], 'resolve' => static function ($source, array $args) use ($app): ?User {
+            $id = (string) self::id($args['id'], 'ClogUser');
+            return $app->viewer->isAdmin() || $app->viewer->id() === $id ? User::find($app->database, $id) : null;
+        }]);
         $builder->mutation('changeClogUserPassword', [
             'inputFields' => [
                 'id' => ['type' => ['non_null' => 'ID']],
@@ -95,10 +119,39 @@ final class GraphQL
                 'newPassword' => ['type' => ['non_null' => 'String']],
             ],
             'outputFields' => ['clogUser' => ['type' => ['non_null' => 'ClogUser']]],
+            'mutateAndGetPayload' => static fn (array $input): array => ['clogUser' => User::changePassword(
+                $app->database, $app->viewer, (string) self::id($input['id'], 'ClogUser'), $input['currentPassword'], $input['newPassword'],
+            )],
+        ]);
+        $builder->mutation('createClogUser', [
+            'inputFields' => [
+                'username' => ['type' => ['non_null' => 'String']],
+                'password' => ['type' => ['non_null' => 'String']],
+                'role' => ['type' => ['non_null' => 'ClogUserRole']],
+                'isAdmin' => ['type' => ['non_null' => 'Boolean']],
+            ],
+            'outputFields' => ['clogUser' => ['type' => ['non_null' => 'ClogUser']]],
+            'mutateAndGetPayload' => static fn (array $input): array => ['clogUser' => User::create(
+                $app->database, $app->viewer, $input['username'], $input['password'], $input['role'], $input['isAdmin'],
+            )],
+        ]);
+        $builder->mutation('resetClogUserPassword', [
+            'inputFields' => [
+                'id' => ['type' => ['non_null' => 'ID']],
+                'newPassword' => ['type' => ['non_null' => 'String']],
+            ],
+            'outputFields' => ['clogUser' => ['type' => ['non_null' => 'ClogUser']]],
+            'mutateAndGetPayload' => static fn (array $input): array => ['clogUser' => User::resetPassword(
+                $app->database, $app->viewer, (string) self::id($input['id'], 'ClogUser'), $input['newPassword'],
+            )],
+        ]);
+        $builder->mutation('deleteClogUser', [
+            'inputFields' => ['id' => ['type' => ['non_null' => 'ID']]],
+            'outputFields' => ['deletedId' => ['type' => ['non_null' => 'ID']]],
             'mutateAndGetPayload' => static function (array $input) use ($app): array {
-                $user = new User((string) self::id($input['id'], 'ClogUser'));
-                $user->changePassword($app->database, $app->viewer, $input['currentPassword'], $input['newPassword']);
-                return ['clogUser' => $user];
+                $id = (string) self::id($input['id'], 'ClogUser');
+                User::delete($app->database, $app->viewer, $id);
+                return ['deletedId' => GlobalId::encode('ClogUser', $id)];
             },
         ]);
         return $builder->build();

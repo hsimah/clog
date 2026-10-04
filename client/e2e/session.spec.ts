@@ -8,6 +8,7 @@ test('compiled application authenticates with a cookie session', async ({ page, 
   await expect(page.getByText('Heinz Ketchup', { exact: true })).toBeVisible();
   const session = await (await context.request.get('/auth/session')).json();
   expect(session.canWrite).toBe(true);
+  expect(session.isAdmin).toBe(false);
 });
 
 test('anonymous session is private and cannot read or mutate GraphQL inventory', async ({ page, context }) => {
@@ -68,7 +69,7 @@ test('account switch discards previous-account UI before accepting new data', as
   await page.goto('/items');
   await expect(page.getByText('Heinz Ketchup', { exact: true })).toBeVisible();
   await page.route('**/auth/session', async (route) => {
-    await route.fulfill({ json: { userId: 'different-user', nonce: 'new-session', canWrite: false } });
+    await route.fulfill({ json: { userId: 'different-user', nonce: 'new-session', canWrite: false, isAdmin: false } });
   });
   await page.evaluate(() => window.dispatchEvent(new Event('focus')));
   await expect(page.getByRole('heading', { name: 'Session ended' })).toBeVisible();

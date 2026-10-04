@@ -22,10 +22,17 @@ type RootQuery {
   clogStockedItems(first: Int, after: String, last: Int, before: String, where: RootQueryToClogStockedItemsConnectionWhereArgs): RootQueryToClogStockedItemsConnection
   node(id: ID!): Node
   clogSummary: ClogSummary
+  clogUsers(first: Int, after: String, last: Int, before: String): RootQueryToClogUserConnection
+  clogUser(id: ID!): ClogUser
 }
 
 interface Node {
   id: ID!
+}
+
+enum ClogUserRole {
+  READER
+  EDITOR
 }
 
 type RootMutation {
@@ -39,6 +46,9 @@ type RootMutation {
   updateClogItem(input: UpdateClogItemInput!): UpdateClogItemPayload
   updateClogLocation(input: UpdateClogLocationInput!): UpdateClogLocationPayload
   changeClogUserPassword(input: ChangeClogUserPasswordInput!): ChangeClogUserPasswordPayload
+  createClogUser(input: CreateClogUserInput!): CreateClogUserPayload
+  resetClogUserPassword(input: ResetClogUserPasswordInput!): ResetClogUserPasswordPayload
+  deleteClogUser(input: DeleteClogUserInput!): DeleteClogUserPayload
 }
 
 type PageInfo {
@@ -379,6 +389,23 @@ type ClogSummary {
 
 type ClogUser {
   id: ID!
+  username: String!
+  role: ClogUserRole!
+  isAdmin: Boolean!
+  isEnabled: Boolean!
+  isViewer: Boolean!
+}
+
+type RootQueryToClogUserConnectionEdge {
+  cursor: String
+  node: ClogUser
+}
+
+type RootQueryToClogUserConnection {
+  nodes: [ClogUser]
+  edges: [RootQueryToClogUserConnectionEdge]
+  pageInfo: PageInfo!
+  totalCount: Int
 }
 
 input ChangeClogUserPasswordInput {
@@ -390,5 +417,39 @@ input ChangeClogUserPasswordInput {
 
 type ChangeClogUserPasswordPayload {
   clogUser: ClogUser!
+  clientMutationId: String
+}
+
+input CreateClogUserInput {
+  username: String!
+  password: String!
+  role: ClogUserRole!
+  isAdmin: Boolean!
+  clientMutationId: String
+}
+
+type CreateClogUserPayload {
+  clogUser: ClogUser!
+  clientMutationId: String
+}
+
+input ResetClogUserPasswordInput {
+  id: ID!
+  newPassword: String!
+  clientMutationId: String
+}
+
+type ResetClogUserPasswordPayload {
+  clogUser: ClogUser!
+  clientMutationId: String
+}
+
+input DeleteClogUserInput {
+  id: ID!
+  clientMutationId: String
+}
+
+type DeleteClogUserPayload {
+  deletedId: ID!
   clientMutationId: String
 }

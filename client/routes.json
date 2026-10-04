@@ -287,6 +287,28 @@
           "kind": "string"
         }
       }
+    },
+    {
+      "name": "UserIndex",
+      "entryPoint": "src/components/user/User.entrypoint.ts",
+      "path": "/users",
+      "fields": {}
+    },
+    {
+      "name": "UserNew",
+      "entryPoint": "src/components/user/User.entrypoint.ts",
+      "path": "/users/new",
+      "fields": {}
+    },
+    {
+      "name": "UserDetail",
+      "entryPoint": "src/components/user/User.entrypoint.ts",
+      "path": "/users/:id",
+      "fields": {
+        "id": {
+          "kind": "string"
+        }
+      }
     }
   ]
 }

@@ -9,13 +9,13 @@ use RuntimeException;
 /** Generated entity DDL plus Clog-owned accounts, indexes and explicit upgrades. */
 final class Schema
 {
-    public const VERSION = 2;
+    public const VERSION = 3;
 
     public static function install(Database $db): void
     {
         $version = (int) $db->scalar('PRAGMA user_version');
         if ($version === self::VERSION) return;
-        if (!in_array($version, [0, 1], true)) {
+        if (!in_array($version, [0, 1, 2], true)) {
             throw new RuntimeException('Unsupported SQLite schema; restore a supported backup or add an explicit migration.');
         }
 
@@ -41,6 +41,22 @@ final class Schema
             }
         }
 
+        if ($version < 2) self::upgradeToVersion2($db, $version);
+        $db->transaction(static function () use ($db): void {
+            // v3 adds account administration. Existing accounts keep their role and
+            // stay non-administrators until granted with `user:admin`. Sessions
+            // remember session_version at login; bumping it signs the account out.
+            $db->select('SELECT id, username, password_hash, role, enabled FROM clog_users LIMIT 0');
+            $db->pdo->exec(<<<'SQL'
+ALTER TABLE clog_users ADD COLUMN admin INTEGER NOT NULL DEFAULT 0 CHECK(admin IN (0, 1));
+ALTER TABLE clog_users ADD COLUMN session_version INTEGER NOT NULL DEFAULT 0;
+PRAGMA user_version = 3;
+SQL);
+        });
+    }
+
+    private static function upgradeToVersion2(Database $db, int $version): void
+    {
         $db->transaction(static function () use ($db, $version): void {
             if ($version === 0) {
                 $db->pdo->exec(<<<'SQL'

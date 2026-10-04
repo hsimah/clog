@@ -1,6 +1,6 @@
 /** URL inputs are validated by tsquid; the view determines the required selection. */
 export type RouteState = {
-  section: "home" | "item" | "location" | "inventory";
+  section: "home" | "item" | "location" | "inventory" | "user";
   term?: string;
   location?: string;
   barcode?: string;

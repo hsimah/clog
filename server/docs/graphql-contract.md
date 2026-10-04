@@ -105,6 +105,24 @@ arbitrary set of filters a changed row belongs to. Never automatically replay a
 mutation after losing its response; it may already have committed. Session changes
 must dispose of the Relay store using the shared session subscription from #34.
 
+## Accounts
+
+Accounts live in Clog's `clog_users` table, not in generated entities. Every
+signed-in account may run `changeClogUserPassword` for itself with its current
+password. `/auth/session` reports `isAdmin`; administration is a separate flag
+from the reader/editor inventory role.
+
+- `clogUsers(first, after)` pages every account by username with `totalCount`.
+  It returns null for non-administrators. `clogUser(id:)` returns any account to
+  an administrator and only the viewer's own account to anyone else.
+- `createClogUser`, `resetClogUserPassword` and `deleteClogUser` require an
+  administrator. Usernames are 1–100 of `[A-Za-z0-9_.@-]` and unique ignoring
+  case; passwords are 12–72 bytes without null characters.
+- Administrators cannot reset or delete their own account, so at least one
+  administrator always remains. A reset or deletion ends all of that account's
+  sessions on their next request; account IDs are never reused. A self-service
+  password change keeps the current session signed in.
+
 ## Reproduce the contract
 
 ```sh

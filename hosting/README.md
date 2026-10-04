@@ -34,7 +34,7 @@ After installing PHP dependencies and building the client:
 
 ```sh
 scripts/standalone-dev.sh install
-bash -c 'read -r -s -p "Local password: " CLOG_NEW_PASSWORD; printf "\n"; printf "%s" "$CLOG_NEW_PASSWORD" | scripts/standalone-dev.sh user:add admin editor'
+bash -c 'read -r -s -p "Local password: " CLOG_NEW_PASSWORD; printf "\n"; printf "%s" "$CLOG_NEW_PASSWORD" | scripts/standalone-dev.sh user:add admin editor --admin'
 # The command above handles account creation; start the server below.
 scripts/standalone-dev.sh serve
 ```
@@ -43,7 +43,7 @@ For fish, the account-creation command can instead be written as:
 
 ```fish
 read -s -P 'Local password: ' CLOG_NEW_PASSWORD
-printf '%s' "$CLOG_NEW_PASSWORD" | scripts/standalone-dev.sh user:add admin editor
+printf '%s' "$CLOG_NEW_PASSWORD" | scripts/standalone-dev.sh user:add admin editor --admin
 set -e CLOG_NEW_PASSWORD
 ```
 
@@ -77,12 +77,15 @@ nginx must have permission to connect to the FPM socket.
      php /opt/clog/server/standalone/cli.php install
    read -rsp 'New password: ' CLOG_NEW_PASSWORD; echo
    printf '%s' "$CLOG_NEW_PASSWORD" | sudo -u www-data env CLOG_DB=/var/lib/clog/clog.sqlite \
-     php /opt/clog/server/standalone/cli.php user:add admin editor
+     php /opt/clog/server/standalone/cli.php user:add admin editor --admin
    unset CLOG_NEW_PASSWORD
    ```
 
    Use `reader` instead of `editor` for a read-only account. Passwords must be
-   12–72 bytes. There is no public registration or email dependency.
+   12–72 bytes. There is no public registration or email dependency. Append
+   `--admin` to create an administrator, or grant an existing account with
+   `cli.php user:admin USERNAME`. Administrators add users, reset passwords and
+   delete users from **Manage users** in the account menu.
 4. Copy `clog-fpm.conf` into the installed PHP-FPM `pool.d` directory. Set
    `CLOG_ORIGIN` to the actual public HTTPS origin. Disable the distribution's
    default pool if nothing else uses it; otherwise include its workers in the
@@ -122,8 +125,9 @@ clear session files to sign everyone out, and restart FPM. Rehearse restoration
 before relying on backups. Never replace a database beneath running workers.
 
 The installer creates fresh entity tables from the generated SQLite installer.
-It also upgrades version 1 prototype databases to version 2 without replacing
-records or accounts; back up first and rerun `install` before serving requests.
+It also upgrades version 1 and 2 databases to version 3 without replacing
+records or accounts (version 3 adds a non-administrator `admin` flag and a session version to accounts;
+existing sessions stay signed in); back up first and rerun `install` before serving requests.
 A current version is a no-op. Unknown schemas are refused. Importing data from
 other systems requires a separate, reviewed migration.
 

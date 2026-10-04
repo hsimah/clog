@@ -4,6 +4,7 @@ import { HOME_ENTRY_POINT } from "../components/home/Home.entrypoint";
 import { ITEM_ENTRY_POINT } from "../components/item/Item.entrypoint";
 import { LOCATION_ENTRY_POINT } from "../components/location/Location.entrypoint";
 import { INVENTORY_ENTRY_POINT } from "../components/inventory/Inventory.entrypoint";
+import { USER_ENTRY_POINT } from "../components/user/User.entrypoint";
 import {
   HomeURI,
   HomeRouteContext,
@@ -43,9 +44,45 @@ import {
   InventoryStockRouteContext,
   InventoryStockLocationURI,
   InventoryStockLocationRouteContext,
+  UserIndexURI,
+  UserIndexRouteContext,
+  UserNewURI,
+  UserNewRouteContext,
+  UserDetailURI,
+  UserDetailRouteContext,
 } from "./__generated__/routes";
 
 export const APP_ROUTES = [
+  defineRoute({
+    uri: UserNewURI,
+    context: UserNewRouteContext,
+    getRouteType: (input): RouteState => ({
+      ...input,
+      section: "user",
+      view: "new",
+    }),
+    entryPoint: USER_ENTRY_POINT,
+  }),
+  defineRoute({
+    uri: UserIndexURI,
+    context: UserIndexRouteContext,
+    getRouteType: (input): RouteState => ({
+      ...input,
+      section: "user",
+      view: "list",
+    }),
+    entryPoint: USER_ENTRY_POINT,
+  }),
+  defineRoute({
+    uri: UserDetailURI,
+    context: UserDetailRouteContext,
+    getRouteType: (input): RouteState => ({
+      ...input,
+      section: "user",
+      view: "detail",
+    }),
+    entryPoint: USER_ENTRY_POINT,
+  }),
   defineRoute({
     uri: LocationNewURI,
     context: LocationNewRouteContext,

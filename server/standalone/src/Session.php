@@ -21,8 +21,11 @@ final class Session
     }
     public static function viewer(Database $db): Viewer
     {
-        $row = $db->select('SELECT id, role FROM clog_users WHERE id = ? AND enabled = 1', [$_SESSION['user_id'] ?? 0])[0] ?? null;
-        return $row ? new Viewer((string) $row['id'], $row['role']) : new Viewer();
+        // Sessions from before session versions existed match the initial version 0.
+        $row = $db->select('SELECT id, role, admin FROM clog_users WHERE id = ? AND enabled = 1 AND session_version = ?', [
+            $_SESSION['user_id'] ?? 0, $_SESSION['session_version'] ?? 0,
+        ])[0] ?? null;
+        return $row ? new Viewer((string) $row['id'], $row['role'], (int) $row['admin'] === 1) : new Viewer();
     }
     public static function validCsrf(?string $token): bool { return is_string($token) && hash_equals($_SESSION['csrf'], $token); }
     public static function login(Database $db, string $username, string $password): bool
@@ -32,7 +35,7 @@ final class Session
         $hash = $user['password_hash'] ?? '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.';
         if (!password_verify($password, $hash) || !$user) return false;
         session_regenerate_id(true);
-        $_SESSION = ['user_id' => $user['id'], 'expires' => time() + 28800, 'csrf' => bin2hex(random_bytes(32))];
+        $_SESSION = ['user_id' => $user['id'], 'session_version' => $user['session_version'], 'expires' => time() + 28800, 'csrf' => bin2hex(random_bytes(32))];
         return true;
     }
     public static function logout(): void
