@@ -3,7 +3,8 @@
 Deployment is managed externally. Clog requires PHP 8.3 or newer, PDO SQLite,
 mbstring, and a web server. This directory provides optional nginx/PHP-FPM
 configuration examples; replace example hostnames, paths, users, and service
-names to fit your environment. The application receives its public origin,
+names to fit your environment. The `clog.hsimah.com` deployment does not use these
+examples; it is managed by [the-loft](https://github.com/hsimah/the-loft/blob/main/docs/services/clog.md). The application receives its public origin,
 database path, and session directory through environment variables.
 Development and packaging use Composer to install locked framework packages.
 

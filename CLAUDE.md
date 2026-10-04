@@ -7,7 +7,17 @@ in `server/standalone/`, using generated entities under `server/generated/`.
 ## Deployment
 
 - Deployment is managed externally. The app uses PHP and local SQLite;
-  `hosting/README.md` supplies optional nginx/PHP-FPM examples.
+  `hosting/README.md` supplies optional nginx/PHP-FPM examples, not production steps.
+- Production (`clog.hsimah.com`) is deployed by [the-loft](https://github.com/hsimah/the-loft),
+  which owns its Compose services, networking, backups and rollback; see its
+  `docs/services/clog.md`. Do not give production systemctl or `/opt/clog` steps.
+- Release handoff: merge to `main` and publish a GitHub release tagged `X.Y`;
+  `release.yml` re-verifies and attaches the archive. In the-loft, pin the version, URL
+  and attached asset's sha256 in `hosts/viking/clog-release.json`, then test the archive
+  with its `tests/clog-runtime.py`. The operator pulls on Viking and runs
+  `loft-ctl deploy clog --plan`, then `loft-ctl deploy clog`, which stops writes, backs
+  up, runs `install` and restarts. One-off CLI commands (`user:admin`, `backup`) use
+  the-loft's `clog-cli` Compose service.
 - Build off-device. `scripts/package-standalone.sh` stages source and compiled assets,
   installs the production Composer lock in isolation, and produces
   `build/clog-standalone.tar.gz`. Never strip the working `server/vendor`.
