@@ -9,13 +9,13 @@ use RuntimeException;
 /** Generated entity DDL plus Clog-owned accounts, indexes and explicit upgrades. */
 final class Schema
 {
-    public const VERSION = 3;
+    public const VERSION = 4;
 
     public static function install(Database $db): void
     {
         $version = (int) $db->scalar('PRAGMA user_version');
         if ($version === self::VERSION) return;
-        if (!in_array($version, [0, 1, 2], true)) {
+        if (!in_array($version, [0, 1, 2, 3], true)) {
             throw new RuntimeException('Unsupported SQLite schema; restore a supported backup or add an explicit migration.');
         }
 
@@ -42,7 +42,7 @@ final class Schema
         }
 
         if ($version < 2) self::upgradeToVersion2($db, $version);
-        $db->transaction(static function () use ($db): void {
+        if ($version < 3) $db->transaction(static function () use ($db): void {
             // v3 adds account administration. Existing accounts keep their role and
             // stay non-administrators until granted with `user:admin`. Sessions
             // remember session_version at login; bumping it signs the account out.
@@ -52,6 +52,15 @@ ALTER TABLE clog_users ADD COLUMN admin INTEGER NOT NULL DEFAULT 0 CHECK(admin I
 ALTER TABLE clog_users ADD COLUMN session_version INTEGER NOT NULL DEFAULT 0;
 PRAGMA user_version = 3;
 SQL);
+        });
+        $db->transaction(static function () use ($db): void {
+            // v4 seeds the photographed cave stock into the deployment holding that
+            // location. Installations without it, including fresh ones, gain nothing.
+            CaveInventorySeed::apply($db);
+            if ($db->select('PRAGMA foreign_key_check') !== []) {
+                throw new RuntimeException('Foreign key violations prevent this schema upgrade.');
+            }
+            $db->pdo->exec('PRAGMA user_version = 4');
         });
     }
 

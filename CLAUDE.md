@@ -56,7 +56,7 @@ in `server/standalone/`, using generated entities under `server/generated/`.
 - Package with `scripts/package-standalone.sh`, then run
   `scripts/php.sh php standalone/tests/package.php` against that exact archive.
 - SQLite prototype databases may now contain real test inventory/accounts. Preserve
-  data: `install` explicitly upgrades versions 1 and 2 to version 3; never reset storage
+  data: `install` explicitly upgrades versions 1–3 to version 4; never reset storage
   during routine development or package updates. Migration tests use disposable databases.
 
 ## Git workflow
