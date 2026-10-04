@@ -53,15 +53,8 @@ ALTER TABLE clog_users ADD COLUMN session_version INTEGER NOT NULL DEFAULT 0;
 PRAGMA user_version = 3;
 SQL);
         });
-        $db->transaction(static function () use ($db): void {
-            // v4 seeds the photographed cave stock into the deployment holding that
-            // location. Installations without it, including fresh ones, gain nothing.
-            CaveInventorySeed::apply($db);
-            if ($db->select('PRAGMA foreign_key_check') !== []) {
-                throw new RuntimeException('Foreign key violations prevent this schema upgrade.');
-            }
-            $db->pdo->exec('PRAGMA user_version = 4');
-        });
+        // v4 seeded the 1.0 cave stock, which has been deployed; other storage only records the version.
+        $db->pdo->exec('PRAGMA user_version = 4');
     }
 
     private static function upgradeToVersion2(Database $db, int $version): void
