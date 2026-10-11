@@ -3,7 +3,7 @@
 declare(strict_types=1);
 require dirname(__DIR__) . '/bootstrap.php';
 
-use Clog\Standalone\{Application, GraphQL as ClogGraphQL, Schema, Session};
+use Clog\Standalone\{Application, GraphQL as ClogGraphQL, InitialRouteData, Schema, Session};
 use Eleph\SQLite\Database;
 use Eleph\Tsquid\{InitialData, Manifest};
 use GraphQL\GraphQL;
@@ -77,14 +77,11 @@ try {
             $html .= '<link rel="stylesheet" href="/' . escape($css) . '?v=' . substr(hash_file('sha256', $dist . '/' . $css), 0, 12) . '">';
         }
         $html .= '</head><body><div id="root"></div><script type="module" src="/' . escape($entry['file']) . '"></script></body></html>';
-        if (getenv('CLOG_SSR') === '1' && $viewer->isAuthenticated()) {
+        if ($viewer->isAuthenticated()) {
             try {
                 $initial = new InitialData(
                     Manifest::fromFile(dirname(__DIR__, 2) . '/generated/tsquid/tsquid-manifest.php'),
-                    static fn ($text, $variables, $operation, $id) => GraphQL::executeQuery(
-                        ClogGraphQL::schema(new Application($db, $viewer)), $text, variableValues: $variables,
-                        operationName: $operation, validationRules: [...\GraphQL\Validator\DocumentValidator::allRules(), new QueryDepth(12), new QueryComplexity(500)],
-                    )->toArray(),
+                    static fn ($text, $variables, $operation, $id) => InitialRouteData::execute($db, $viewer, $text, $variables, $operation),
                 );
                 $response = $initial->render($_SERVER['REQUEST_URI'], $html);
                 foreach ($response->headers as $name => $value) header($name . ': ' . $value);

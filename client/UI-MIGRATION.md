@@ -19,7 +19,7 @@ resolve the full import graph.
 - `*.entrypoint.ts` describes the initial query graph. Inventory starts its list,
   location tabs, and selected detail queries together. `*Route.ts` reads the
   references and composes the page and selected panel.
-- `RouteResource` lazily loads route UI. `NavigationLink` adapts Astryx's `href`
+- Tsquid’s `lazyResource` lazily loads route UI. `NavigationLink` adapts Astryx's `href`
   to tsquid's link; hover and keyboard focus preload code and query graphs.
 - Initial query references belong to tsquid. `useRouteQuery` handles explicit
   refreshes and on-demand picker/expanded-row requests, disposing those requests

@@ -1,25 +1,21 @@
-import type { RouteEntryPoint } from "@tsquid/routes/entrypoint";
-import { RouteResource } from "../../routes/RouteResource";
-import type { RouteState } from "../../routes/RouteState";
+import { lazyResource, type RouteEntryPoint } from "@tsquid/routes/entrypoint";
+import { HomeRouteQuery, type HomeEntryPointParams } from "../../routes/__generated__/routes";
 import type { HomeRouteQueries } from "./HomeRoute";
 import PAGE_QUERY from "../home/__generated__/HomePageQuery.graphql";
 
 export const HOME_ENTRY_POINT: RouteEntryPoint<
-  RouteState,
-  HomeRouteQueries,
-  Empty,
-  Empty,
-  RouteState
+  HomeEntryPointParams,
+  HomeRouteQueries
 > = {
-  root: RouteResource("HomeRoute", () =>
+  root: lazyResource("HomeRoute", () =>
     import("./HomeRoute").then((module) => module.HomeRoute),
   ),
   getPreloadProps: (route) => ({
-    extraProps: route,
     queries: {
-      page: { parameters: PAGE_QUERY, variables: {} },
+      page: {
+        parameters: PAGE_QUERY,
+        variables: HomeRouteQuery.getVariables(route.input),
+      },
     },
   }),
 };
-
-type Empty = Record<string, never>;

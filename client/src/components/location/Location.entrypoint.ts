@@ -1,30 +1,31 @@
-import type { RouteEntryPoint } from "@tsquid/routes/entrypoint";
-import { RouteResource } from "../../routes/RouteResource";
-import type { RouteState } from "../../routes/RouteState";
+import { lazyResource, type RouteEntryPoint } from "@tsquid/routes/entrypoint";
+import {
+  RouteName,
+  LocationIndexRouteQuery,
+  type LocationEntryPointParams,
+} from "../../routes/__generated__/routes";
 import type { LocationRouteQueries } from "./LocationRoute";
 import PAGE_QUERY from "../location/__generated__/LocationPageQuery.graphql";
 import RECORD_QUERY from "../location/__generated__/LocationRecordQuery.graphql";
 
 export const LOCATION_ENTRY_POINT: RouteEntryPoint<
-  RouteState,
-  LocationRouteQueries,
-  Empty,
-  Empty,
-  RouteState
+  LocationEntryPointParams,
+  LocationRouteQueries
 > = {
-  root: RouteResource("LocationRoute", () =>
+  root: lazyResource("LocationRoute", () =>
     import("./LocationRoute").then((module) => module.LocationRoute),
   ),
   getPreloadProps: (route) => ({
-    extraProps: route,
     queries: {
-      page: { parameters: PAGE_QUERY, variables: { term: route.term ?? "" } },
+      page: {
+        parameters: PAGE_QUERY,
+        variables: LocationIndexRouteQuery.getVariables(route.input),
+      },
       record:
-        route.view === "detail" || route.view === "edit"
-          ? { parameters: RECORD_QUERY, variables: { id: route.id } }
+        route.currentRoute === RouteName.LocationDetail ||
+        route.currentRoute === RouteName.LocationEdit
+          ? { parameters: RECORD_QUERY, variables: { id: route.input.id } }
           : undefined,
     },
   }),
 };
-
-type Empty = Record<string, never>;

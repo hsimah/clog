@@ -39,23 +39,25 @@ existing sessions remain signed in.
 
 ### Test initial route data locally
 
-The client pins the published tsquid runtime and codegen to `0.2.0`; the server
+The client pins the published tsquid runtime and codegen to `0.3.0`; the server
 uses Elephentity's tsquid `0.1.0` generator and PHP runtime.
-After the normal setup, build and start the PHP server with initial data enabled:
+Initial route data is always enabled for signed-in viewers. After the normal setup,
+build and start the PHP server:
 
 ```sh
 scripts/node.sh npm ci
 scripts/node.sh npm run build
-CLOG_SSR=1 scripts/standalone-dev.sh serve
+scripts/standalone-dev.sh serve
 ```
 
 Sign in at <http://localhost:18473/auth/login> and open `/`. The HTML contains
 `#tsquid-data` with the real `HomePageQuery` response for the signed-in viewer;
 the Network panel should show no POST for that operation. Every declared route
 inlines its page query, with URL filters and GraphQL defaults. Detail queries and
-inventory helpers still fetch normally, as does `/auth/session`. Without
-`CLOG_SSR=1`, all routes fetch normally.
+inventory helpers still fetch normally, as does `/auth/session`.
 Use the PHP-served compiled app on port 18473; Vite's HTML does not inline data.
+Inline responses use the same GraphQL error validation as client requests, so
+resolver errors show a retryable alert.
 
 After changing queries or routes, regenerate in this order and commit the outputs:
 
@@ -69,10 +71,10 @@ scripts/node.sh npm run build
 Relay writes `client/persisted_queries.json` with query text; tsquid resolves it
 into `routes.manifest.json`; Elephentity compiles that into signed
 `server/generated/tsquid/tsquid-manifest.php`. SSR route matching reads compiled
-PHP on requests. Enable the SSR checks against a disposable database with:
+PHP on requests. Run the SSR checks against a disposable database with:
 
 ```sh
-CLOG_SSR=1 scripts/test-standalone-browser.sh e2e/tsquid.spec.ts
+scripts/test-standalone-browser.sh e2e/tsquid.spec.ts
 ```
 
 ## Verify and package

@@ -31,12 +31,24 @@ export type HomeInputType = {
 };
 export const HomeURI = createURI<HomeInputType>("/", {});
 
+export const HomeRouteQuery = {
+  operation: "HomePageQuery",
+  getVariables: (_input?: HomeInputType) => ({}),
+} as const;
 
 export type ItemIndexInputType = {
   term?: string;
 };
 export const ItemIndexURI = createURI<ItemIndexInputType>("/items", {"term":{"kind":"string","optional":true}});
 
+export const ItemIndexRouteQuery = {
+  operation: "ItemPageQuery",
+  getVariables: <I extends ItemIndexInputType>(input: I) : {
+    "term": NonNullable<(I & ItemIndexInputType)["term"]> | "";
+  } => ({
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type ItemNewInputType = {
   barcode?: string;
@@ -44,6 +56,14 @@ export type ItemNewInputType = {
 };
 export const ItemNewURI = createURI<ItemNewInputType>("/items/new", {"barcode":{"kind":"string","optional":true},"term":{"kind":"string","optional":true}});
 
+export const ItemNewRouteQuery = {
+  operation: "ItemPageQuery",
+  getVariables: <I extends ItemNewInputType>(input: I) : {
+    "term": NonNullable<(I & ItemNewInputType)["term"]> | "";
+  } => ({
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type ItemDetailInputType = {
   id: string;
@@ -51,6 +71,14 @@ export type ItemDetailInputType = {
 };
 export const ItemDetailURI = createURI<ItemDetailInputType>("/items/:id", {"id":{"kind":"string","optional":false},"term":{"kind":"string","optional":true}});
 
+export const ItemDetailRouteQuery = {
+  operation: "ItemPageQuery",
+  getVariables: <I extends ItemDetailInputType>(input: I) : {
+    "term": NonNullable<(I & ItemDetailInputType)["term"]> | "";
+  } => ({
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type ItemEditInputType = {
   id: string;
@@ -58,18 +86,42 @@ export type ItemEditInputType = {
 };
 export const ItemEditURI = createURI<ItemEditInputType>("/items/:id/edit", {"id":{"kind":"string","optional":false},"term":{"kind":"string","optional":true}});
 
+export const ItemEditRouteQuery = {
+  operation: "ItemPageQuery",
+  getVariables: <I extends ItemEditInputType>(input: I) : {
+    "term": NonNullable<(I & ItemEditInputType)["term"]> | "";
+  } => ({
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type LocationIndexInputType = {
   term?: string;
 };
 export const LocationIndexURI = createURI<LocationIndexInputType>("/locations", {"term":{"kind":"string","optional":true}});
 
+export const LocationIndexRouteQuery = {
+  operation: "LocationPageQuery",
+  getVariables: <I extends LocationIndexInputType>(input: I) : {
+    "term": NonNullable<(I & LocationIndexInputType)["term"]> | "";
+  } => ({
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type LocationNewInputType = {
   term?: string;
 };
 export const LocationNewURI = createURI<LocationNewInputType>("/locations/new", {"term":{"kind":"string","optional":true}});
 
+export const LocationNewRouteQuery = {
+  operation: "LocationPageQuery",
+  getVariables: <I extends LocationNewInputType>(input: I) : {
+    "term": NonNullable<(I & LocationNewInputType)["term"]> | "";
+  } => ({
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type LocationDetailInputType = {
   id: string;
@@ -77,6 +129,14 @@ export type LocationDetailInputType = {
 };
 export const LocationDetailURI = createURI<LocationDetailInputType>("/locations/:id", {"id":{"kind":"string","optional":false},"term":{"kind":"string","optional":true}});
 
+export const LocationDetailRouteQuery = {
+  operation: "LocationPageQuery",
+  getVariables: <I extends LocationDetailInputType>(input: I) : {
+    "term": NonNullable<(I & LocationDetailInputType)["term"]> | "";
+  } => ({
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type LocationEditInputType = {
   id: string;
@@ -84,6 +144,14 @@ export type LocationEditInputType = {
 };
 export const LocationEditURI = createURI<LocationEditInputType>("/locations/:id/edit", {"id":{"kind":"string","optional":false},"term":{"kind":"string","optional":true}});
 
+export const LocationEditRouteQuery = {
+  operation: "LocationPageQuery",
+  getVariables: <I extends LocationEditInputType>(input: I) : {
+    "term": NonNullable<(I & LocationEditInputType)["term"]> | "";
+  } => ({
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type InventoryIndexInputType = {
   location?: string;
@@ -91,6 +159,16 @@ export type InventoryIndexInputType = {
 };
 export const InventoryIndexURI = createURI<InventoryIndexInputType>("/inventory", {"location":{"kind":"string","optional":true},"term":{"kind":"string","optional":true}});
 
+export const InventoryIndexRouteQuery = {
+  operation: "InventoryPageQuery",
+  getVariables: <I extends InventoryIndexInputType>(input: I) : {
+    "location": NonNullable<(I & InventoryIndexInputType)["location"]> | null;
+    "term": NonNullable<(I & InventoryIndexInputType)["term"]> | "";
+  } => ({
+    "location": input.location ?? (null),
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type InventoryNewInputType = {
   location?: string;
@@ -98,6 +176,16 @@ export type InventoryNewInputType = {
 };
 export const InventoryNewURI = createURI<InventoryNewInputType>("/inventory/new", {"location":{"kind":"string","optional":true},"term":{"kind":"string","optional":true}});
 
+export const InventoryNewRouteQuery = {
+  operation: "InventoryPageQuery",
+  getVariables: <I extends InventoryNewInputType>(input: I) : {
+    "location": NonNullable<(I & InventoryNewInputType)["location"]> | null;
+    "term": NonNullable<(I & InventoryNewInputType)["term"]> | "";
+  } => ({
+    "location": input.location ?? (null),
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type InventoryDetailInputType = {
   id: string;
@@ -106,6 +194,16 @@ export type InventoryDetailInputType = {
 };
 export const InventoryDetailURI = createURI<InventoryDetailInputType>("/inventory/:id", {"id":{"kind":"string","optional":false},"location":{"kind":"string","optional":true},"term":{"kind":"string","optional":true}});
 
+export const InventoryDetailRouteQuery = {
+  operation: "InventoryPageQuery",
+  getVariables: <I extends InventoryDetailInputType>(input: I) : {
+    "location": NonNullable<(I & InventoryDetailInputType)["location"]> | null;
+    "term": NonNullable<(I & InventoryDetailInputType)["term"]> | "";
+  } => ({
+    "location": input.location ?? (null),
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type InventoryEditInputType = {
   id: string;
@@ -114,6 +212,16 @@ export type InventoryEditInputType = {
 };
 export const InventoryEditURI = createURI<InventoryEditInputType>("/inventory/:id/edit", {"id":{"kind":"string","optional":false},"location":{"kind":"string","optional":true},"term":{"kind":"string","optional":true}});
 
+export const InventoryEditRouteQuery = {
+  operation: "InventoryPageQuery",
+  getVariables: <I extends InventoryEditInputType>(input: I) : {
+    "location": NonNullable<(I & InventoryEditInputType)["location"]> | null;
+    "term": NonNullable<(I & InventoryEditInputType)["term"]> | "";
+  } => ({
+    "location": input.location ?? (null),
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type InventoryItemDetailInputType = {
   id: string;
@@ -122,6 +230,16 @@ export type InventoryItemDetailInputType = {
 };
 export const InventoryItemDetailURI = createURI<InventoryItemDetailInputType>("/inventory/items/:id", {"id":{"kind":"string","optional":false},"location":{"kind":"string","optional":true},"term":{"kind":"string","optional":true}});
 
+export const InventoryItemDetailRouteQuery = {
+  operation: "InventoryPageQuery",
+  getVariables: <I extends InventoryItemDetailInputType>(input: I) : {
+    "location": NonNullable<(I & InventoryItemDetailInputType)["location"]> | null;
+    "term": NonNullable<(I & InventoryItemDetailInputType)["term"]> | "";
+  } => ({
+    "location": input.location ?? (null),
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type InventoryItemEditInputType = {
   id: string;
@@ -130,6 +248,16 @@ export type InventoryItemEditInputType = {
 };
 export const InventoryItemEditURI = createURI<InventoryItemEditInputType>("/inventory/items/:id/edit", {"id":{"kind":"string","optional":false},"location":{"kind":"string","optional":true},"term":{"kind":"string","optional":true}});
 
+export const InventoryItemEditRouteQuery = {
+  operation: "InventoryPageQuery",
+  getVariables: <I extends InventoryItemEditInputType>(input: I) : {
+    "location": NonNullable<(I & InventoryItemEditInputType)["location"]> | null;
+    "term": NonNullable<(I & InventoryItemEditInputType)["term"]> | "";
+  } => ({
+    "location": input.location ?? (null),
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type InventoryLocationDetailInputType = {
   id: string;
@@ -138,6 +266,16 @@ export type InventoryLocationDetailInputType = {
 };
 export const InventoryLocationDetailURI = createURI<InventoryLocationDetailInputType>("/inventory/locations/:id", {"id":{"kind":"string","optional":false},"location":{"kind":"string","optional":true},"term":{"kind":"string","optional":true}});
 
+export const InventoryLocationDetailRouteQuery = {
+  operation: "InventoryPageQuery",
+  getVariables: <I extends InventoryLocationDetailInputType>(input: I) : {
+    "location": NonNullable<(I & InventoryLocationDetailInputType)["location"]> | null;
+    "term": NonNullable<(I & InventoryLocationDetailInputType)["term"]> | "";
+  } => ({
+    "location": input.location ?? (null),
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type InventoryLocationEditInputType = {
   id: string;
@@ -146,6 +284,16 @@ export type InventoryLocationEditInputType = {
 };
 export const InventoryLocationEditURI = createURI<InventoryLocationEditInputType>("/inventory/locations/:id/edit", {"id":{"kind":"string","optional":false},"location":{"kind":"string","optional":true},"term":{"kind":"string","optional":true}});
 
+export const InventoryLocationEditRouteQuery = {
+  operation: "InventoryPageQuery",
+  getVariables: <I extends InventoryLocationEditInputType>(input: I) : {
+    "location": NonNullable<(I & InventoryLocationEditInputType)["location"]> | null;
+    "term": NonNullable<(I & InventoryLocationEditInputType)["term"]> | "";
+  } => ({
+    "location": input.location ?? (null),
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type InventoryStockInputType = {
   itemId: string;
@@ -154,6 +302,16 @@ export type InventoryStockInputType = {
 };
 export const InventoryStockURI = createURI<InventoryStockInputType>("/inventory/stock/:itemId", {"itemId":{"kind":"string","optional":false},"location":{"kind":"string","optional":true},"term":{"kind":"string","optional":true}});
 
+export const InventoryStockRouteQuery = {
+  operation: "InventoryPageQuery",
+  getVariables: <I extends InventoryStockInputType>(input: I) : {
+    "location": NonNullable<(I & InventoryStockInputType)["location"]> | null;
+    "term": NonNullable<(I & InventoryStockInputType)["term"]> | "";
+  } => ({
+    "location": input.location ?? (null),
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type InventoryStockLocationInputType = {
   itemId: string;
@@ -163,22 +321,44 @@ export type InventoryStockLocationInputType = {
 };
 export const InventoryStockLocationURI = createURI<InventoryStockLocationInputType>("/inventory/stock/:itemId/:locationId", {"itemId":{"kind":"string","optional":false},"location":{"kind":"string","optional":true},"locationId":{"kind":"string","optional":false},"term":{"kind":"string","optional":true}});
 
+export const InventoryStockLocationRouteQuery = {
+  operation: "InventoryPageQuery",
+  getVariables: <I extends InventoryStockLocationInputType>(input: I) : {
+    "location": NonNullable<(I & InventoryStockLocationInputType)["location"]> | null;
+    "term": NonNullable<(I & InventoryStockLocationInputType)["term"]> | "";
+  } => ({
+    "location": input.location ?? (null),
+    "term": input.term ?? ("" as const),
+  }),
+} as const;
 
 export type UserIndexInputType = {
 };
 export const UserIndexURI = createURI<UserIndexInputType>("/users", {});
 
+export const UserIndexRouteQuery = {
+  operation: "UserPageQuery",
+  getVariables: (_input?: UserIndexInputType) => ({}),
+} as const;
 
 export type UserNewInputType = {
 };
 export const UserNewURI = createURI<UserNewInputType>("/users/new", {});
 
+export const UserNewRouteQuery = {
+  operation: "UserPageQuery",
+  getVariables: (_input?: UserNewInputType) => ({}),
+} as const;
 
 export type UserDetailInputType = {
   id: string;
 };
 export const UserDetailURI = createURI<UserDetailInputType>("/users/:id", {"id":{"kind":"string","optional":false}});
 
+export const UserDetailRouteQuery = {
+  operation: "UserPageQuery",
+  getVariables: (_input?: UserDetailInputType) => ({}),
+} as const;
 
 export type RouteContextType =
   RouteContextValue<HomeInputType, RouteName.Home>
@@ -228,6 +408,9 @@ export const UserIndexRouteContext = ROUTE_CONTEXT.forRoute(RouteName.UserIndex)
 export const UserNewRouteContext = ROUTE_CONTEXT.forRoute(RouteName.UserNew);
 export const UserDetailRouteContext = ROUTE_CONTEXT.forRoute(RouteName.UserDetail);
 
+export type HomeEntryPointParams =
+  { currentRoute: RouteName.Home; input: HomeInputType };
+
 export type HomeRouteContextType = Extract<RouteContextType, { currentRoute: RouteName.Home }>;
 export function useHomeRouteContext(): HomeRouteContextType {
   const context = ROUTE_CONTEXT.useRouteContext();
@@ -239,6 +422,18 @@ export function useHomeRouteContext(): HomeRouteContextType {
       throw new Error('useHomeRouteContext requires the Home entrypoint; current route is ' + currentRoute);
   }
 }
+
+export type InventoryEntryPointParams =
+  { currentRoute: RouteName.InventoryIndex; input: InventoryIndexInputType }
+  | { currentRoute: RouteName.InventoryNew; input: InventoryNewInputType }
+  | { currentRoute: RouteName.InventoryDetail; input: InventoryDetailInputType }
+  | { currentRoute: RouteName.InventoryEdit; input: InventoryEditInputType }
+  | { currentRoute: RouteName.InventoryItemDetail; input: InventoryItemDetailInputType }
+  | { currentRoute: RouteName.InventoryItemEdit; input: InventoryItemEditInputType }
+  | { currentRoute: RouteName.InventoryLocationDetail; input: InventoryLocationDetailInputType }
+  | { currentRoute: RouteName.InventoryLocationEdit; input: InventoryLocationEditInputType }
+  | { currentRoute: RouteName.InventoryStock; input: InventoryStockInputType }
+  | { currentRoute: RouteName.InventoryStockLocation; input: InventoryStockLocationInputType };
 
 export type InventoryRouteContextType = Extract<RouteContextType, { currentRoute: RouteName.InventoryIndex | RouteName.InventoryNew | RouteName.InventoryDetail | RouteName.InventoryEdit | RouteName.InventoryItemDetail | RouteName.InventoryItemEdit | RouteName.InventoryLocationDetail | RouteName.InventoryLocationEdit | RouteName.InventoryStock | RouteName.InventoryStockLocation }>;
 export function useInventoryRouteContext(): InventoryRouteContextType {
@@ -261,6 +456,12 @@ export function useInventoryRouteContext(): InventoryRouteContextType {
   }
 }
 
+export type ItemEntryPointParams =
+  { currentRoute: RouteName.ItemIndex; input: ItemIndexInputType }
+  | { currentRoute: RouteName.ItemNew; input: ItemNewInputType }
+  | { currentRoute: RouteName.ItemDetail; input: ItemDetailInputType }
+  | { currentRoute: RouteName.ItemEdit; input: ItemEditInputType };
+
 export type ItemRouteContextType = Extract<RouteContextType, { currentRoute: RouteName.ItemIndex | RouteName.ItemNew | RouteName.ItemDetail | RouteName.ItemEdit }>;
 export function useItemRouteContext(): ItemRouteContextType {
   const context = ROUTE_CONTEXT.useRouteContext();
@@ -276,6 +477,12 @@ export function useItemRouteContext(): ItemRouteContextType {
   }
 }
 
+export type LocationEntryPointParams =
+  { currentRoute: RouteName.LocationIndex; input: LocationIndexInputType }
+  | { currentRoute: RouteName.LocationNew; input: LocationNewInputType }
+  | { currentRoute: RouteName.LocationDetail; input: LocationDetailInputType }
+  | { currentRoute: RouteName.LocationEdit; input: LocationEditInputType };
+
 export type LocationRouteContextType = Extract<RouteContextType, { currentRoute: RouteName.LocationIndex | RouteName.LocationNew | RouteName.LocationDetail | RouteName.LocationEdit }>;
 export function useLocationRouteContext(): LocationRouteContextType {
   const context = ROUTE_CONTEXT.useRouteContext();
@@ -290,6 +497,11 @@ export function useLocationRouteContext(): LocationRouteContextType {
       throw new Error('useLocationRouteContext requires the Location entrypoint; current route is ' + currentRoute);
   }
 }
+
+export type UserEntryPointParams =
+  { currentRoute: RouteName.UserIndex; input: UserIndexInputType }
+  | { currentRoute: RouteName.UserNew; input: UserNewInputType }
+  | { currentRoute: RouteName.UserDetail; input: UserDetailInputType };
 
 export type UserRouteContextType = Extract<RouteContextType, { currentRoute: RouteName.UserIndex | RouteName.UserNew | RouteName.UserDetail }>;
 export function useUserRouteContext(): UserRouteContextType {

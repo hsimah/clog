@@ -59,11 +59,6 @@ jobs:
           trap 'kill "$CLOG_PHP_PID"' EXIT
           cd client
           npx playwright test -c playwright.config.ts
-          kill "$CLOG_PHP_PID"
-          wait "$CLOG_PHP_PID" || true
-          CLOG_SSR=1 php -S 127.0.0.1:18473 ../server/standalone/public/router.php > /tmp/clog-ssr-browser.log 2>&1 &
-          CLOG_PHP_PID=$!
-          CLOG_TEST_SSR=1 npx playwright test -c playwright.config.ts e2e/tsquid.spec.ts
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

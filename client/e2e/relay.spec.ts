@@ -13,7 +13,9 @@ test('locations own their queries and retry a failed read', async ({ page, authe
       await route.fulfill({ json: { errors: [{ message: 'Temporary query failure' }] } });
     } else await route.continue();
   });
-  await page.goto('/locations');
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Overview', exact: true })).toBeVisible();
+  await page.getByRole('navigation').getByRole('link', { name: 'Locations', exact: true }).click();
   await expect(page.getByRole('alert')).toHaveText('Temporary query failure');
   await page.getByRole('button', { name: 'Try again' }).click();
   await expect(page.getByRole('link', { name: 'Garage Shelves' })).toBeVisible();
@@ -94,14 +96,17 @@ test('Relay preserves draft on expiry, never replays a lost write, and clears on
   await expect(page.getByRole('navigation')).toHaveCount(0);
 });
 
-test('leaving a Relay route aborts its pending query', async ({ page, authenticate }) => {
+test('leaving a Relay route aborts its entrypoint query', async ({ page, authenticate }) => {
   await authenticate();
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Overview', exact: true })).toBeVisible();
   await page.route('**/graphql', async (route) => {
     if (route.request().postDataJSON()?.operationName !== 'LocationPageQuery') await route.continue();
-    // Hold this response so the route is left while its query is in flight.
+    // Hold the entrypoint response until navigation releases its query reference.
   });
   const request = page.waitForRequest((req) => req.postData()?.includes('LocationPageQuery') ?? false);
-  await page.goto('/locations');
+  // Dispatch without hover/focus so speculative preloading does not retain the query.
+  await page.getByRole('navigation').getByRole('link', { name: 'Locations', exact: true }).dispatchEvent('click');
   await request;
   const aborted = page.waitForEvent('requestfailed', { predicate: (req) => req.postData()?.includes('LocationPageQuery') ?? false });
   await page.getByRole('navigation').getByRole('link', { name: 'Overview', exact: true }).click();

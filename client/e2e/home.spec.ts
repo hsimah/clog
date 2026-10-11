@@ -83,12 +83,44 @@ test('dashboard reads authoritative totals above 100 without fetching collection
     await expect(page.getByRole('region', { name: 'Items', exact: true }).getByLabel('Total items', { exact: true })).toHaveText(String(clogSummary.items));
     await expect(page.getByRole('region', { name: 'Locations', exact: true }).getByLabel('Total locations', { exact: true })).toHaveText(String(clogSummary.locations));
     await expect(page.getByRole('region', { name: 'Inventory', exact: true }).getByLabel('Total items in stock', { exact: true })).toHaveText(String(clogSummary.inventory));
-    expect(operations.length).toBeGreaterThan(0);
-    expect(operations.every((operation) => operation === 'HomePageQuery')).toBe(true);
+    expect(operations).toEqual([]);
   } finally {
     await execute(`mutation { deleteClogItem(input: {id: ${JSON.stringify(item)}}) { deletedId } }`);
     await execute(`mutation { deleteClogLocation(input: {id: ${JSON.stringify(location)}}) { deletedId } }`);
   }
+});
+
+test('direct dashboard load surfaces an inlined resolver error and retries', async ({ page, authenticate }) => {
+  await authenticate();
+  await page.route('**/*', async (route) => {
+    const response = await route.fetch();
+    // Keep fulfilled HTML and its resources in the same browser address space.
+    if (!route.request().isNavigationRequest()) {
+      await route.fulfill({ response });
+      return;
+    }
+    const html = await response.text();
+    const failed = html.replace(/(<script type="application\/json" id="tsquid-data">)(.*?)(<\/script>)/, (_, before, json, after) => {
+      const payload = JSON.parse(json);
+      payload.responses[0].response = {
+        data: { clogSummary: null },
+        errors: [{ message: 'Totals temporarily unavailable' }],
+      };
+      return before + JSON.stringify(payload) + after;
+    });
+    expect(failed).not.toBe(html);
+    await route.fulfill({ response, body: failed });
+  });
+  const operations: string[] = [];
+  page.on('request', (request) => {
+    if (request.url().endsWith('/graphql')) operations.push(request.postDataJSON()?.operationName);
+  });
+  await page.goto('/');
+  await expect(page.getByRole('alert')).toHaveText('Totals temporarily unavailable');
+  expect(operations).toEqual([]);
+  await page.getByRole('button', { name: 'Try again', exact: true }).click();
+  await expect(page.getByRole('region', { name: 'Inventory', exact: true })).toBeVisible();
+  expect(operations).toContain('HomePageQuery');
 });
 
 test('dashboard retries a failed summary and fits narrow and portrait screens', async ({ page, authenticate }) => {
@@ -100,7 +132,9 @@ test('dashboard retries a failed summary and fits narrow and portrait screens', 
       await route.fulfill({ json: { errors: [{ message: 'Totals temporarily unavailable' }] } });
     } else await route.continue();
   });
-  await page.goto('/');
+  await page.goto('/items');
+  await expect(page.getByRole('link', { name: 'Heinz Ketchup', exact: true })).toBeVisible();
+  await page.getByRole('navigation').getByRole('link', { name: 'Overview', exact: true }).click();
   await expect(page.getByRole('alert')).toHaveText('Totals temporarily unavailable');
   await page.getByRole('button', { name: 'Try again' }).click();
   await expect(page.getByRole('region', { name: 'Inventory', exact: true })).toBeVisible();

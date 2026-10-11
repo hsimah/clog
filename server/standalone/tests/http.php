@@ -38,6 +38,7 @@ function signIn(string $username, string $password = 'test-password-only'): stri
 try {
     for ($i=0;$i<100;$i++) { $ready=@stream_socket_client('tcp://'.$address,$errno,$error,.1); if ($ready) { fclose($ready); break; } usleep(20000); }
     [$status,$body]=request('/healthz'); ensure($status===200,'Health endpoint');
+    [$status,$html]=request('/'); ensure($status===200 && !str_contains($html, 'id="tsquid-data"'), 'Anonymous shell has no initial data');
     [$status]=request('/graphql','POST','{"query":"{clogSummary{items}}"}',['Content-Type: application/json']); ensure($status===401,'Anonymous API denied');
     [$status]=request('/auth/login','POST','username=editor&password=test-password-only',['Content-Type: application/x-www-form-urlencoded']); ensure($status===403,'Login CSRF enforced');
     $csrf=signIn('editor');
@@ -48,6 +49,7 @@ try {
     [$status]=request('/graphql','GET'); ensure($status===405,'GraphQL GET denied');
     [$status]=request('/graphql','POST','not-json',$headers); ensure($status===400,'Malformed JSON rejected');
     [$status,$html]=request('/'); ensure($status===200 && str_contains($html,'type="module"'),'Root application shell');
+    ensure(str_contains($html, 'id="tsquid-data"') && str_contains($html, 'HomePageQuery'), 'Authenticated shell always includes initial route data');
     [$status]=request('/unknown'); ensure($status===404,'Unknown server route');
     [$status,$html]=request('/inventory'); ensure($status===200 && str_contains($html,'/assets/stylex.css') && str_contains($html,'type="module"'),'Compiled deep link shell');
     [$status]=request('/auth/logout','POST',null,['X-Clog-CSRF: '.$csrf]); ensure($status===200,'Logout');
@@ -89,6 +91,13 @@ try {
     ensure($status === 200 && !isset(json_decode($body, true)['errors']), 'Administrator deletes account over HTTP: ' . $body);
     $cookies = $readerCookies;
     [, $body] = request('/auth/session'); ensure(json_decode($body, true)['userId'] === '0', 'Deleted account session ended');
+    $cookies = [];
+    signIn('editor');
+    $db->execute('DROP TABLE app_clog_item');
+    [$status, $html] = request('/');
+    preg_match('~<script type="application/json" id="tsquid-data">(.*?)</script>~', $html, $match);
+    $initial = json_decode($match[1], true, flags: JSON_THROW_ON_ERROR);
+    ensure($status === 200 && !empty($initial['responses'][0]['response']['errors']), 'Direct HTML load preserves real resolver errors for the client error boundary');
     echo "PASS: HTTP login, cookies, CSRF, sessions, GraphQL, reader policy, account administration and compiled deep links\n";
 } catch (Throwable $error) {
     fwrite(STDERR, file_get_contents($dir . '/http.log'));
