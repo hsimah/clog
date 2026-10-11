@@ -1,7 +1,6 @@
 import { test, expect } from "./fixtures";
 
 test("Overview consumes server data without a GraphQL request", async ({ page, authenticate }) => {
-  test.skip(process.env.CLOG_TEST_SSR !== "1", "Enable with CLOG_SSR=1.");
   await authenticate();
   const operations: string[] = [];
   page.on("request", (request) => {
@@ -17,7 +16,7 @@ test("Overview consumes server data without a GraphQL request", async ({ page, a
   await page.getByRole("navigation", { name: "Main navigation" })
     .getByRole("link", { name: "Items", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Items", exact: true })).toBeVisible();
-  expect(operations).toContain("ItemPageQuery");
+  await expect.poll(() => operations).toContain("ItemPageQuery");
 });
 
 for (const { url, operation, variables, heading } of [
@@ -29,7 +28,6 @@ for (const { url, operation, variables, heading } of [
   { url: "/items/1?term=Heinz", operation: "ItemPageQuery", variables: { term: "Heinz" }, heading: "Heinz Ketchup" },
 ]) {
   test(`generated SSR data satisfies ${url}`, async ({ page, authenticate }) => {
-    test.skip(process.env.CLOG_TEST_SSR !== "1", "Enable with CLOG_SSR=1.");
     await authenticate("admin");
     const operations: string[] = [];
     page.on("request", (request) => {
@@ -48,7 +46,6 @@ for (const { url, operation, variables, heading } of [
 }
 
 test("invalid SSR URL has no payload and remains recoverable", async ({ page, authenticate }) => {
-  test.skip(process.env.CLOG_TEST_SSR !== "1", "Enable with CLOG_SSR=1.");
   await authenticate();
   await page.goto("/items?term=a&term=b");
   await expect(page.locator("#tsquid-data")).toHaveCount(0);
@@ -64,7 +61,6 @@ test("anonymous HTML contains no initial route data", async ({ request }) => {
 });
 
 test("SSR executes account queries with the requesting viewer's permissions", async ({ page, authenticate }) => {
-  test.skip(process.env.CLOG_TEST_SSR !== "1", "Enable with CLOG_SSR=1.");
   await authenticate("reader");
   await page.goto("/users");
   const data = JSON.parse(await page.locator("#tsquid-data").textContent() ?? "null");

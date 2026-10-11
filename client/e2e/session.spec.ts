@@ -30,10 +30,13 @@ test('anonymous session is private and cannot read or mutate GraphQL inventory',
 
 test('cookie session uses fresh nonces and preserves drafts after expiry', async ({ page, context, authenticate }) => {
   await authenticate();
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Overview', exact: true })).toBeVisible();
   const request = page.waitForRequest((req) => req.url().endsWith('/graphql'));
-  await page.goto('/items/new');
+  await page.getByRole('navigation').getByRole('link', { name: 'Items', exact: true }).click();
   expect((await request).headers()['x-clog-csrf']).toBeTruthy();
   expect((await request).headers()['authorization']).toBeUndefined();
+  await page.getByRole('link', { name: 'Add Item', exact: true }).click();
   await page.getByRole('textbox', { name: /^Name/ }).fill('Unsubmitted draft');
   await context.clearCookies();
   await page.evaluate(() => window.dispatchEvent(new Event('focus')));

@@ -59,6 +59,19 @@ test("SSR manifest preserves Relay operation text, IDs and defaults", async () =
     for (const argument of node.operation.argumentDefinitions) {
       assert.equal(route.query.variables[argument.name].default ?? null, argument.defaultValue, `${route.name}.${argument.name}`);
     }
+    const helper = routes[`${route.name}RouteQuery`];
+    assert.equal(helper.operation, route.query.operation);
+    for (const populated of [false, true]) {
+      const input = Object.fromEntries(Object.entries(source.fields)
+        .filter(([, field]) => populated || !field.optional)
+        .map(([name]) => [name, `value/${name}`]));
+      const expected = Object.fromEntries(Object.entries(route.query.variables)
+        .map(([name, binding]) => [name, input[binding.input] ?? binding.default ?? null]));
+      assert.deepEqual(helper.getVariables(input), expected, route.name);
+      // Routes sharing an entrypoint all preload the same page query.
+      const first = config.routes.find((candidate) => candidate.entryPoint === source.entryPoint);
+      assert.deepEqual(routes[`${first.name}RouteQuery`].getVariables(input), expected, route.name);
+    }
   }
 });
 

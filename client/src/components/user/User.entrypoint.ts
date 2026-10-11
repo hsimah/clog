@@ -1,30 +1,30 @@
-import type { RouteEntryPoint } from "@tsquid/routes/entrypoint";
-import { RouteResource } from "../../routes/RouteResource";
-import type { RouteState } from "../../routes/RouteState";
+import { lazyResource, type RouteEntryPoint } from "@tsquid/routes/entrypoint";
+import {
+  RouteName,
+  UserIndexRouteQuery,
+  type UserEntryPointParams,
+} from "../../routes/__generated__/routes";
 import type { UserRouteQueries } from "./UserRoute";
 import PAGE_QUERY from "../user/__generated__/UserPageQuery.graphql";
 import RECORD_QUERY from "../user/__generated__/UserRecordQuery.graphql";
 
 export const USER_ENTRY_POINT: RouteEntryPoint<
-  RouteState,
-  UserRouteQueries,
-  Empty,
-  Empty,
-  RouteState
+  UserEntryPointParams,
+  UserRouteQueries
 > = {
-  root: RouteResource("UserRoute", () =>
+  root: lazyResource("UserRoute", () =>
     import("./UserRoute").then((module) => module.UserRoute),
   ),
   getPreloadProps: (route) => ({
-    extraProps: route,
     queries: {
-      page: { parameters: PAGE_QUERY, variables: {} },
+      page: {
+        parameters: PAGE_QUERY,
+        variables: UserIndexRouteQuery.getVariables(route.input),
+      },
       record:
-        route.view === "detail"
-          ? { parameters: RECORD_QUERY, variables: { id: route.id } }
+        route.currentRoute === RouteName.UserDetail
+          ? { parameters: RECORD_QUERY, variables: { id: route.input.id } }
           : undefined,
     },
   }),
 };
-
-type Empty = Record<string, never>;

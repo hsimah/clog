@@ -1,6 +1,9 @@
-import type { RouteEntryPoint } from "@tsquid/routes/entrypoint";
-import { RouteResource } from "../../routes/RouteResource";
-import type { RouteState } from "../../routes/RouteState";
+import { lazyResource, type RouteEntryPoint } from "@tsquid/routes/entrypoint";
+import {
+  RouteName,
+  InventoryIndexRouteQuery,
+  type InventoryEntryPointParams,
+} from "../../routes/__generated__/routes";
 import type { InventoryRouteQueries } from "./InventoryRoute";
 import PAGE_QUERY from "../inventory/__generated__/InventoryPageQuery.graphql";
 import LOCATIONS_QUERY from "../inventory/__generated__/InventoryLocationsQuery.graphql";
@@ -10,50 +13,51 @@ import LOCATION_QUERY from "../location/__generated__/LocationRecordQuery.graphq
 import STOCK_QUERY from "../stock/__generated__/StockSelectionQuery.graphql";
 
 export const INVENTORY_ENTRY_POINT: RouteEntryPoint<
-  RouteState,
-  InventoryRouteQueries,
-  Empty,
-  Empty,
-  RouteState
+  InventoryEntryPointParams,
+  InventoryRouteQueries
 > = {
-  root: RouteResource("InventoryRoute", () =>
+  root: lazyResource("InventoryRoute", () =>
     import("./InventoryRoute").then((module) => module.InventoryRoute),
   ),
   getPreloadProps: (route) => ({
-    extraProps: route,
     queries: {
       page: {
         parameters: PAGE_QUERY,
-        variables: { term: route.term ?? "", location: route.location ?? null },
+        variables: InventoryIndexRouteQuery.getVariables(route.input),
       },
       locations: {
         parameters: LOCATIONS_QUERY,
-        variables: { id: route.location ?? "", selected: !!route.location },
+        variables: {
+          id: route.input.location ?? "",
+          selected: !!route.input.location,
+        },
       },
       record:
-        route.view === "detail" || route.view === "edit"
-          ? { parameters: RECORD_QUERY, variables: { id: route.id } }
+        route.currentRoute === RouteName.InventoryDetail ||
+        route.currentRoute === RouteName.InventoryEdit
+          ? { parameters: RECORD_QUERY, variables: { id: route.input.id } }
           : undefined,
       item:
-        route.view === "item" || route.view === "item-edit"
-          ? { parameters: ITEM_QUERY, variables: { id: route.id } }
+        route.currentRoute === RouteName.InventoryItemDetail ||
+        route.currentRoute === RouteName.InventoryItemEdit
+          ? { parameters: ITEM_QUERY, variables: { id: route.input.id } }
           : undefined,
       location:
-        route.view === "location" || route.view === "location-edit"
-          ? { parameters: LOCATION_QUERY, variables: { id: route.id } }
+        route.currentRoute === RouteName.InventoryLocationDetail ||
+        route.currentRoute === RouteName.InventoryLocationEdit
+          ? { parameters: LOCATION_QUERY, variables: { id: route.input.id } }
           : undefined,
       stock:
-        route.view === "stock"
+        route.currentRoute === RouteName.InventoryStock ||
+        route.currentRoute === RouteName.InventoryStockLocation
           ? {
               parameters: STOCK_QUERY,
               variables: {
-                item: route.itemId,
-                location: route.locationId ?? null,
+                item: route.input.itemId,
+                location: "locationId" in route.input ? route.input.locationId : null,
               },
             }
           : undefined,
     },
   }),
 };
-
-type Empty = Record<string, never>;

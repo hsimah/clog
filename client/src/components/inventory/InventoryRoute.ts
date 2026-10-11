@@ -1,6 +1,6 @@
 import { createElement } from "react";
+import { RouteName, useInventoryRouteContext } from "../../routes/__generated__/routes";
 import type { EntryPointProps } from "@tsquid/routes/entrypoint";
-import type { RouteState } from "../../routes/RouteState";
 import type { InventoryPageQuery } from "../inventory/__generated__/InventoryPageQuery.graphql";
 import type { InventoryLocationsQuery } from "../inventory/__generated__/InventoryLocationsQuery.graphql";
 import type { InventoryRecordQuery } from "../inventory/__generated__/InventoryRecordQuery.graphql";
@@ -14,10 +14,14 @@ import { InventoryRecord } from "../inventory/InventoryRecord";
 import { InventoryForm } from "../inventory/InventoryForm";
 import { StockSelection } from "../stock/StockSelection";
 
-export function InventoryRoute({ queries, extraProps }: InventoryRouteProps) {
-  const edit = extraProps.view.endsWith("edit");
+export function InventoryRoute({ queries }: InventoryRouteProps) {
+  const route = useInventoryRouteContext();
+  const edit =
+    route.currentRoute === RouteName.InventoryEdit ||
+    route.currentRoute === RouteName.InventoryItemEdit ||
+    route.currentRoute === RouteName.InventoryLocationEdit;
   const detail =
-    extraProps.view === "new"
+    route.currentRoute === RouteName.InventoryNew
       ? createElement(InventoryForm, {})
       : queries.record
         ? createElement(InventoryRecord, { reference: queries.record, edit })
@@ -38,12 +42,7 @@ export function InventoryRoute({ queries, extraProps }: InventoryRouteProps) {
   });
 }
 
-export type InventoryRouteProps = EntryPointProps<
-  InventoryRouteQueries,
-  Empty,
-  Empty,
-  RouteState
->;
+export type InventoryRouteProps = EntryPointProps<InventoryRouteQueries>;
 
 export type InventoryRouteQueries = {
   page: InventoryPageQuery;
@@ -53,5 +52,3 @@ export type InventoryRouteQueries = {
   location?: LocationRecordQuery;
   stock?: StockSelectionQuery;
 };
-
-type Empty = Record<string, never>;

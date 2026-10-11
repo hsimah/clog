@@ -77,7 +77,7 @@ try {
             $html .= '<link rel="stylesheet" href="/' . escape($css) . '?v=' . substr(hash_file('sha256', $dist . '/' . $css), 0, 12) . '">';
         }
         $html .= '</head><body><div id="root"></div><script type="module" src="/' . escape($entry['file']) . '"></script></body></html>';
-        if (getenv('CLOG_SSR') === '1' && $viewer->isAuthenticated()) {
+        if ($viewer->isAuthenticated()) {
             try {
                 $initial = new InitialData(
                     Manifest::fromFile(dirname(__DIR__, 2) . '/generated/tsquid/tsquid-manifest.php'),

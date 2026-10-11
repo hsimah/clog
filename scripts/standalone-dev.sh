@@ -19,6 +19,5 @@ exec "$ENGINE" run --rm -p "127.0.0.1:${CLOG_DEV_PORT:-18473}:8080" \
     -v "$ROOT:/work/clog:z" -w /work/clog/server \
     -e CLOG_DB=/work/clog/.standalone/clog.sqlite \
     -e CLOG_SESSION_PATH=/work/clog/.standalone/sessions \
-    -e CLOG_SSR="${CLOG_SSR:-0}" \
     -e CLOG_ORIGIN="http://localhost:${CLOG_DEV_PORT:-18473}" \
     clog-php:8.3-rust php -S 0.0.0.0:8080 standalone/public/router.php

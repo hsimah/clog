@@ -83,8 +83,7 @@ test('dashboard reads authoritative totals above 100 without fetching collection
     await expect(page.getByRole('region', { name: 'Items', exact: true }).getByLabel('Total items', { exact: true })).toHaveText(String(clogSummary.items));
     await expect(page.getByRole('region', { name: 'Locations', exact: true }).getByLabel('Total locations', { exact: true })).toHaveText(String(clogSummary.locations));
     await expect(page.getByRole('region', { name: 'Inventory', exact: true }).getByLabel('Total items in stock', { exact: true })).toHaveText(String(clogSummary.inventory));
-    expect(operations.length).toBeGreaterThan(0);
-    expect(operations.every((operation) => operation === 'HomePageQuery')).toBe(true);
+    expect(operations).toEqual([]);
   } finally {
     await execute(`mutation { deleteClogItem(input: {id: ${JSON.stringify(item)}}) { deletedId } }`);
     await execute(`mutation { deleteClogLocation(input: {id: ${JSON.stringify(location)}}) { deletedId } }`);
@@ -100,7 +99,9 @@ test('dashboard retries a failed summary and fits narrow and portrait screens', 
       await route.fulfill({ json: { errors: [{ message: 'Totals temporarily unavailable' }] } });
     } else await route.continue();
   });
-  await page.goto('/');
+  await page.goto('/items');
+  await expect(page.getByRole('link', { name: 'Heinz Ketchup', exact: true })).toBeVisible();
+  await page.getByRole('navigation').getByRole('link', { name: 'Overview', exact: true }).click();
   await expect(page.getByRole('alert')).toHaveText('Totals temporarily unavailable');
   await page.getByRole('button', { name: 'Try again' }).click();
   await expect(page.getByRole('region', { name: 'Inventory', exact: true })).toBeVisible();
