@@ -57,10 +57,7 @@ inlines its page query, with URL filters and GraphQL defaults. Detail queries an
 inventory helpers still fetch normally, as does `/auth/session`.
 Use the PHP-served compiled app on port 18473; Vite's HTML does not inline data.
 Inline responses use the same GraphQL error validation as client requests, so
-resolver errors show a retryable alert. Initial-data queries use a 250 ms SQLite
-lock wait; results taking over 500 ms fall back to client loading. PDO cannot
-interrupt an already-running query, so the elapsed-time budget rejects late
-results rather than enforcing a hard execution deadline.
+resolver errors show a retryable alert.
 
 After changing queries or routes, regenerate in this order and commit the outputs:
 
