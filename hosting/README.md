@@ -48,10 +48,10 @@ printf '%s' "$CLOG_NEW_PASSWORD" | scripts/standalone-dev.sh user:add admin edit
 set -e CLOG_NEW_PASSWORD
 ```
 
-Open `http://localhost:8280/`. Overview is the home page; routes and assets are
+Open `http://localhost:18473/`. Overview is the home page; routes and assets are
 served from the domain root. Sign in at `/auth/login`. This uses PHP's development server and
 stores the database/sessions in ignored `.standalone/`. Stop it with Ctrl+C.
-For frontend hot reload, use `CLOG_PROXY_TARGET=http://localhost:8280` with Vite
+For frontend hot reload, use `CLOG_PROXY_TARGET=http://localhost:18473` with Vite
 on the host. Containerized Vite needs an origin it can reach from its network.
 Use nginx/FPM for production.
 

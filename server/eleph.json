@@ -14,6 +14,11 @@
         "graphql-php": {
             "builder": "vendor/bin/eleph-gen-graphql-php",
             "output": "generated/graphql"
+        },
+        "tsquid": {
+            "builder": "vendor/bin/eleph-gen-tsquid",
+            "output": "generated/tsquid",
+            "manifest": "../../../client/src/routes/__generated__/routes.manifest.json"
         }
     }
 }

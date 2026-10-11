@@ -1,6 +1,6 @@
 import { defineConfig } from '@playwright/test';
 
-const baseURL = process.env.CLOG_TEST_URL || 'http://127.0.0.1:8280';
+const baseURL = process.env.CLOG_TEST_URL || 'http://127.0.0.1:18473';
 
 export default defineConfig({
   testDir: './e2e',

@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<6bff4ec8d11355e2da19a45ab4de2a51>>
+ * @generated SignedSource<<9fd30dca60236f4e50d16e41996f0839>>
+ * @relayHash 2d05f6ab41154cced6e1371da71e0975
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID 2d05f6ab41154cced6e1371da71e0975
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -226,7 +229,7 @@ return {
   },
   "params": {
     "cacheID": "2d05f6ab41154cced6e1371da71e0975",
-    "id": null,
+    "id": "2d05f6ab41154cced6e1371da71e0975",
     "metadata": {},
     "name": "StockSelectionQuery",
     "operationKind": "query",

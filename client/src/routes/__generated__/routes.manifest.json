@@ -1,0 +1,623 @@
+{
+  "version": 1,
+  "routes": [
+    {
+      "name": "Home",
+      "path": "/",
+      "ssr": true,
+      "fields": {},
+      "query": {
+        "operation": "HomePageQuery",
+        "id": "aec0b1f528b151b0088a0672f5d7d5d6",
+        "text": "query HomePageQuery {\n  clogSummary {\n    items\n    locations\n    inventory\n  }\n}\n",
+        "variables": {}
+      }
+    },
+    {
+      "name": "ItemIndex",
+      "path": "/items",
+      "ssr": true,
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "ItemPageQuery",
+        "id": "28b842f023915fd2f27705f5eae3f8fb",
+        "text": "query ItemPageQuery(\n  $term: String = \"\"\n) {\n  ...ItemList_query_4hh6ED\n}\n\nfragment ItemList_query_4hh6ED on RootQuery {\n  clogItemSearch(first: 25, where: {term: $term}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        barcode\n        createdAt\n        stockCount\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "ItemNew",
+      "path": "/items/new",
+      "ssr": true,
+      "fields": {
+        "barcode": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        },
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "ItemPageQuery",
+        "id": "28b842f023915fd2f27705f5eae3f8fb",
+        "text": "query ItemPageQuery(\n  $term: String = \"\"\n) {\n  ...ItemList_query_4hh6ED\n}\n\nfragment ItemList_query_4hh6ED on RootQuery {\n  clogItemSearch(first: 25, where: {term: $term}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        barcode\n        createdAt\n        stockCount\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "ItemDetail",
+      "path": "/items/:id",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        },
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "ItemPageQuery",
+        "id": "28b842f023915fd2f27705f5eae3f8fb",
+        "text": "query ItemPageQuery(\n  $term: String = \"\"\n) {\n  ...ItemList_query_4hh6ED\n}\n\nfragment ItemList_query_4hh6ED on RootQuery {\n  clogItemSearch(first: 25, where: {term: $term}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        barcode\n        createdAt\n        stockCount\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "ItemEdit",
+      "path": "/items/:id/edit",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        },
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "ItemPageQuery",
+        "id": "28b842f023915fd2f27705f5eae3f8fb",
+        "text": "query ItemPageQuery(\n  $term: String = \"\"\n) {\n  ...ItemList_query_4hh6ED\n}\n\nfragment ItemList_query_4hh6ED on RootQuery {\n  clogItemSearch(first: 25, where: {term: $term}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        barcode\n        createdAt\n        stockCount\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "LocationIndex",
+      "path": "/locations",
+      "ssr": true,
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "LocationPageQuery",
+        "id": "cceefb75b98d9f9d92c4bc91329a4722",
+        "text": "query LocationPageQuery(\n  $term: String = \"\"\n) {\n  ...LocationList_query_4hh6ED\n}\n\nfragment LocationList_query_4hh6ED on RootQuery {\n  clogLocationSearch(first: 25, where: {term: $term}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        createdAt\n        stockCount\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "LocationNew",
+      "path": "/locations/new",
+      "ssr": true,
+      "fields": {
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "LocationPageQuery",
+        "id": "cceefb75b98d9f9d92c4bc91329a4722",
+        "text": "query LocationPageQuery(\n  $term: String = \"\"\n) {\n  ...LocationList_query_4hh6ED\n}\n\nfragment LocationList_query_4hh6ED on RootQuery {\n  clogLocationSearch(first: 25, where: {term: $term}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        createdAt\n        stockCount\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "LocationDetail",
+      "path": "/locations/:id",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        },
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "LocationPageQuery",
+        "id": "cceefb75b98d9f9d92c4bc91329a4722",
+        "text": "query LocationPageQuery(\n  $term: String = \"\"\n) {\n  ...LocationList_query_4hh6ED\n}\n\nfragment LocationList_query_4hh6ED on RootQuery {\n  clogLocationSearch(first: 25, where: {term: $term}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        createdAt\n        stockCount\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "LocationEdit",
+      "path": "/locations/:id/edit",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        },
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "LocationPageQuery",
+        "id": "cceefb75b98d9f9d92c4bc91329a4722",
+        "text": "query LocationPageQuery(\n  $term: String = \"\"\n) {\n  ...LocationList_query_4hh6ED\n}\n\nfragment LocationList_query_4hh6ED on RootQuery {\n  clogLocationSearch(first: 25, where: {term: $term}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        createdAt\n        stockCount\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "InventoryIndex",
+      "path": "/inventory",
+      "ssr": true,
+      "fields": {
+        "location": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        },
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "InventoryPageQuery",
+        "id": "52ec8892241662c4ef68cb91b86a46a5",
+        "text": "query InventoryPageQuery(\n  $term: String = \"\"\n  $location: ID\n) {\n  ...InventoryList_query_1Tmkwq\n}\n\nfragment InventoryList_query_1Tmkwq on RootQuery {\n  clogStockedItems(first: 25, where: {term: $term, location: $location}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        stockCount(location: $location)\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "location": {
+            "input": "location"
+          },
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "InventoryNew",
+      "path": "/inventory/new",
+      "ssr": true,
+      "fields": {
+        "location": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        },
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "InventoryPageQuery",
+        "id": "52ec8892241662c4ef68cb91b86a46a5",
+        "text": "query InventoryPageQuery(\n  $term: String = \"\"\n  $location: ID\n) {\n  ...InventoryList_query_1Tmkwq\n}\n\nfragment InventoryList_query_1Tmkwq on RootQuery {\n  clogStockedItems(first: 25, where: {term: $term, location: $location}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        stockCount(location: $location)\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "location": {
+            "input": "location"
+          },
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "InventoryDetail",
+      "path": "/inventory/:id",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        },
+        "location": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        },
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "InventoryPageQuery",
+        "id": "52ec8892241662c4ef68cb91b86a46a5",
+        "text": "query InventoryPageQuery(\n  $term: String = \"\"\n  $location: ID\n) {\n  ...InventoryList_query_1Tmkwq\n}\n\nfragment InventoryList_query_1Tmkwq on RootQuery {\n  clogStockedItems(first: 25, where: {term: $term, location: $location}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        stockCount(location: $location)\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "location": {
+            "input": "location"
+          },
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "InventoryEdit",
+      "path": "/inventory/:id/edit",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        },
+        "location": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        },
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "InventoryPageQuery",
+        "id": "52ec8892241662c4ef68cb91b86a46a5",
+        "text": "query InventoryPageQuery(\n  $term: String = \"\"\n  $location: ID\n) {\n  ...InventoryList_query_1Tmkwq\n}\n\nfragment InventoryList_query_1Tmkwq on RootQuery {\n  clogStockedItems(first: 25, where: {term: $term, location: $location}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        stockCount(location: $location)\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "location": {
+            "input": "location"
+          },
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "InventoryItemDetail",
+      "path": "/inventory/items/:id",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        },
+        "location": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        },
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "InventoryPageQuery",
+        "id": "52ec8892241662c4ef68cb91b86a46a5",
+        "text": "query InventoryPageQuery(\n  $term: String = \"\"\n  $location: ID\n) {\n  ...InventoryList_query_1Tmkwq\n}\n\nfragment InventoryList_query_1Tmkwq on RootQuery {\n  clogStockedItems(first: 25, where: {term: $term, location: $location}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        stockCount(location: $location)\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "location": {
+            "input": "location"
+          },
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "InventoryItemEdit",
+      "path": "/inventory/items/:id/edit",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        },
+        "location": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        },
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "InventoryPageQuery",
+        "id": "52ec8892241662c4ef68cb91b86a46a5",
+        "text": "query InventoryPageQuery(\n  $term: String = \"\"\n  $location: ID\n) {\n  ...InventoryList_query_1Tmkwq\n}\n\nfragment InventoryList_query_1Tmkwq on RootQuery {\n  clogStockedItems(first: 25, where: {term: $term, location: $location}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        stockCount(location: $location)\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "location": {
+            "input": "location"
+          },
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "InventoryLocationDetail",
+      "path": "/inventory/locations/:id",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        },
+        "location": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        },
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "InventoryPageQuery",
+        "id": "52ec8892241662c4ef68cb91b86a46a5",
+        "text": "query InventoryPageQuery(\n  $term: String = \"\"\n  $location: ID\n) {\n  ...InventoryList_query_1Tmkwq\n}\n\nfragment InventoryList_query_1Tmkwq on RootQuery {\n  clogStockedItems(first: 25, where: {term: $term, location: $location}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        stockCount(location: $location)\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "location": {
+            "input": "location"
+          },
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "InventoryLocationEdit",
+      "path": "/inventory/locations/:id/edit",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        },
+        "location": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        },
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "InventoryPageQuery",
+        "id": "52ec8892241662c4ef68cb91b86a46a5",
+        "text": "query InventoryPageQuery(\n  $term: String = \"\"\n  $location: ID\n) {\n  ...InventoryList_query_1Tmkwq\n}\n\nfragment InventoryList_query_1Tmkwq on RootQuery {\n  clogStockedItems(first: 25, where: {term: $term, location: $location}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        stockCount(location: $location)\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "location": {
+            "input": "location"
+          },
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "InventoryStock",
+      "path": "/inventory/stock/:itemId",
+      "ssr": true,
+      "fields": {
+        "itemId": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        },
+        "location": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        },
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "InventoryPageQuery",
+        "id": "52ec8892241662c4ef68cb91b86a46a5",
+        "text": "query InventoryPageQuery(\n  $term: String = \"\"\n  $location: ID\n) {\n  ...InventoryList_query_1Tmkwq\n}\n\nfragment InventoryList_query_1Tmkwq on RootQuery {\n  clogStockedItems(first: 25, where: {term: $term, location: $location}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        stockCount(location: $location)\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "location": {
+            "input": "location"
+          },
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "InventoryStockLocation",
+      "path": "/inventory/stock/:itemId/:locationId",
+      "ssr": true,
+      "fields": {
+        "itemId": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        },
+        "location": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        },
+        "locationId": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        },
+        "term": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "InventoryPageQuery",
+        "id": "52ec8892241662c4ef68cb91b86a46a5",
+        "text": "query InventoryPageQuery(\n  $term: String = \"\"\n  $location: ID\n) {\n  ...InventoryList_query_1Tmkwq\n}\n\nfragment InventoryList_query_1Tmkwq on RootQuery {\n  clogStockedItems(first: 25, where: {term: $term, location: $location}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        stockCount(location: $location)\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {
+          "location": {
+            "input": "location"
+          },
+          "term": {
+            "input": "term",
+            "default": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "UserIndex",
+      "path": "/users",
+      "ssr": true,
+      "fields": {},
+      "query": {
+        "operation": "UserPageQuery",
+        "id": "ddac67ee546e1d87acd95d581fcd6405",
+        "text": "query UserPageQuery {\n  ...UserList_query\n}\n\nfragment UserList_query on RootQuery {\n  clogUsers(first: 25) {\n    totalCount\n    edges {\n      node {\n        id\n        username\n        role\n        isAdmin\n        isEnabled\n        isViewer\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {}
+      }
+    },
+    {
+      "name": "UserNew",
+      "path": "/users/new",
+      "ssr": true,
+      "fields": {},
+      "query": {
+        "operation": "UserPageQuery",
+        "id": "ddac67ee546e1d87acd95d581fcd6405",
+        "text": "query UserPageQuery {\n  ...UserList_query\n}\n\nfragment UserList_query on RootQuery {\n  clogUsers(first: 25) {\n    totalCount\n    edges {\n      node {\n        id\n        username\n        role\n        isAdmin\n        isEnabled\n        isViewer\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {}
+      }
+    },
+    {
+      "name": "UserDetail",
+      "path": "/users/:id",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        }
+      },
+      "query": {
+        "operation": "UserPageQuery",
+        "id": "ddac67ee546e1d87acd95d581fcd6405",
+        "text": "query UserPageQuery {\n  ...UserList_query\n}\n\nfragment UserList_query on RootQuery {\n  clogUsers(first: 25) {\n    totalCount\n    edges {\n      node {\n        id\n        username\n        role\n        isAdmin\n        isEnabled\n        isViewer\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n",
+        "variables": {}
+      }
+    }
+  ]
+}

@@ -4,8 +4,45 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ec20a1762c01729516d2597922e8d028",
+    "content-hash": "2bd8029906cfefdf778b8109206ff01d",
     "packages": [
+        {
+            "name": "elephentity/codegen-tsquid",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hsimah-services/elephentity-codegen-tsquid.git",
+                "reference": "3d5ad4d5755b03214c5fd00136b6a90e9130e5d9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen-tsquid/zipball/3d5ad4d5755b03214c5fd00136b6a90e9130e5d9",
+                "reference": "3d5ad4d5755b03214c5fd00136b6a90e9130e5d9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.3"
+            },
+            "bin": [
+                "bin/eleph-gen-tsquid"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Eleph\\Tsquid\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "description": "Tsquid manifest builder and standalone PHP initial-data integration.",
+            "support": {
+                "issues": "https://github.com/hsimah-services/elephentity-codegen-tsquid/issues",
+                "source": "https://github.com/hsimah-services/elephentity-codegen-tsquid/tree/v0.1.0"
+            },
+            "time": "2026-10-10T23:33:32+00:00"
+        },
         {
             "name": "elephentity/graphql",
             "version": "v0.1.0-alpha.2",

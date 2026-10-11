@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<252c8c0340303591234b9efcaea038f1>>
+ * @generated SignedSource<<83832c27e310dbf75a617bf6d0edf13d>>
+ * @relayHash 28b842f023915fd2f27705f5eae3f8fb
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID 28b842f023915fd2f27705f5eae3f8fb
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -23,7 +26,7 @@ export type ItemPageQuery = {
 const node: ConcreteRequest = (function(){
 var v0 = [
   {
-    "defaultValue": null,
+    "defaultValue": "",
     "kind": "LocalArgument",
     "name": "term"
   }
@@ -197,16 +200,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "9beb8040003eb15f061865eb589a7068",
-    "id": null,
+    "cacheID": "28b842f023915fd2f27705f5eae3f8fb",
+    "id": "28b842f023915fd2f27705f5eae3f8fb",
     "metadata": {},
     "name": "ItemPageQuery",
     "operationKind": "query",
-    "text": "query ItemPageQuery(\n  $term: String\n) {\n  ...ItemList_query_4hh6ED\n}\n\nfragment ItemList_query_4hh6ED on RootQuery {\n  clogItemSearch(first: 25, where: {term: $term}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        barcode\n        createdAt\n        stockCount\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query ItemPageQuery(\n  $term: String = \"\"\n) {\n  ...ItemList_query_4hh6ED\n}\n\nfragment ItemList_query_4hh6ED on RootQuery {\n  clogItemSearch(first: 25, where: {term: $term}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        barcode\n        createdAt\n        stockCount\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "1e5d2eab48589a5e41b5cc989c99b07c";
+(node as any).hash = "d5ffc082b38f8f415c44ac350d6fe65f";
 
 export default node;

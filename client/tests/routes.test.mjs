@@ -42,6 +42,26 @@ test("every application route round-trips escaped path and query values", () => 
   }
 });
 
+test("SSR manifest preserves Relay operation text, IDs and defaults", async () => {
+  const config = JSON.parse(readFileSync(new URL("../routes.json", import.meta.url), "utf8"));
+  const manifest = JSON.parse(readFileSync(new URL("../src/routes/__generated__/routes.manifest.json", import.meta.url), "utf8"));
+  for (const route of manifest.routes) {
+    const source = config.routes.find((candidate) => candidate.name === route.name);
+    const artifact = new URL(`../${source.entryPoint.replace(/[^/]+$/, "")}__generated__/${route.query.operation}.graphql.ts`, import.meta.url);
+    const compiled = ts.transpileModule(readFileSync(artifact, "utf8"), {
+      compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
+    }).outputText;
+    const output = `${directory}/${route.query.operation}.mjs`;
+    writeFileSync(output, compiled);
+    const { default: node } = await import(pathToFileURL(output).href);
+    assert.equal(route.query.id, node.params.id, route.name);
+    assert.equal(route.query.text, node.params.text, route.name);
+    for (const argument of node.operation.argumentDefinitions) {
+      assert.equal(route.query.variables[argument.name].default ?? null, argument.defaultValue, `${route.name}.${argument.name}`);
+    }
+  }
+});
+
 test("detail and edit URIs retain filters and scanner input is shareable", () => {
   const filters = { term: "tinned beans", location: "ClogLocation:9" };
   const detail = routes.InventoryItemDetailURI.getURI({

@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<874899f5dbddbb1131f86166a05ab0aa>>
+ * @generated SignedSource<<1196ffa3e084e6248f7f5fae20915d88>>
+ * @relayHash e91dedbd885711c620cc7746b36c87fc
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID e91dedbd885711c620cc7746b36c87fc
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -188,7 +191,7 @@ return {
   },
   "params": {
     "cacheID": "e91dedbd885711c620cc7746b36c87fc",
-    "id": null,
+    "id": "e91dedbd885711c620cc7746b36c87fc",
     "metadata": {},
     "name": "StockUnitsQuery",
     "operationKind": "query",

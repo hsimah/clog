@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<a720a45738477f4e0459723c010a91d8>>
+ * @generated SignedSource<<3b8af9d9ac37f12a3e91f3a852c0c390>>
+ * @relayHash 1c226492edf35a5dca00e0451ea228d6
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID 1c226492edf35a5dca00e0451ea228d6
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -178,7 +181,7 @@ return {
   },
   "params": {
     "cacheID": "1c226492edf35a5dca00e0451ea228d6",
-    "id": null,
+    "id": "1c226492edf35a5dca00e0451ea228d6",
     "metadata": {},
     "name": "InventoryLocationsPaginationQuery",
     "operationKind": "query",

@@ -110,7 +110,7 @@ test('leaving a Relay route aborts its pending query', async ({ page, authentica
 });
 
 test('Standalone PHP serves Relay location deep links after reload', async ({ page, context }, testInfo) => {
-  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:8280';
+  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:18473';
   await login(context.request, base);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${base}/locations`);

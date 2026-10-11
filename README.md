@@ -25,7 +25,7 @@ bash -c 'read -r -s -p "Local password: " CLOG_NEW_PASSWORD; printf "\n"; printf
 scripts/standalone-dev.sh serve
 ```
 
-Open <http://localhost:8280/auth/login>. Stop the server with Ctrl+C.
+Open <http://localhost:18473/auth/login>. Stop the server with Ctrl+C.
 Local databases and sessions live in ignored `.standalone/`; `install` preserves
 existing supported databases. Use `reader` for a read-only account. `--admin` lets
 the account manage users from the account menu; grant an existing account with
@@ -36,6 +36,44 @@ Signed-in users can open the avatar menu and choose **Change password** or
 **Sign out**. Changing a password requires the current password and a new password
 of 12–72 bytes. Both readers and editors can change only their own password;
 existing sessions remain signed in.
+
+### Test initial route data locally
+
+The client pins the published tsquid runtime and codegen to `0.2.0`; the server
+uses Elephentity's tsquid `0.1.0` generator and PHP runtime.
+After the normal setup, build and start the PHP server with initial data enabled:
+
+```sh
+scripts/node.sh npm ci
+scripts/node.sh npm run build
+CLOG_SSR=1 scripts/standalone-dev.sh serve
+```
+
+Sign in at <http://localhost:18473/auth/login> and open `/`. The HTML contains
+`#tsquid-data` with the real `HomePageQuery` response for the signed-in viewer;
+the Network panel should show no POST for that operation. Every declared route
+inlines its page query, with URL filters and GraphQL defaults. Detail queries and
+inventory helpers still fetch normally, as does `/auth/session`. Without
+`CLOG_SSR=1`, all routes fetch normally.
+Use the PHP-served compiled app on port 18473; Vite's HTML does not inline data.
+
+After changing queries or routes, regenerate in this order and commit the outputs:
+
+```sh
+scripts/node.sh npm run relay
+scripts/node.sh npm run routes
+scripts/php.sh vendor/bin/eleph generate
+scripts/node.sh npm run build
+```
+
+Relay writes `client/persisted_queries.json` with query text; tsquid resolves it
+into `routes.manifest.json`; Elephentity compiles that into signed
+`server/generated/tsquid/tsquid-manifest.php`. SSR route matching reads compiled
+PHP on requests. Enable the SSR checks against a disposable database with:
+
+```sh
+CLOG_SSR=1 scripts/test-standalone-browser.sh e2e/tsquid.spec.ts
+```
 
 ## Verify and package
 

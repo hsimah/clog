@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<9f2133c531116bbd71352549689502de>>
+ * @generated SignedSource<<aa1b756e17136f9ecafd5bbbc4ba40a1>>
+ * @relayHash cceefb75b98d9f9d92c4bc91329a4722
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID cceefb75b98d9f9d92c4bc91329a4722
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -23,7 +26,7 @@ export type LocationPageQuery = {
 const node: ConcreteRequest = (function(){
 var v0 = [
   {
-    "defaultValue": null,
+    "defaultValue": "",
     "kind": "LocalArgument",
     "name": "term"
   }
@@ -190,16 +193,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "beb1b28fae3c119ceec113991b228207",
-    "id": null,
+    "cacheID": "cceefb75b98d9f9d92c4bc91329a4722",
+    "id": "cceefb75b98d9f9d92c4bc91329a4722",
     "metadata": {},
     "name": "LocationPageQuery",
     "operationKind": "query",
-    "text": "query LocationPageQuery(\n  $term: String\n) {\n  ...LocationList_query_4hh6ED\n}\n\nfragment LocationList_query_4hh6ED on RootQuery {\n  clogLocationSearch(first: 25, where: {term: $term}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        createdAt\n        stockCount\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query LocationPageQuery(\n  $term: String = \"\"\n) {\n  ...LocationList_query_4hh6ED\n}\n\nfragment LocationList_query_4hh6ED on RootQuery {\n  clogLocationSearch(first: 25, where: {term: $term}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        createdAt\n        stockCount\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "4e8312dda57a51a75980f58535b6d9e3";
+(node as any).hash = "8b0d433a68c81dccfb975465d4396471";
 
 export default node;

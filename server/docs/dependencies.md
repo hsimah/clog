@@ -18,10 +18,13 @@ The repository still commits signed generated PHP artifacts.
 | `elephentity/codegen-php` | 0.6.0 | PHP entities and contracts |
 | `elephentity/codegen-sqlite` | 0.1.0-alpha.1 | SQLite manifest and initial installer |
 | `elephentity/codegen-graphql-php` | 0.1.0-alpha.1 | Standalone GraphQL manifest and verifier |
+| `elephentity/codegen-tsquid` | 0.1.0 | Tsquid manifest compiler and production PHP initial-data runtime |
 
 Only the four new integration/generator packages allow alpha releases. The rest
 retain stable constraints. `webonyx/graphql-php` is the separate GraphQL engine,
-currently locked at 15.37.2. Production installs only the runtime packages.
+currently locked at 15.37.2. Production also installs `codegen-tsquid` because
+its `Eleph\Tsquid` runtime serves initial route data; Rust is needed only to build
+the generator.
 
 Both integration adapters support runtime 0.11 as of alpha.2. The compatibility
 issues [SQLite #1](https://github.com/hsimah-services/elephentity-sqlite/issues/1)
@@ -37,9 +40,11 @@ scripts/php.sh composer check-generated
 ```
 
 After editing specs, run `scripts/php.sh vendor/bin/eleph generate` before the
-check. The three targets are `php`, `sqlite`, and `graphql-php`. The generic
+check. The four targets are `php`, `sqlite`, `graphql-php`, and `tsquid`. The generic
 integration key inside YAML is `graphql`. Outputs live in `server/generated`,
-`server/generated/sqlite`, and `server/generated/graphql`. `eleph check` loads
+`server/generated/sqlite`, `server/generated/graphql`, and `server/generated/tsquid`.
+Generate the client Relay artifacts and routes first; the tsquid target reads
+`client/src/routes/__generated__/routes.manifest.json`. `eleph check` loads
 the generated GraphQL verifier and tests its accessors against the real classes.
 
 `project.storage.tablePrefix` is `app_clog_`, preserving the prototype's physical

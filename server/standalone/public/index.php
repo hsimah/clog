@@ -5,6 +5,7 @@ require dirname(__DIR__) . '/bootstrap.php';
 
 use Clog\Standalone\{Application, GraphQL as ClogGraphQL, Schema, Session};
 use Eleph\SQLite\Database;
+use Eleph\Tsquid\{InitialData, Manifest};
 use GraphQL\GraphQL;
 use GraphQL\Validator\Rules\{QueryDepth, QueryComplexity};
 
@@ -70,13 +71,30 @@ try {
         $manifest = json_decode(file_get_contents($dist . '/.vite/manifest.json'), true, flags: JSON_THROW_ON_ERROR);
         $entry = $manifest['index.html'];
         $styles = array_unique([...($entry['css'] ?? []), 'assets/stylex.css']);
-        header('Content-Type: text/html; charset=utf-8');
-        echo '<!doctype html><html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Clog</title><link rel="icon" type="image/png" href="/assets/clog-white.png" media="(prefers-color-scheme: dark)"><link rel="icon" type="image/png" href="/assets/clog.png" media="(prefers-color-scheme: light)">';
+        $html = '<!doctype html><html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Clog</title><link rel="icon" type="image/png" href="/assets/clog-white.png" media="(prefers-color-scheme: dark)"><link rel="icon" type="image/png" href="/assets/clog.png" media="(prefers-color-scheme: light)">';
         foreach ($styles as $css) {
             if (!is_file($dist . '/' . $css)) throw new RuntimeException('Missing stylesheet. Build the client first.');
-            echo '<link rel="stylesheet" href="/' . escape($css) . '?v=' . substr(hash_file('sha256', $dist . '/' . $css), 0, 12) . '">';
+            $html .= '<link rel="stylesheet" href="/' . escape($css) . '?v=' . substr(hash_file('sha256', $dist . '/' . $css), 0, 12) . '">';
         }
-        echo '</head><body><div id="root"></div><script type="module" src="/' . escape($entry['file']) . '"></script></body></html>'; exit;
+        $html .= '</head><body><div id="root"></div><script type="module" src="/' . escape($entry['file']) . '"></script></body></html>';
+        if (getenv('CLOG_SSR') === '1' && $viewer->isAuthenticated()) {
+            try {
+                $initial = new InitialData(
+                    Manifest::fromFile(dirname(__DIR__, 2) . '/generated/tsquid/tsquid-manifest.php'),
+                    static fn ($text, $variables, $operation, $id) => GraphQL::executeQuery(
+                        ClogGraphQL::schema(new Application($db, $viewer)), $text, variableValues: $variables,
+                        operationName: $operation, validationRules: [...\GraphQL\Validator\DocumentValidator::allRules(), new QueryDepth(12), new QueryComplexity(500)],
+                    )->toArray(),
+                );
+                $response = $initial->render($_SERVER['REQUEST_URI'], $html);
+                foreach ($response->headers as $name => $value) header($name . ': ' . $value);
+                $html = $response->body;
+            } catch (Throwable $error) {
+                error_log('Initial route data: ' . $error->getMessage());
+            }
+        }
+        header('Content-Type: text/html; charset=utf-8');
+        echo $html; exit;
     }
     jsonResponse(['error' => 'Not found.'], 404);
 } catch (Throwable $error) {

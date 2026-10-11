@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<eec19409d551f4f8c1a4cb863bfee831>>
+ * @generated SignedSource<<39db50d94d7fa4dc382a63f4f993332a>>
+ * @relayHash 52ec8892241662c4ef68cb91b86a46a5
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID 52ec8892241662c4ef68cb91b86a46a5
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -28,7 +31,7 @@ var v0 = {
   "name": "location"
 },
 v1 = {
-  "defaultValue": null,
+  "defaultValue": "",
   "kind": "LocalArgument",
   "name": "term"
 },
@@ -201,16 +204,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "ecaca49b8bb8b8891cf23b3dabf45f07",
-    "id": null,
+    "cacheID": "52ec8892241662c4ef68cb91b86a46a5",
+    "id": "52ec8892241662c4ef68cb91b86a46a5",
     "metadata": {},
     "name": "InventoryPageQuery",
     "operationKind": "query",
-    "text": "query InventoryPageQuery(\n  $term: String\n  $location: ID\n) {\n  ...InventoryList_query_1Tmkwq\n}\n\nfragment InventoryList_query_1Tmkwq on RootQuery {\n  clogStockedItems(first: 25, where: {term: $term, location: $location}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        stockCount(location: $location)\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
+    "text": "query InventoryPageQuery(\n  $term: String = \"\"\n  $location: ID\n) {\n  ...InventoryList_query_1Tmkwq\n}\n\nfragment InventoryList_query_1Tmkwq on RootQuery {\n  clogStockedItems(first: 25, where: {term: $term, location: $location}) {\n    totalCount\n    edges {\n      node {\n        id\n        name\n        stockCount(location: $location)\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "de12dbec1e01f8c2ff962bc069af9af6";
+(node as any).hash = "379b5f584aadbaa3ed5818eaed69ad17";
 
 export default node;
