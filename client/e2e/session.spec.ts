@@ -2,7 +2,7 @@ import { test, expect } from './fixtures';
 import { login } from './session';
 
 test('compiled application authenticates with a cookie session', async ({ page, context }) => {
-  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:8280';
+  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:18473';
   await login(context.request, base);
   await page.goto(`${base}/items`);
   await expect(page.getByText('Heinz Ketchup', { exact: true })).toBeVisible();

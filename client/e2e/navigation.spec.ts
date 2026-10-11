@@ -42,7 +42,7 @@ for (const viewport of [
 }
 
 test('Standalone PHP deep routes load the StyleX stylesheet and bundled logo', async ({ page, context }) => {
-  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:8280';
+  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:18473';
   await login(context.request, base);
   await page.goto(`${base}/items/new`);
   await expect(page.getByRole('textbox', { name: /^Name/ })).toBeVisible();
@@ -81,7 +81,7 @@ test.describe('Navigation', () => {
 
 test('compiled home and deep links deliver both favicon variants', async ({ page, context, authenticate }) => {
   await authenticate();
-  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:8280';
+  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:18473';
   await login(context.request, base);
   for (const url of ['/', `${base}/items/new`]) {
     await page.goto(url);

@@ -36,7 +36,7 @@ test('administrator adds a user, resets their password and deletes them', async 
   await expect(page.getByRole('row').filter({ hasText: username })).toBeVisible();
 
   // A reset signs every helper session out; only the new password signs in.
-  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:8280';
+  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:18473';
   const helpers = [await playwrightRequest.newContext(), await playwrightRequest.newContext()];
   const fresh = await playwrightRequest.newContext();
   const sessionUser = async (request: APIRequestContext) => (await (await request.get(`${base}/auth/session`)).json()).userId;
