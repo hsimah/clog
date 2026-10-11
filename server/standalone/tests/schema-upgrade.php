@@ -76,7 +76,6 @@ refused(fn () => $v2->execute('UPDATE clog_users SET admin = 2'));
 // New installs use the generated DDL, with Clog's Unicode uniqueness retained.
 $fresh = new Database(':memory:');
 Schema::install($fresh);
-checkUpgrade((int) $fresh->scalar('SELECT COUNT(*) FROM app_clog_item') === 0, 'Fresh installation was seeded.');
 $freshApp = new Application($fresh, new Viewer('1', 'editor'));
 $freshApp->runtime->create('Location', ['name' => 'Étagère']);
 refused(fn () => $freshApp->runtime->create('Location', ['name' => 'étagère']));
@@ -113,43 +112,14 @@ refused(fn () => Schema::install($broken));
 checkUpgrade((int) $broken->scalar('PRAGMA user_version') === 1, 'Failed upgrade did not roll back its version.');
 checkUpgrade((int) $broken->scalar("SELECT COUNT(*) FROM sqlite_master WHERE name = 'clog_item_barcode_nocase'") === 0, 'Failed upgrade left partial indexes.');
 
-// Version 4 seeds the photographed cave stock into the deployment holding location 2,
-// reusing items already recorded with a seeded barcode and preserving existing rows.
-$cave = new Database(':memory:');
-$cave->pdo->exec(file_get_contents(__DIR__ . '/fixtures/prototype-v2.sql'));
-$cave->insert('app_clog_location', ['id' => 2, 'created_at' => $time, 'updated_at' => $time, 'name' => 'Cave']);
-$cave->insert('app_clog_location', ['id' => 5, 'created_at' => $time, 'updated_at' => $time, 'name' => 'Loft']);
-$cave->insert('app_clog_item', ['id' => 9, 'created_at' => $time, 'updated_at' => $time, 'name' => 'My gin', 'barcode' => '088110110505']);
-$cave->insert('app_clog_inventory', ['id' => 11, 'created_at' => $time, 'updated_at' => $time, 'name' => 'My gin @ Loft', 'date_added' => $time, 'item_id' => 9, 'location_id' => 5]);
-$caveBefore = snapshot($cave);
-Schema::install($cave);
-Schema::requireReady($cave);
-$caveAfter = snapshot($cave);
-foreach ($caveBefore as $table => $rows) {
-    checkUpgrade(array_slice($caveAfter[$table], 0, count($rows)) === $rows, "Seed changed existing $table rows.");
-}
-$seeded = $cave->select('SELECT v.name, v.date_added, i.name AS item, i.barcode FROM app_clog_inventory v JOIN app_clog_item i ON i.id = v.item_id WHERE v.location_id = 2 ORDER BY v.id');
-checkUpgrade(count($seeded) === 20 && (int) $cave->scalar('SELECT COUNT(*) FROM app_clog_item') === 15, 'Seed added the wrong items or units.');
-checkUpgrade(array_filter($seeded, fn ($unit) => $unit['name'] !== $unit['item'] . ' @ Cave' || $unit['date_added'] !== '2026-09-28 00:00:00') === [], 'Seeded units have the wrong labels or dates.');
-checkUpgrade(count(array_filter($seeded, fn ($unit) => $unit['item'] === 'My gin')) === 1, 'Seed did not reuse the item with its barcode.');
-checkUpgrade(count(array_filter($seeded, fn ($unit) => $unit['barcode'] === null)) === 1, 'Seed invented a barcode.');
-Schema::install($cave);
-checkUpgrade(snapshot($cave) === $caveAfter, 'Repeated installation seeded again.');
-$caveApp = new Application($cave, new Viewer('1', 'editor'));
-checkUpgrade($caveApp->queries->search('Inventory', '851738004002')->count() === 2, 'Seeded stock cannot be found by barcode.');
-refused(fn () => $caveApp->runtime->create('Item', ['name' => 'Duplicate tequila', 'barcode' => '851738004002']));
-
-// An interrupted seed rolls back entirely and leaves version 3 storage untouched.
+// Version 3 storage reaches version 4 unchanged.
 $v3 = new Database(':memory:');
 $v3->pdo->exec(file_get_contents(__DIR__ . '/fixtures/prototype-v2.sql'));
 Schema::install($v3);
 $v3->pdo->exec('PRAGMA user_version = 3');
 $v3->insert('app_clog_location', ['id' => 2, 'created_at' => $time, 'updated_at' => $time, 'name' => 'Cave']);
-$v3->pdo->exec("CREATE TRIGGER interrupt_seed BEFORE INSERT ON app_clog_inventory WHEN NEW.item_id = (SELECT id FROM app_clog_item WHERE barcode = '016500546054') BEGIN SELECT RAISE(ABORT, 'interrupted'); END");
-refused(fn () => Schema::install($v3));
-checkUpgrade((int) $v3->scalar('PRAGMA user_version') === 3 && (int) $v3->scalar('SELECT COUNT(*) FROM app_clog_item') === 0, 'Failed seed did not roll back.');
-$v3->pdo->exec('DROP TRIGGER interrupt_seed');
+$v3Before = snapshot($v3);
 Schema::install($v3);
-checkUpgrade((int) $v3->scalar('SELECT COUNT(*) FROM app_clog_inventory') === 20, 'Version 3 storage was not seeded.');
+checkUpgrade(snapshot($v3) === $v3Before && (int) $v3->scalar('PRAGMA user_version') === 4, 'Version 3 upgrade changed data or version.');
 
-echo "PASS: prototype, v2 and v3 upgrades preserve data/accounts/IDs, cave seed, generated installation, collation, interruption recovery and refusal rollback\n";
+echo "PASS: prototype, v2 and v3 upgrades preserve data/accounts/IDs, generated installation, collation, interruption recovery and refusal rollback\n";
