@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<cd04195086d215fe48c83e243cfc7513>>
+ * @generated SignedSource<<e0d451821e50e2d9111b399ac7a13019>>
+ * @relayHash 861bb1c2cd97fc9ec6f808fec5c49e18
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID 861bb1c2cd97fc9ec6f808fec5c49e18
 
 import { ConcreteRequest } from 'relay-runtime';
 export type DeleteClogInventoryInput = {
@@ -101,7 +104,7 @@ return {
   },
   "params": {
     "cacheID": "861bb1c2cd97fc9ec6f808fec5c49e18",
-    "id": null,
+    "id": "861bb1c2cd97fc9ec6f808fec5c49e18",
     "metadata": {},
     "name": "useInventoryDetailsDeleteMutation",
     "operationKind": "mutation",

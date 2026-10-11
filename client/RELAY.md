@@ -5,7 +5,11 @@ ownership. All application data uses route-owned Relay queries; there is no
 Apollo cache or global collection provider.
 
 - `scripts/node.sh npm run relay` regenerates application artifacts from
-  `client/schema.graphql`. Commit them with their source operations.
+  `client/schema.graphql` and rebuilds `persisted_queries.json` from empty to
+  remove old operation versions. Query text remains in the artifacts, so the
+  HTTP transport continues sending full queries. Commit both outputs with their
+  source operations, then run `npm run routes` through the Node wrapper and
+  `scripts/php.sh vendor/bin/eleph generate` to update the SSR manifests.
 - `scripts/node.sh npm run relay:check` validates both the application artifacts
   and the API contract fixture. CI/release builds run this without a live server.
 - `scripts/php.sh php standalone/tests/export-schema.php` refreshes the schema

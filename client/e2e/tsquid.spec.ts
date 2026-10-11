@@ -1,5 +1,77 @@
 import { test, expect } from "./fixtures";
 
+test("Overview consumes server data without a GraphQL request", async ({ page, authenticate }) => {
+  test.skip(process.env.CLOG_TEST_SSR !== "1", "Enable with CLOG_SSR=1.");
+  await authenticate();
+  const operations: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().endsWith("/graphql"))
+      operations.push(request.postDataJSON()?.operationName);
+  });
+  const response = await page.goto("/");
+  expect(response?.headers()["cache-control"]).toContain("no-store");
+  const data = JSON.parse(await page.locator("#tsquid-data").textContent() ?? "null");
+  expect(data.responses[0].operation).toBe("HomePageQuery");
+  await expect(page.getByRole("heading", { name: "Overview", exact: true })).toBeVisible();
+  expect(operations).not.toContain("HomePageQuery");
+  await page.getByRole("navigation", { name: "Main navigation" })
+    .getByRole("link", { name: "Items", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Items", exact: true })).toBeVisible();
+  expect(operations).toContain("ItemPageQuery");
+});
+
+for (const { url, operation, variables, heading } of [
+  { url: "/items", operation: "ItemPageQuery", variables: { term: "" }, heading: "Items" },
+  { url: "/items?term=Heinz", operation: "ItemPageQuery", variables: { term: "Heinz" }, heading: "Items" },
+  { url: "/locations?term=Garage", operation: "LocationPageQuery", variables: { term: "Garage" }, heading: "Locations" },
+  { url: "/inventory?term=Heinz&location=1", operation: "InventoryPageQuery", variables: { term: "Heinz", location: "1" }, heading: "Inventory" },
+  { url: "/users", operation: "UserPageQuery", variables: {}, heading: "Users" },
+  { url: "/items/1?term=Heinz", operation: "ItemPageQuery", variables: { term: "Heinz" }, heading: "Heinz Ketchup" },
+]) {
+  test(`generated SSR data satisfies ${url}`, async ({ page, authenticate }) => {
+    test.skip(process.env.CLOG_TEST_SSR !== "1", "Enable with CLOG_SSR=1.");
+    await authenticate("admin");
+    const operations: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().endsWith("/graphql"))
+        operations.push(request.postDataJSON()?.operationName);
+    });
+    await page.goto(url);
+    const data = JSON.parse(await page.locator("#tsquid-data").textContent() ?? "null");
+    expect(data.responses[0].operation).toBe(operation);
+    expect(data.responses[0].variables).toEqual(variables);
+    expect(data.responses[0].response.errors).toBeUndefined();
+    await expect(page.getByRole("heading", { name: heading, exact: true })).toBeVisible();
+    expect(operations).not.toContain(operation);
+    if (url.startsWith("/items/1")) expect(operations).toContain("ItemRecordQuery");
+  });
+}
+
+test("invalid SSR URL has no payload and remains recoverable", async ({ page, authenticate }) => {
+  test.skip(process.env.CLOG_TEST_SSR !== "1", "Enable with CLOG_SSR=1.");
+  await authenticate();
+  await page.goto("/items?term=a&term=b");
+  await expect(page.locator("#tsquid-data")).toHaveCount(0);
+  await expect(page.getByRole("alert")).toBeVisible();
+  await page.getByRole("navigation").getByRole("link", { name: "Items", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Items", exact: true })).toBeVisible();
+});
+
+test("anonymous HTML contains no initial route data", async ({ request }) => {
+  const response = await request.get("/");
+  expect(response.ok()).toBe(true);
+  expect(await response.text()).not.toContain('id="tsquid-data"');
+});
+
+test("SSR executes account queries with the requesting viewer's permissions", async ({ page, authenticate }) => {
+  test.skip(process.env.CLOG_TEST_SSR !== "1", "Enable with CLOG_SSR=1.");
+  await authenticate("reader");
+  await page.goto("/users");
+  const data = JSON.parse(await page.locator("#tsquid-data").textContent() ?? "null");
+  expect(data.responses[0].operation).toBe("UserPageQuery");
+  expect(data.responses[0].response.data.clogUsers).toBeNull();
+});
+
 test("hover and focus preload route queries before navigation", async ({
   page,
   authenticate,

@@ -8,9 +8,10 @@
         "ext-mbstring": "*",
         "ext-pdo": "*",
         "ext-pdo_sqlite": "*",
+        "elephentity/codegen-tsquid": "^0.1",
+        "elephentity/graphql": "^0.1.0-alpha.2",
         "elephentity/runtime": "^0.11.1",
         "elephentity/sqlite": "^0.1.0-alpha.2",
-        "elephentity/graphql": "^0.1.0-alpha.2",
         "psr/container": "^2.0",
         "psr/log": "^3.0",
         "webonyx/graphql-php": "^15.37"
@@ -18,9 +19,9 @@
     "require-dev": {
         "elephentity/cli": "^0.11.0",
         "elephentity/codegen": "^0.6.0",
+        "elephentity/codegen-graphql-php": "^0.1@alpha",
         "elephentity/codegen-php": "^0.6.0",
-        "elephentity/codegen-sqlite": "^0.1@alpha",
-        "elephentity/codegen-graphql-php": "^0.1@alpha"
+        "elephentity/codegen-sqlite": "^0.1@alpha"
     },
     "scripts": {
         "build-generators": "sh ../scripts/build-generators.sh",

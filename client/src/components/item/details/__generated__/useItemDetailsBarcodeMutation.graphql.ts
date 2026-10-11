@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<88110db199839421b8c75f00d5d23b13>>
+ * @generated SignedSource<<a41519661c4a9f97d59ad81ed3c2b0a9>>
+ * @relayHash 0a649da4a3c340339c326f55f667f11a
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID 0a649da4a3c340339c326f55f667f11a
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -150,7 +153,7 @@ return {
   },
   "params": {
     "cacheID": "0a649da4a3c340339c326f55f667f11a",
-    "id": null,
+    "id": "0a649da4a3c340339c326f55f667f11a",
     "metadata": {},
     "name": "useItemDetailsBarcodeMutation",
     "operationKind": "mutation",

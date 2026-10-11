@@ -14,7 +14,7 @@ try {
     }
     $code = <<<'CODE'
 require $argv[1] . '/server/standalone/bootstrap.php';
-foreach (['elephentity/runtime', 'elephentity/sqlite', 'elephentity/graphql', 'webonyx/graphql-php'] as $package) {
+foreach (['elephentity/runtime', 'elephentity/sqlite', 'elephentity/graphql', 'elephentity/codegen-tsquid', 'webonyx/graphql-php'] as $package) {
     if (!Composer\InstalledVersions::isInstalled($package)) throw new RuntimeException('Missing production dependency: ' . $package);
 }
 $db = new Eleph\SQLite\Database($argv[1] . '/database.sqlite');
@@ -24,11 +24,17 @@ $app->runtime->create('Item', ['name'=>'Packaged item']);
 $schema = Clog\Standalone\GraphQL::schema($app);
 $result = GraphQL\GraphQL::executeQuery($schema, '{clogSummary{items}}')->toArray();
 if (($result['data']['clogSummary']['items'] ?? null) !== 1) throw new RuntimeException('Packaged GraphQL failed');
+$initial = new Eleph\Tsquid\InitialData(
+    Eleph\Tsquid\Manifest::fromFile($argv[1] . '/server/generated/tsquid/tsquid-manifest.php'),
+    static fn ($text, $variables, $operation) => GraphQL\GraphQL::executeQuery($schema, $text, variableValues: $variables, operationName: $operation)->toArray(),
+);
+$html = $initial->render('/', '<html><head></head><body></body></html>');
+if (!str_contains($html->body, '"items":1') || ($html->headers['Cache-Control'] ?? null) !== 'private, no-store') throw new RuntimeException('Packaged initial route data failed');
 $db->execute('VACUUM INTO ?', [$argv[1] . '/backup.sqlite']);
 $restored = new Eleph\SQLite\Database($argv[1] . '/backup.sqlite');
 Clog\Standalone\Schema::requireReady($restored);
 if ((int)$restored->scalar('SELECT COUNT(*) FROM app_clog_item') !== 1) throw new RuntimeException('Backup restore failed');
-echo "PASS: isolated release install, entity write, GraphQL and SQLite backup/restore\n";
+echo "PASS: isolated release install, entity write, GraphQL, initial route data and SQLite backup/restore\n";
 CODE;
     $process = proc_open([PHP_BINARY, '-r', $code, $dir], [0=>STDIN,1=>STDOUT,2=>STDERR], $pipes);
     if (proc_close($process) !== 0) throw new RuntimeException('Packaged runtime failed.');

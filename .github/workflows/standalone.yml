@@ -28,6 +28,7 @@ jobs:
             server/vendor/elephentity/codegen-php/target
             server/vendor/elephentity/codegen-sqlite/target
             server/vendor/elephentity/codegen-graphql-php/target
+            server/vendor/elephentity/codegen-tsquid/target
           key: ${{ runner.os }}-eleph-generators-${{ hashFiles('server/composer.lock') }}
       - name: Verify generated entities and integration manifests
         working-directory: server
@@ -51,13 +52,18 @@ jobs:
         working-directory: client
       - name: Browser regression tests
         run: |
-          export CLOG_DB=/tmp/clog-browser.sqlite CLOG_ORIGIN=http://127.0.0.1:8280
+          export CLOG_DB=/tmp/clog-browser.sqlite CLOG_ORIGIN=http://127.0.0.1:18473
           php server/standalone/tests/browser-fixture.php
-          php -S 127.0.0.1:8280 server/standalone/public/router.php > /tmp/clog-browser.log 2>&1 &
+          php -S 127.0.0.1:18473 server/standalone/public/router.php > /tmp/clog-browser.log 2>&1 &
           CLOG_PHP_PID=$!
           trap 'kill "$CLOG_PHP_PID"' EXIT
           cd client
           npx playwright test -c playwright.config.ts
+          kill "$CLOG_PHP_PID"
+          wait "$CLOG_PHP_PID" || true
+          CLOG_SSR=1 php -S 127.0.0.1:18473 ../server/standalone/public/router.php > /tmp/clog-ssr-browser.log 2>&1 &
+          CLOG_PHP_PID=$!
+          CLOG_TEST_SSR=1 npx playwright test -c playwright.config.ts e2e/tsquid.spec.ts
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

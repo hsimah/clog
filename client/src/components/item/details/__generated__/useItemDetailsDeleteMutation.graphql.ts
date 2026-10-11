@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<9a303e3f0620aa8bc3fa19a880234619>>
+ * @generated SignedSource<<c8fe69b2fe13a27b1548a87bff2f85bf>>
+ * @relayHash 98ebf594542cbc14e267ec86aed65220
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID 98ebf594542cbc14e267ec86aed65220
 
 import { ConcreteRequest } from 'relay-runtime';
 export type DeleteClogItemInput = {
@@ -101,7 +104,7 @@ return {
   },
   "params": {
     "cacheID": "98ebf594542cbc14e267ec86aed65220",
-    "id": null,
+    "id": "98ebf594542cbc14e267ec86aed65220",
     "metadata": {},
     "name": "useItemDetailsDeleteMutation",
     "operationKind": "mutation",

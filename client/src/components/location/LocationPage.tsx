@@ -13,7 +13,7 @@ import { useLocationRouteContext } from "../../routes/__generated__/routes";
 import type { LocationPageQuery } from "./__generated__/LocationPageQuery.graphql";
 
 const QUERY = graphql`
-  query LocationPageQuery($term: String) {
+  query LocationPageQuery($term: String = "") {
     ...LocationList_query @arguments(term: $term)
   }
 `;

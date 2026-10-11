@@ -4,3 +4,4 @@ storage:
   tablePrefix: app_clog_
 integrations:
   graphql:
+  tsquid:

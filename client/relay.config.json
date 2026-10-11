@@ -3,5 +3,11 @@
   "schema": "./schema.graphql",
   "language": "typescript",
   "eagerEsModules": true,
-  "excludes": ["**/__generated__/**"]
+  "excludes": [
+    "**/__generated__/**"
+  ],
+  "persistConfig": {
+    "file": "./persisted_queries.json",
+    "include_query_text": true
+  }
 }

@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<688625e1b9e0263135fde4d63c28e6af>>
+ * @generated SignedSource<<856871412f4addd1d9db28dd7da32cc5>>
+ * @relayHash de56b93ba681a723abb243bca2cf2514
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID de56b93ba681a723abb243bca2cf2514
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -144,7 +147,7 @@ return {
   },
   "params": {
     "cacheID": "de56b93ba681a723abb243bca2cf2514",
-    "id": null,
+    "id": "de56b93ba681a723abb243bca2cf2514",
     "metadata": {},
     "name": "InventoryRecordQuery",
     "operationKind": "query",

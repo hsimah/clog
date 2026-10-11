@@ -15,7 +15,7 @@ import { InventoryLocations } from "./InventoryLocations";
 import type { InventoryLocationsQuery } from "./__generated__/InventoryLocationsQuery.graphql";
 
 const QUERY = graphql`
-  query InventoryPageQuery($term: String, $location: ID) {
+  query InventoryPageQuery($term: String = "", $location: ID) {
     ...InventoryList_query @arguments(term: $term, location: $location)
   }
 `;

@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<43e04f2e09370e421e33698112df981b>>
+ * @generated SignedSource<<9d4d4a0e28e8e63120fbf779cef50ab0>>
+ * @relayHash 6a04f4279c1f2ce6786937e51a57c854
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID 6a04f4279c1f2ce6786937e51a57c854
 
 import { ConcreteRequest } from 'relay-runtime';
 export type CreateClogInventoryInput = {
@@ -149,7 +152,7 @@ return {
   },
   "params": {
     "cacheID": "6a04f4279c1f2ce6786937e51a57c854",
-    "id": null,
+    "id": "6a04f4279c1f2ce6786937e51a57c854",
     "metadata": {},
     "name": "useAddStockMutation",
     "operationKind": "mutation",

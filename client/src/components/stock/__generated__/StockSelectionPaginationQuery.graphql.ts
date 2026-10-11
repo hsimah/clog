@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<f15182dd10861d6427a287894fd67c62>>
+ * @generated SignedSource<<26fd93e5ed3a94c6392acbd43da80aec>>
+ * @relayHash c576594a9f4ac233f089194939426a38
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID c576594a9f4ac233f089194939426a38
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -257,7 +260,7 @@ return {
   },
   "params": {
     "cacheID": "c576594a9f4ac233f089194939426a38",
-    "id": null,
+    "id": "c576594a9f4ac233f089194939426a38",
     "metadata": {},
     "name": "StockSelectionPaginationQuery",
     "operationKind": "query",

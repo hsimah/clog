@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<e3d86d5d403d73f5fe8f0c8182cd39a2>>
+ * @generated SignedSource<<4c3229ddf6bbf0ae370871b16ec5f8b2>>
+ * @relayHash 03a593afbfa084c26103c6729b1eadfc
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID 03a593afbfa084c26103c6729b1eadfc
 
 import { ConcreteRequest } from 'relay-runtime';
 export type DeleteClogLocationInput = {
@@ -101,7 +104,7 @@ return {
   },
   "params": {
     "cacheID": "03a593afbfa084c26103c6729b1eadfc",
-    "id": null,
+    "id": "03a593afbfa084c26103c6729b1eadfc",
     "metadata": {},
     "name": "useLocationDetailsDeleteMutation",
     "operationKind": "mutation",

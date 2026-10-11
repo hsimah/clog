@@ -5,7 +5,8 @@
       "name": "Home",
       "entryPoint": "src/components/home/Home.entrypoint.ts",
       "path": "/",
-      "fields": {}
+      "fields": {},
+      "query": "HomePageQuery"
     },
     {
       "name": "ItemIndex",
@@ -16,7 +17,8 @@
           "kind": "string",
           "optional": true
         }
-      }
+      },
+      "query": "ItemPageQuery"
     },
     {
       "name": "ItemNew",
@@ -31,7 +33,8 @@
           "kind": "string",
           "optional": true
         }
-      }
+      },
+      "query": "ItemPageQuery"
     },
     {
       "name": "ItemDetail",
@@ -45,7 +48,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "ItemPageQuery"
     },
     {
       "name": "ItemEdit",
@@ -59,7 +63,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "ItemPageQuery"
     },
     {
       "name": "LocationIndex",
@@ -70,7 +75,8 @@
           "kind": "string",
           "optional": true
         }
-      }
+      },
+      "query": "LocationPageQuery"
     },
     {
       "name": "LocationNew",
@@ -81,7 +87,8 @@
           "kind": "string",
           "optional": true
         }
-      }
+      },
+      "query": "LocationPageQuery"
     },
     {
       "name": "LocationDetail",
@@ -95,7 +102,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "LocationPageQuery"
     },
     {
       "name": "LocationEdit",
@@ -109,7 +117,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "LocationPageQuery"
     },
     {
       "name": "InventoryIndex",
@@ -124,7 +133,8 @@
           "kind": "string",
           "optional": true
         }
-      }
+      },
+      "query": "InventoryPageQuery"
     },
     {
       "name": "InventoryNew",
@@ -139,7 +149,8 @@
           "kind": "string",
           "optional": true
         }
-      }
+      },
+      "query": "InventoryPageQuery"
     },
     {
       "name": "InventoryDetail",
@@ -157,7 +168,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "InventoryPageQuery"
     },
     {
       "name": "InventoryEdit",
@@ -175,7 +187,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "InventoryPageQuery"
     },
     {
       "name": "InventoryItemDetail",
@@ -193,7 +206,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "InventoryPageQuery"
     },
     {
       "name": "InventoryItemEdit",
@@ -211,7 +225,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "InventoryPageQuery"
     },
     {
       "name": "InventoryLocationDetail",
@@ -229,7 +244,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "InventoryPageQuery"
     },
     {
       "name": "InventoryLocationEdit",
@@ -247,7 +263,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "InventoryPageQuery"
     },
     {
       "name": "InventoryStock",
@@ -265,7 +282,8 @@
         "itemId": {
           "kind": "string"
         }
-      }
+      },
+      "query": "InventoryPageQuery"
     },
     {
       "name": "InventoryStockLocation",
@@ -286,19 +304,22 @@
         "locationId": {
           "kind": "string"
         }
-      }
+      },
+      "query": "InventoryPageQuery"
     },
     {
       "name": "UserIndex",
       "entryPoint": "src/components/user/User.entrypoint.ts",
       "path": "/users",
-      "fields": {}
+      "fields": {},
+      "query": "UserPageQuery"
     },
     {
       "name": "UserNew",
       "entryPoint": "src/components/user/User.entrypoint.ts",
       "path": "/users/new",
-      "fields": {}
+      "fields": {},
+      "query": "UserPageQuery"
     },
     {
       "name": "UserDetail",
@@ -308,7 +329,9 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "UserPageQuery"
     }
-  ]
+  ],
+  "persistedQueries": "persisted_queries.json"
 }

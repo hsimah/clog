@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<e544641df22fd12c054e71345808e809>>
+ * @generated SignedSource<<ce2b10c80fdc89ad623bb02f1a5b9fd7>>
+ * @relayHash 7c37b01e68965cb092585200c2c74477
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID 7c37b01e68965cb092585200c2c74477
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -196,7 +199,7 @@ return {
   },
   "params": {
     "cacheID": "7c37b01e68965cb092585200c2c74477",
-    "id": null,
+    "id": "7c37b01e68965cb092585200c2c74477",
     "metadata": {},
     "name": "InventoryLocationsQuery",
     "operationKind": "query",

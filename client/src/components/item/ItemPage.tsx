@@ -15,7 +15,7 @@ import { BarcodeScannerDialog } from "../barcode/BarcodeScannerDialog";
 import { ItemNewURI } from "../../routes/__generated__/routes";
 
 const QUERY = graphql`
-  query ItemPageQuery($term: String) {
+  query ItemPageQuery($term: String = "") {
     ...ItemList_query @arguments(term: $term)
   }
 `;

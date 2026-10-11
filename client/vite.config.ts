@@ -3,7 +3,7 @@ import { tsquid } from "@tsquid/vite";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const target = new URL(env.CLOG_PROXY_TARGET || "http://localhost:8280")
+  const target = new URL(env.CLOG_PROXY_TARGET || "http://localhost:18473")
     .origin;
   const proxy = { target, changeOrigin: true, cookieDomainRewrite: "" };
   return {
