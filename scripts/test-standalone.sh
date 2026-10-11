@@ -5,4 +5,5 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 "$ROOT/scripts/php.sh" php standalone/tests/conformance.php
 "$ROOT/scripts/php.sh" php standalone/tests/schema-upgrade.php
 "$ROOT/scripts/php.sh" php standalone/tests/integration.php
+"$ROOT/scripts/php.sh" php standalone/tests/initial-data.php
 "$ROOT/scripts/php.sh" php standalone/tests/http.php

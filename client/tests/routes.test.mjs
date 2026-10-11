@@ -70,6 +70,7 @@ test("SSR manifest preserves Relay operation text, IDs and defaults", async () =
       assert.deepEqual(helper.getVariables(input), expected, route.name);
       // Routes sharing an entrypoint all preload the same page query.
       const first = config.routes.find((candidate) => candidate.entryPoint === source.entryPoint);
+      assert.equal(routes[`${first.name}RouteQuery`].operation, route.query.operation, route.name);
       assert.deepEqual(routes[`${first.name}RouteQuery`].getVariables(input), expected, route.name);
     }
   }

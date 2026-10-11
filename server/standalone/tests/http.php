@@ -91,6 +91,13 @@ try {
     ensure($status === 200 && !isset(json_decode($body, true)['errors']), 'Administrator deletes account over HTTP: ' . $body);
     $cookies = $readerCookies;
     [, $body] = request('/auth/session'); ensure(json_decode($body, true)['userId'] === '0', 'Deleted account session ended');
+    $cookies = [];
+    signIn('editor');
+    $db->execute('DROP TABLE app_clog_item');
+    [$status, $html] = request('/');
+    preg_match('~<script type="application/json" id="tsquid-data">(.*?)</script>~', $html, $match);
+    $initial = json_decode($match[1], true, flags: JSON_THROW_ON_ERROR);
+    ensure($status === 200 && !empty($initial['responses'][0]['response']['errors']), 'Direct HTML load preserves real resolver errors for the client error boundary');
     echo "PASS: HTTP login, cookies, CSRF, sessions, GraphQL, reader policy, account administration and compiled deep links\n";
 } catch (Throwable $error) {
     fwrite(STDERR, file_get_contents($dir . '/http.log'));

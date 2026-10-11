@@ -54,7 +54,9 @@ export const INVENTORY_ENTRY_POINT: RouteEntryPoint<
               parameters: STOCK_QUERY,
               variables: {
                 item: route.input.itemId,
-                location: "locationId" in route.input ? route.input.locationId : null,
+                location: route.currentRoute === RouteName.InventoryStockLocation
+                    ? route.input.locationId
+                    : null,
               },
             }
           : undefined,

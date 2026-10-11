@@ -90,6 +90,39 @@ test('dashboard reads authoritative totals above 100 without fetching collection
   }
 });
 
+test('direct dashboard load surfaces an inlined resolver error and retries', async ({ page, authenticate }) => {
+  await authenticate();
+  await page.route('**/*', async (route) => {
+    const response = await route.fetch();
+    // Keep fulfilled HTML and its resources in the same browser address space.
+    if (!route.request().isNavigationRequest()) {
+      await route.fulfill({ response });
+      return;
+    }
+    const html = await response.text();
+    const failed = html.replace(/(<script type="application\/json" id="tsquid-data">)(.*?)(<\/script>)/, (_, before, json, after) => {
+      const payload = JSON.parse(json);
+      payload.responses[0].response = {
+        data: { clogSummary: null },
+        errors: [{ message: 'Totals temporarily unavailable' }],
+      };
+      return before + JSON.stringify(payload) + after;
+    });
+    expect(failed).not.toBe(html);
+    await route.fulfill({ response, body: failed });
+  });
+  const operations: string[] = [];
+  page.on('request', (request) => {
+    if (request.url().endsWith('/graphql')) operations.push(request.postDataJSON()?.operationName);
+  });
+  await page.goto('/');
+  await expect(page.getByRole('alert')).toHaveText('Totals temporarily unavailable');
+  expect(operations).toEqual([]);
+  await page.getByRole('button', { name: 'Try again', exact: true }).click();
+  await expect(page.getByRole('region', { name: 'Inventory', exact: true })).toBeVisible();
+  expect(operations).toContain('HomePageQuery');
+});
+
 test('dashboard retries a failed summary and fits narrow and portrait screens', async ({ page, authenticate }) => {
   await authenticate();
   let fail = true;
