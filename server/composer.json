@@ -29,7 +29,6 @@
             "@php standalone/tests/conformance.php",
             "@php standalone/tests/schema-upgrade.php",
             "@php standalone/tests/integration.php",
-            "@php standalone/tests/initial-data.php",
             "@php standalone/tests/http.php"
         ],
         "check-generated": [

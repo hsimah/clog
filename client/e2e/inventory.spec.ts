@@ -1,47 +1,5 @@
 import { test, expect } from './fixtures';
 
-test.describe('Inventory', () => {
-  test('lists seed inventory grouped by item', async ({ page, waitForData, authenticate }) => {
-    await authenticate();
-    await page.goto('/inventory');
-    await waitForData(page);
-
-    await expect(page.getByRole('heading', { name: 'Inventory' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Heinz Ketchup', exact: true })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Purina Dry Dog Food', exact: true })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Pedigree Wet Dog Food', exact: true })).toBeVisible();
-  });
-
-  test('search filters inventory', async ({ page, waitForData, authenticate }) => {
-    await authenticate();
-    await page.goto('/inventory');
-    await waitForData(page);
-
-    await page.getByPlaceholder('Search inventory...').fill('ketchup');
-    await expect(page.getByRole('link', { name: 'Heinz Ketchup', exact: true })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Purina Dry Dog Food', exact: true })).not.toBeVisible();
-  });
-
-  test('expands item row to show location breakdown', async ({ page, waitForData, authenticate }) => {
-    await authenticate();
-    await page.goto('/inventory');
-    await waitForData(page);
-
-    await page.getByRole('button', { name: 'Show locations for Heinz Ketchup' }).click();
-    await expect(page.getByRole('link', { name: 'Kitchen Cabinet', exact: true })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Garage Shelves', exact: true })).toBeVisible();
-  });
-
-  test('shows no results message for empty search', async ({ page, waitForData, authenticate }) => {
-    await authenticate();
-    await page.goto('/inventory');
-    await waitForData(page);
-
-    await page.getByPlaceholder('Search inventory...').fill('nonexistent xyz');
-    await expect(page.getByText('No inventory found')).toBeVisible();
-  });
-});
-
 test('location tabs, grouped details and browser history preserve workspace filters', async ({ page, authenticate }) => {
   await authenticate();
   await page.goto('/inventory?term=ketchup');

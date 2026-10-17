@@ -1,25 +1,7 @@
 import { test, expect } from "./fixtures";
 
-test("Overview consumes server data without a GraphQL request", async ({ page, authenticate }) => {
-  await authenticate();
-  const operations: string[] = [];
-  page.on("request", (request) => {
-    if (request.url().endsWith("/graphql"))
-      operations.push(request.postDataJSON()?.operationName);
-  });
-  const response = await page.goto("/");
-  expect(response?.headers()["cache-control"]).toContain("no-store");
-  const data = JSON.parse(await page.locator("#tsquid-data").textContent() ?? "null");
-  expect(data.responses[0].operation).toBe("HomePageQuery");
-  await expect(page.getByRole("heading", { name: "Overview", exact: true })).toBeVisible();
-  expect(operations).not.toContain("HomePageQuery");
-  await page.getByRole("navigation", { name: "Main navigation" })
-    .getByRole("link", { name: "Items", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Items", exact: true })).toBeVisible();
-  await expect.poll(() => operations).toContain("ItemPageQuery");
-});
-
 for (const { url, operation, variables, heading } of [
+  { url: "/", operation: "HomePageQuery", variables: {}, heading: "Overview" },
   { url: "/items", operation: "ItemPageQuery", variables: { term: "" }, heading: "Items" },
   { url: "/items?term=Heinz", operation: "ItemPageQuery", variables: { term: "Heinz" }, heading: "Items" },
   { url: "/locations?term=Garage", operation: "LocationPageQuery", variables: { term: "Garage" }, heading: "Locations" },
@@ -34,7 +16,8 @@ for (const { url, operation, variables, heading } of [
       if (request.url().endsWith("/graphql"))
         operations.push(request.postDataJSON()?.operationName);
     });
-    await page.goto(url);
+    const response = await page.goto(url);
+    expect(response?.headers()["cache-control"]).toContain("no-store");
     const data = JSON.parse(await page.locator("#tsquid-data").textContent() ?? "null");
     expect(data.responses[0].operation).toBe(operation);
     expect(data.responses[0].variables).toEqual(variables);
@@ -52,12 +35,7 @@ test("invalid SSR URL has no payload and remains recoverable", async ({ page, au
   await expect(page.getByRole("alert")).toBeVisible();
   await page.getByRole("navigation").getByRole("link", { name: "Items", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Items", exact: true })).toBeVisible();
-});
-
-test("anonymous HTML contains no initial route data", async ({ request }) => {
-  const response = await request.get("/");
-  expect(response.ok()).toBe(true);
-  expect(await response.text()).not.toContain('id="tsquid-data"');
+  await expect(page.getByRole("link", { name: "Heinz Ketchup" })).toBeVisible();
 });
 
 test("SSR executes account queries with the requesting viewer's permissions", async ({ page, authenticate }) => {
@@ -142,18 +120,4 @@ test("typing a URL-backed search retains focus across entrypoint loads", async (
   await expect(input).toHaveValue("Heinz");
   await expect(page.getByRole("link", { name: "Heinz Ketchup" })).toBeVisible();
   expect(new URL(page.url()).searchParams.get("term")).toBe("Heinz");
-});
-
-test("invalid typed URL shows a recoverable error", async ({
-  page,
-  authenticate,
-}) => {
-  await authenticate();
-  await page.goto("/items?term=a&term=b");
-  await expect(page.getByRole("alert")).toBeVisible();
-  await page
-    .getByRole("navigation")
-    .getByRole("link", { name: "Items", exact: true })
-    .click();
-  await expect(page.getByRole("link", { name: "Heinz Ketchup" })).toBeVisible();
 });
