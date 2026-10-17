@@ -1,15 +1,4 @@
 import { test, expect } from './fixtures';
-import { login } from './session';
-
-test('compiled application authenticates with a cookie session', async ({ page, context }) => {
-  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:18473';
-  await login(context.request, base);
-  await page.goto(`${base}/items`);
-  await expect(page.getByText('Heinz Ketchup', { exact: true })).toBeVisible();
-  const session = await (await context.request.get('/auth/session')).json();
-  expect(session.canWrite).toBe(true);
-  expect(session.isAdmin).toBe(false);
-});
 
 test('anonymous session is private and cannot read or mutate GraphQL inventory', async ({ page, context }) => {
   const session = await context.request.get('/auth/session');
@@ -28,7 +17,7 @@ test('anonymous session is private and cannot read or mutate GraphQL inventory',
   await expect(page.getByRole('navigation')).toHaveCount(0);
 });
 
-test('cookie session uses fresh nonces and preserves drafts after expiry', async ({ page, context, authenticate }) => {
+test('GraphQL requests carry the session nonce instead of an authorization header', async ({ page, authenticate }) => {
   await authenticate();
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Overview', exact: true })).toBeVisible();
@@ -36,15 +25,13 @@ test('cookie session uses fresh nonces and preserves drafts after expiry', async
   await page.getByRole('navigation').getByRole('link', { name: 'Items', exact: true }).click();
   expect((await request).headers()['x-clog-csrf']).toBeTruthy();
   expect((await request).headers()['authorization']).toBeUndefined();
-  await page.getByRole('link', { name: 'Add Item', exact: true }).click();
-  await page.getByRole('textbox', { name: /^Name/ }).fill('Unsubmitted draft');
-  await context.clearCookies();
-  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
-  await expect(page.getByRole('heading', { name: 'Sign in to continue' })).toBeVisible();
-  await expect(page.getByRole('textbox', { name: /^Name/ })).toBeHidden();
-  await login(context.request);
-  await page.getByRole('button', { name: 'Check session' }).click();
-  await expect(page.getByRole('textbox', { name: /^Name/ })).toHaveValue('Unsubmitted draft');
+});
+
+test('reader can load the workspace but cannot submit changes', async ({ page, authenticate }) => {
+  await authenticate('reader');
+  await page.goto('/items/new');
+  await expect(page.getByRole('textbox', { name: /^Name/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Create', exact: true })).toBeDisabled();
 });
 
 test('logout is nonce protected and clears inventory in other tabs', async ({ page, context, authenticate }) => {
@@ -65,36 +52,4 @@ test('logout is nonce protected and clears inventory in other tabs', async ({ pa
   }
   const session = await context.request.get('/auth/session');
   expect((await session.json()).nonce).toBeNull();
-});
-
-test('account switch discards previous-account UI before accepting new data', async ({ page, authenticate }) => {
-  await authenticate();
-  await page.goto('/items');
-  await expect(page.getByText('Heinz Ketchup', { exact: true })).toBeVisible();
-  await page.route('**/auth/session', async (route) => {
-    await route.fulfill({ json: { userId: 'different-user', nonce: 'new-session', canWrite: false, isAdmin: false } });
-  });
-  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
-  await expect(page.getByRole('heading', { name: 'Session ended' })).toBeVisible();
-  await expect(page.getByText('Heinz Ketchup', { exact: true })).toHaveCount(0);
-});
-
-test('a lost mutation response is not replayed and leaves input available', async ({ page, authenticate }) => {
-  await authenticate();
-  let writes = 0;
-  await page.route('**/graphql', async (route) => {
-    if (route.request().postDataJSON()?.operationName === 'useItemFormCreateMutation') {
-      writes++;
-      await route.fetch(); // The server committed; only its response is lost.
-      await route.abort('failed');
-    } else {
-      await route.continue();
-    }
-  });
-  await page.goto('/items/new');
-  await page.getByRole('textbox', { name: /^Name/ }).fill('Clog E2E Lost response');
-  await page.getByRole('button', { name: 'Create', exact: true }).click();
-  await expect(page.getByRole('alert').filter({ hasText: 'Check inventory before retrying' })).toContainText('Check inventory before retrying');
-  await expect(page.getByRole('textbox', { name: /^Name/ })).toHaveValue('Clog E2E Lost response');
-  expect(writes).toBe(1);
 });

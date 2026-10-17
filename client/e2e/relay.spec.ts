@@ -44,11 +44,15 @@ test('locations paginate and raw detail links resolve off-page records', async (
   await expect(page.getByRole('heading', { name: names[25] })).toBeVisible();
 });
 
-test('location mutation updates, delete and legacy route return stay fresh', async ({ page, authenticate }) => {
+test('location create, reload, update, delete and history return stay fresh', async ({ page, authenticate }) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
   await authenticate();
   await page.goto('/locations/new');
   await page.getByRole('textbox', { name: /^Name/ }).fill('Clog E2E Relay create');
   await page.getByRole('button', { name: 'Create', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Clog E2E Relay create' })).toBeVisible();
+  await page.reload();
   await expect(page.getByRole('heading', { name: 'Clog E2E Relay create' })).toBeVisible();
   await page.getByRole('link', { name: 'Edit', exact: true }).click();
   await page.getByRole('textbox', { name: /^Name/ }).fill('Clog E2E Relay renamed');
@@ -65,6 +69,7 @@ test('location mutation updates, delete and legacy route return stay fresh', asy
   await expect(page).toHaveURL(/\/locations$/);
   await page.getByLabel('Search locations', { exact: true }).fill('Clog E2E Relay renamed');
   await expect(page.getByText('No locations found')).toBeVisible();
+  expect(errors).toEqual([]);
 });
 
 test('Relay preserves draft on expiry, never replays a lost write, and clears on account switch', async ({ page, context, authenticate }) => {
@@ -114,11 +119,10 @@ test('leaving a Relay route aborts its entrypoint query', async ({ page, authent
   await expect(page).toHaveURL(/\/$/);
 });
 
-test('Standalone PHP serves Relay location deep links after reload', async ({ page, context }, testInfo) => {
-  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:18473';
-  await login(context.request, base);
+test('location deep links focus the panel heading after reload on a phone', async ({ page, authenticate }, testInfo) => {
+  await authenticate();
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto(`${base}/locations`);
+  await page.goto('/locations');
   await page.getByLabel('Search locations', { exact: true }).fill('Garage Shelves');
   await page.getByRole('link', { name: 'Garage Shelves', exact: true }).click();
   await page.reload();

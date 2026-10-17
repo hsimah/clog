@@ -30,7 +30,8 @@ test("every application route round-trips escaped path and query values", () => 
   );
   for (const route of config.routes) {
     const input = Object.fromEntries(
-      Object.keys(route.fields).map((key) => [key, "id/with + & unicode λ"]),
+      // Distinct values per field also catch swapped path and query bindings.
+      Object.keys(route.fields).map((key) => [key, `${key}/with + & unicode λ`]),
     );
     assert.deepEqual(
       routes[`${route.name}URI`].parseURI(
@@ -74,24 +75,6 @@ test("SSR manifest preserves Relay operation text, IDs and defaults", async () =
       assert.deepEqual(routes[`${first.name}RouteQuery`].getVariables(input), expected, route.name);
     }
   }
-});
-
-test("detail and edit URIs retain filters and scanner input is shareable", () => {
-  const filters = { term: "tinned beans", location: "ClogLocation:9" };
-  const detail = routes.InventoryItemDetailURI.getURI({
-    ...filters,
-    id: "ClogItem:3",
-  });
-  assert.deepEqual(routes.InventoryItemDetailURI.parseURI(detail), {
-    ...filters,
-    id: "ClogItem:3",
-  });
-  assert.deepEqual(
-    routes.ItemNewURI.parseURI(
-      routes.ItemNewURI.getURI({ barcode: "0012345", term: "beans" }),
-    ),
-    { barcode: "0012345", term: "beans" },
-  );
 });
 
 test("malformed path encoding and duplicate filters fail instead of silently coercing", () => {

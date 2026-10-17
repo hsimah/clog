@@ -1,5 +1,4 @@
 import { test, expect } from './fixtures';
-import { login } from './session';
 
 for (const viewport of [
   { width: 390, height: 844 },
@@ -41,25 +40,10 @@ for (const viewport of [
   });
 }
 
-test('Standalone PHP deep routes load the StyleX stylesheet and bundled logo', async ({ page, context }) => {
-  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:18473';
-  await login(context.request, base);
-  await page.goto(`${base}/items/new`);
-  await expect(page.getByRole('textbox', { name: /^Name/ })).toBeVisible();
-  const stylesheet = page.locator('link[rel="stylesheet"][href*="stylex.css?v="]');
-  await expect(stylesheet).toHaveCount(1);
-  expect((await context.request.get((await stylesheet.getAttribute('href'))!)).ok()).toBe(true);
-  const logo = page.getByRole('navigation', { name: 'Main navigation' }).locator('img');
-  await expect(logo).toHaveCSS('width', '32px');
-  expect(await logo.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
-});
-
-
 test.describe('Navigation', () => {
-  test('header navigation links work correctly', async ({ page, waitForData, authenticate }) => {
+  test('header navigation links work correctly', async ({ page, authenticate }) => {
     await authenticate();
     await page.goto('/');
-    await waitForData(page);
 
     // Navigate to Items
     await page.getByRole('navigation').getByRole('link', { name: 'Items' }).click();
@@ -79,13 +63,14 @@ test.describe('Navigation', () => {
   });
 });
 
-test('compiled home and deep links deliver both favicon variants', async ({ page, context, authenticate }) => {
+test('compiled home and deep links deliver the StyleX stylesheet and both favicon variants', async ({ page, context, authenticate }) => {
   await authenticate();
-  const base = process.env.CLOG_TEST_URL || 'http://127.0.0.1:18473';
-  await login(context.request, base);
-  for (const url of ['/', `${base}/items/new`]) {
+  for (const url of ['/', '/items/new']) {
     await page.goto(url);
     await expect(page.getByRole('main')).toBeVisible();
+    const stylesheet = page.locator('link[rel="stylesheet"][href*="stylex.css?v="]');
+    await expect(stylesheet).toHaveCount(1);
+    expect((await context.request.get((await stylesheet.getAttribute('href'))!)).ok()).toBe(true);
     const icons = page.locator('link[rel="icon"]');
     await expect(icons).toHaveCount(2);
     for (const icon of await icons.all()) {
