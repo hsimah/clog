@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Inventory/InventorySideEffects.php
- * digest: sha256:51b3009a2cd43108d2b613deb6a3b3323cc1b50eef5ac7bdca9c56c46410c6b9
+ * digest: sha256:1d9aa7f5342a50c5e90e532563556f16aded5fabc087a3596327f03c42da552d
  */
 
 namespace Clog\Entity\Inventory;
@@ -43,7 +43,7 @@ final readonly class InventorySideEffects implements EntitySideEffects
         if (SideEffectPhase::PreCommit === $phase && in_array($event, [SideEffectEvent::Create, SideEffectEvent::Update], true)) {
             $handlers[] = fn () => $this->displayNameSideEffect->handle(InventoryPreCommitContext::of($context));
         }
-        
+
         return $handlers;
     }
 }

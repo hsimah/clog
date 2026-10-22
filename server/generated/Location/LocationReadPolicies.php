@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Location/LocationReadPolicies.php
- * digest: sha256:573cb0df2b7229e54a7fba2809af74dcacb4b0d7ec5fe197263f189033d70eaf
+ * digest: sha256:dbaf4ffcf144be8d6f33a302910b71a5069f26afb78007f22484153e4fbcaeb0
  */
 
 namespace Clog\Entity\Location;
@@ -41,7 +41,7 @@ final readonly class LocationReadPolicies implements EntityReadPolicies
         if (PolicyOutcome::Skip !== $decision->outcome) {
             return $decision->withPolicy('signedIn');
         }
-        
+
         return PolicyDecision::deny('No policy allowed this read.')->withPolicy('terminal');
     }
 }

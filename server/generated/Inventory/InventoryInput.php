@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Inventory/InventoryInput.php
- * digest: sha256:0fdd967f6f3cd254402fe15767375f2036da67c8d619c303d5678debca384ca0
+ * digest: sha256:fdcc29be6b77d2df36afa087500bebac217c8e7a432359e79dd2379a154c63d2
  */
 
 namespace Clog\Entity\Inventory;
@@ -37,7 +37,7 @@ final readonly class InventoryInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->string($value, 'Inventory.name');
     }
 
@@ -47,7 +47,7 @@ final readonly class InventoryInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->datetime($value, 'Inventory.dateAdded');
     }
 
@@ -60,7 +60,7 @@ final readonly class InventoryInput
         if (null === $value) {
             return [];
         }
-        
+
         return [$this->decode->id($value, 'Inventory.item')];
     }
 
@@ -73,13 +73,13 @@ final readonly class InventoryInput
         if (null === $value) {
             return [];
         }
-        
+
         return [$this->decode->id($value, 'Inventory.location')];
     }
 
     /**
-     * Only what the caller supplied. A key that is absent is left alone,
-     * which is what makes a partial update partial.
+     * Seeds declared defaults on create and applies explicit input.
+     * Absent update keys and existing pending values are not reset by defaults.
      *
      * @param array<string, mixed> $input
      */
@@ -90,15 +90,15 @@ final readonly class InventoryInput
         if (array_key_exists('name', $input)) {
             $buffer->set('name', $this->name($input['name']));
         }
-        
+
         if (array_key_exists('dateAdded', $input)) {
             $buffer->set('dateAdded', $this->dateAdded($input['dateAdded']));
         }
-        
+
         if (array_key_exists('item', $input)) {
             $buffer->edge('item')->set($this->item($input['item']));
         }
-        
+
         if (array_key_exists('location', $input)) {
             $buffer->edge('location')->set($this->location($input['location']));
         }
@@ -113,7 +113,7 @@ final readonly class InventoryInput
         array $args,
     ): array {
         return match ($action) {
-        
+
             default => throw new InvalidArgumentException(sprintf('Unknown action %s.', $action)),
         };
     }

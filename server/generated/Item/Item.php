@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Item/Item.php
- * digest: sha256:f41dd0af0e4091313dae30030856191630db0e51f4bdab174d328d1c59aff454
+ * digest: sha256:92f9ea55d519b16823967a3cda1074100e30e16f2c8f329e8ad06f5a2e906839
  */
 
 namespace Clog\Entity\Item;
@@ -71,7 +71,7 @@ final class Item implements ClogPost
     public function inventoryEntries(): EntityQuery {
         /** @var EntityQuery<Inventory> $related */
         $related = $this->edges->inverseToMany('Inventory', 'item', $this->id);
-        
+
         return $related;
     }
 

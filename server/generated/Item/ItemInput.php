@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Item/ItemInput.php
- * digest: sha256:3221369e117f7345599be8d4da0b11aa176cb360f42b7f6a2c56a308b275f116
+ * digest: sha256:7098df2e742fdf6c0ba214012d6783e1eda398c05a6e60016759f2e77b30af22
  */
 
 namespace Clog\Entity\Item;
@@ -35,7 +35,7 @@ final readonly class ItemInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->string($value, 'Item.name');
     }
 
@@ -45,13 +45,13 @@ final readonly class ItemInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->string($value, 'Item.barcode');
     }
 
     /**
-     * Only what the caller supplied. A key that is absent is left alone,
-     * which is what makes a partial update partial.
+     * Seeds declared defaults on create and applies explicit input.
+     * Absent update keys and existing pending values are not reset by defaults.
      *
      * @param array<string, mixed> $input
      */
@@ -62,7 +62,7 @@ final readonly class ItemInput
         if (array_key_exists('name', $input)) {
             $buffer->set('name', $this->name($input['name']));
         }
-        
+
         if (array_key_exists('barcode', $input)) {
             $buffer->set('barcode', $this->barcode($input['barcode']));
         }
@@ -77,7 +77,7 @@ final readonly class ItemInput
         array $args,
     ): array {
         return match ($action) {
-        
+
             default => throw new InvalidArgumentException(sprintf('Unknown action %s.', $action)),
         };
     }

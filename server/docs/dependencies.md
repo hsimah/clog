@@ -9,27 +9,27 @@ The repository still commits signed generated PHP artifacts.
 
 | Package | Locked release | Role |
 | --- | --- | --- |
-| `elephentity/runtime` | 0.11.1 | Runtime contracts and unit of work |
-| `elephentity/sqlite` | 0.1.0-alpha.2 | Runtime SQLite adapter |
-| `elephentity/graphql` | 0.1.0-alpha.2 | Runtime GraphQL integration; repository is `elephentity-graphql-php` |
-| `elephentity/cli` | 0.11.0 | Build-time commands |
-| `elephentity/schema` | 0.11.0 | Compiler, installed through CLI |
-| `elephentity/codegen` | 0.6.0 | Generator orchestrator |
-| `elephentity/codegen-php` | 0.6.0 | PHP entities and contracts |
-| `elephentity/codegen-sqlite` | 0.1.0-alpha.1 | SQLite manifest and initial installer |
-| `elephentity/codegen-graphql-php` | 0.1.0-alpha.1 | Standalone GraphQL manifest and verifier |
-| `elephentity/codegen-tsquid` | 0.1.0 | Tsquid manifest compiler and production PHP initial-data runtime |
+| `elephentity/runtime` | 0.17.0 | Runtime contracts and unit of work |
+| `elephentity/sqlite` | 0.17.0 | Runtime SQLite adapter |
+| `elephentity/graphql` | 0.17.0 | Runtime GraphQL integration; repository is `elephentity-graphql-php` |
+| `eleph` (binary) | 0.16.1 | Spec compiler; installed by `install.sh`, not Composer |
+| `elephentity/codegen` | 0.7.0 | Generator orchestrator |
+| `elephentity/codegen-php` | 0.9.0 | PHP entities and contracts |
+| `elephentity/codegen-sqlite` | 0.1.0-alpha.5 | SQLite manifest and initial installer |
+| `elephentity/codegen-graphql-php` | 0.1.0-alpha.4 | Standalone GraphQL manifest and verifier |
+| `elephentity/codegen-tsquid` | 0.2.0 | Tsquid manifest compiler and production PHP initial-data runtime |
 
-Only the four new integration/generator packages allow alpha releases. The rest
-retain stable constraints. `webonyx/graphql-php` is the separate GraphQL engine,
-currently locked at 15.37.2. Production also installs `codegen-tsquid` because
+The runtime, SQLite and GraphQL packages are released together as PHP 0.17.0. Only
+`codegen-sqlite` and `codegen-graphql-php` are alpha and allow alpha stability; the
+rest retain stable constraints. `webonyx/graphql-php` is the separate GraphQL engine,
+currently locked at 15.38.1. Production also installs `codegen-tsquid` because
 its `Eleph\Tsquid` runtime serves initial route data; Rust is needed only to build
-the generator.
+the generators.
 
-Both integration adapters support runtime 0.11 as of alpha.2. The compatibility
-issues [SQLite #1](https://github.com/hsimah-services/elephentity-sqlite/issues/1)
-and [GraphQL PHP #1](https://github.com/hsimah-services/elephentity-graphql-php/issues/1)
-are resolved. The constraints require these compatible releases or newer.
+The `eleph` compiler is a standalone binary. `elephentity/cli` and `elephentity/schema`
+were retired after 0.14.2 and cannot be installed alongside runtime 0.17. The
+`.docker/php/Dockerfile` (`ELEPH_VERSION`) and `standalone.yml` pin the same release
+through upstream's checksummed `install.sh`. Builders still come from Composer.
 
 ## Generation
 
@@ -39,7 +39,7 @@ scripts/php.sh composer build-generators
 scripts/php.sh composer check-generated
 ```
 
-After editing specs, run `scripts/php.sh vendor/bin/eleph generate` before the
+After editing specs, run `scripts/php.sh eleph generate` before the
 check. The four targets are `php`, `sqlite`, `graphql-php`, and `tsquid`. The generic
 integration key inside YAML is `graphql`. Outputs live in `server/generated`,
 `server/generated/sqlite`, `server/generated/graphql`, and `server/generated/tsquid`.
@@ -67,10 +67,10 @@ SQLite generator deliberately emits default SQLite collation. An interrupted
 fresh install can resume only if its generated schema matches exactly and contains
 no records; unknown or populated unversioned schemas are refused.
 
-Runtime 0.11.1 fixes relationship-aware deletion traversal
+Runtime 0.11.1 fixed relationship-aware deletion traversal
 ([elephentity #91](https://github.com/hsimah-services/elephentity/issues/91)).
 Clog passes storage directly to the unit of work; the `DependentReadStorage`
-workaround has been removed. The runtime constraint requires the fixed release.
+workaround has been removed. Later releases keep that behavior.
 Regression tests use mismatched and colliding IDs to verify parent cascades,
 child deletion preserving parents/siblings, and occupied-location restrictions.
 

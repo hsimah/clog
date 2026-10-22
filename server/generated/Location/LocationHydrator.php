@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Location/LocationHydrator.php
- * digest: sha256:fb0258aa253ef394a83905fa34f0cb2dd0df2397148044c96e600cdbc55e1247
+ * digest: sha256:ecff38aa24dbc0520eb5b922f67a342840d4dbf556a1ad8d60db21d5e7d34c5c
  */
 
 namespace Clog\Entity\Location;
@@ -50,7 +50,7 @@ final readonly class LocationHydrator implements Hydrator
         Record $record,
     ): DateTimeImmutable {
         $value = $record->value('createdAt');
-        
+
         return $this->decode->datetime($value, 'Location.createdAt');
     }
 
@@ -58,7 +58,7 @@ final readonly class LocationHydrator implements Hydrator
         Record $record,
     ): DateTimeImmutable {
         $value = $record->value('updatedAt');
-        
+
         return $this->decode->datetime($value, 'Location.updatedAt');
     }
 
@@ -66,7 +66,7 @@ final readonly class LocationHydrator implements Hydrator
         Record $record,
     ): string {
         $value = $record->value('name');
-        
+
         return $this->decode->string($value, 'Location.name');
     }
 }

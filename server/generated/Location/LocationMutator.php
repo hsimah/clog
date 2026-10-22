@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Location/LocationMutator.php
- * digest: sha256:bf75edca8360f0ff426e455ede94d1a1fab629605add3ac41b9f550fd4619449
+ * digest: sha256:0f6afab01c63adb8f4878851e76e115a382986c1c66226d6f189aa16fd437d7f
  */
 
 namespace Clog\Entity\Location;
@@ -34,7 +34,7 @@ final class LocationMutator
         string $name,
     ): self {
         $this->buffer->set('name', $name);
-        
+
         return $this;
     }
 }

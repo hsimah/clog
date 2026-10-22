@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Inventory/InventoryWritePolicies.php
- * digest: sha256:42c16545e2dcb30b339329f1c4bd2b4d073a621bd3584f0c40218d61dac48e7f
+ * digest: sha256:61ad91b9f0b808e4aa964136190ebc86d0bd01658a8c2ce17b990ab0780df43b
  */
 
 namespace Clog\Entity\Inventory;
@@ -43,7 +43,7 @@ final readonly class InventoryWritePolicies implements EntityWritePolicies
         if (PolicyOutcome::Skip !== $decision->outcome) {
             return $decision->withPolicy('staff');
         }
-        
+
         return PolicyDecision::deny('No policy allowed this write.')->withPolicy('terminal');
     }
 }

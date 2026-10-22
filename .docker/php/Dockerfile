@@ -11,6 +11,8 @@ ENV CARGO_HOME=/composer/cargo
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
         git \
         build-essential \
         unzip \
@@ -23,6 +25,12 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=docker.io/library/composer:2 /usr/bin/composer /usr/bin/composer
+
+# The eleph spec compiler is a standalone binary (elephentity/cli was retired after
+# 0.14.2). The installer checks the download against the release's SHA256SUMS.
+ARG ELEPH_VERSION=0.16.1
+RUN curl -fsSL "https://github.com/hsimah-services/elephentity/releases/download/v${ELEPH_VERSION}/install.sh" \
+    | ELEPH_VERSION="${ELEPH_VERSION}" ELEPH_INSTALL_DIR=/usr/local/bin sh
 
 # Composer refuses to run as root without this, and rootless podman maps the host
 # user to root inside the container.

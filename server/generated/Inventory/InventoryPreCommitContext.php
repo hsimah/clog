@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Inventory/InventoryPreCommitContext.php
- * digest: sha256:065034410e896da5f524dc0bf012b8550891614b916e3ba5fd785ccd3b2c759d
+ * digest: sha256:b0ff0ef97906eaf3a8ef8d755a3d4262033f0496a22a068fe25ce2f183189524
  */
 
 namespace Clog\Entity\Inventory;
@@ -146,56 +146,56 @@ final readonly class InventoryPreCommitContext implements MutableMutationContext
     public function originalCreatedAt(): ?DateTimeImmutable {
         $value = $this->context->original('createdAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function pendingCreatedAt(): ?DateTimeImmutable {
         $value = $this->context->pending('createdAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function originalUpdatedAt(): ?DateTimeImmutable {
         $value = $this->context->original('updatedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function pendingUpdatedAt(): ?DateTimeImmutable {
         $value = $this->context->pending('updatedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function originalName(): ?string {
         $value = $this->context->original('name');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function pendingName(): ?string {
         $value = $this->context->pending('name');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function originalDateAdded(): ?DateTimeImmutable {
         $value = $this->context->original('dateAdded');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function pendingDateAdded(): ?DateTimeImmutable {
         $value = $this->context->pending('dateAdded');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 

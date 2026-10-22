@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   install.php
- * digest: sha256:b77ddae90a2c26c6ba2f0f021dea0a739a7257666473b6263e92926dbe2286b0
+ * digest: sha256:1341b3b95215a8b14d4e4c884caa5ced26d1c8107a55ad69fac5859144d4dcb9
  */
 
 /**
@@ -62,7 +62,8 @@ return static function (\PDO $database, string $prefix = ''): void {
     try {
         foreach ($statements as $sql) {
             if ($database->exec($sql) === false) {
-                throw new \RuntimeException('SQLite schema installation failed: ' . ($database->errorInfo()[2] ?? 'unknown error'));
+                $detail = $database->errorInfo()[2] ?? null;
+                throw new \RuntimeException('SQLite schema installation failed: ' . (is_string($detail) ? $detail : 'unknown error'));
             }
         }
         $database->commit();

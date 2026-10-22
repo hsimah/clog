@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Item/ItemReadPolicies.php
- * digest: sha256:dda606cbd9b9ec7d415f90d77d6c4f9b5cb31edf517d034e829e658519dad014
+ * digest: sha256:5911a6481e95a910240269a265deec597e1ad82b7594e616a541c72fcd8f3de1
  */
 
 namespace Clog\Entity\Item;
@@ -41,7 +41,7 @@ final readonly class ItemReadPolicies implements EntityReadPolicies
         if (PolicyOutcome::Skip !== $decision->outcome) {
             return $decision->withPolicy('signedIn');
         }
-        
+
         return PolicyDecision::deny('No policy allowed this read.')->withPolicy('terminal');
     }
 }
