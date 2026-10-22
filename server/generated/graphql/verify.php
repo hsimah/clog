@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   verify.php
- * digest: sha256:7d95970f85bfa030b82794708014117215e8d869e3961108f02f2917ca824366
+ * digest: sha256:3eaec793921e16ca957a22d781b5e28ac336c239b2c7dc82976bed01219688be
  */
 
 namespace Eleph\GraphQL\Generated;
@@ -21,6 +21,7 @@ use Eleph\Runtime\Conformance\Verifier;
 use Eleph\GraphQL\Manifest\Manifest;
 
 $manifest = require __DIR__ . '/graphql-manifest.php';
+assert($manifest instanceof Manifest);
 
 return new class($manifest) implements Verifier
 {

@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Location/LocationWritePolicies.php
- * digest: sha256:a2378ed20a2cbd25932e0e30133ec9163e211549dfa7a0c13b12f19cc5c13ed2
+ * digest: sha256:52a52fa34dafcb019c243a80b9a7393a652a5a05c95e5ff523e054ddc35ff0da
  */
 
 namespace Clog\Entity\Location;
@@ -43,7 +43,7 @@ final readonly class LocationWritePolicies implements EntityWritePolicies
         if (PolicyOutcome::Skip !== $decision->outcome) {
             return $decision->withPolicy('staff');
         }
-        
+
         return PolicyDecision::deny('No policy allowed this write.')->withPolicy('terminal');
     }
 }

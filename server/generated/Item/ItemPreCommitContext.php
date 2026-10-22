@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Item/ItemPreCommitContext.php
- * digest: sha256:4d7edd4f1157ee0f0906b5603839dc7a32edff460486d32f6bb1043c927b8e2a
+ * digest: sha256:d0154e127eb9cfdee1ad0dc4b1234a45da3bfcb4285a0e30172f8c324e477847
  */
 
 namespace Clog\Entity\Item;
@@ -138,56 +138,56 @@ final readonly class ItemPreCommitContext implements MutableMutationContext
     public function originalCreatedAt(): ?DateTimeImmutable {
         $value = $this->context->original('createdAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function pendingCreatedAt(): ?DateTimeImmutable {
         $value = $this->context->pending('createdAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function originalUpdatedAt(): ?DateTimeImmutable {
         $value = $this->context->original('updatedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function pendingUpdatedAt(): ?DateTimeImmutable {
         $value = $this->context->pending('updatedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function originalName(): ?string {
         $value = $this->context->original('name');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function pendingName(): ?string {
         $value = $this->context->pending('name');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function originalBarcode(): ?string {
         $value = $this->context->original('barcode');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function pendingBarcode(): ?string {
         $value = $this->context->pending('barcode');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 

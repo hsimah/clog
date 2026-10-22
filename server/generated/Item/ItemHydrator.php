@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Item/ItemHydrator.php
- * digest: sha256:f1c115b0615614979754f1e36fa8a8d1699ab4576a59a4c3ed5d8d70e53cea64
+ * digest: sha256:a8f82c3d88989c6943f9f0bc3a1cdbe8d2b1bc209feffb2e4c89f5378b20bd98
  */
 
 namespace Clog\Entity\Item;
@@ -51,7 +51,7 @@ final readonly class ItemHydrator implements Hydrator
         Record $record,
     ): DateTimeImmutable {
         $value = $record->value('createdAt');
-        
+
         return $this->decode->datetime($value, 'Item.createdAt');
     }
 
@@ -59,7 +59,7 @@ final readonly class ItemHydrator implements Hydrator
         Record $record,
     ): DateTimeImmutable {
         $value = $record->value('updatedAt');
-        
+
         return $this->decode->datetime($value, 'Item.updatedAt');
     }
 
@@ -67,7 +67,7 @@ final readonly class ItemHydrator implements Hydrator
         Record $record,
     ): string {
         $value = $record->value('name');
-        
+
         return $this->decode->string($value, 'Item.name');
     }
 
@@ -75,7 +75,7 @@ final readonly class ItemHydrator implements Hydrator
         Record $record,
     ): ?string {
         $value = $record->value('barcode');
-        
+
         return null === $value ? null : $this->decode->string($value, 'Item.barcode');
     }
 }

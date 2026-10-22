@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2bd8029906cfefdf778b8109206ff01d",
+    "content-hash": "8dda6c9564b7f9487c094b916142e426",
     "packages": [
         {
             "name": "elephentity/codegen-tsquid",
-            "version": "v0.1.0",
+            "version": "v0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-codegen-tsquid.git",
-                "reference": "3d5ad4d5755b03214c5fd00136b6a90e9130e5d9"
+                "reference": "8ac81840326635b434423692e8cd1d13131ff5c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen-tsquid/zipball/3d5ad4d5755b03214c5fd00136b6a90e9130e5d9",
-                "reference": "3d5ad4d5755b03214c5fd00136b6a90e9130e5d9",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen-tsquid/zipball/8ac81840326635b434423692e8cd1d13131ff5c1",
+                "reference": "8ac81840326635b434423692e8cd1d13131ff5c1",
                 "shasum": ""
             },
             "require": {
@@ -34,35 +34,40 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "Apache-2.0"
+                "MIT"
             ],
             "description": "Tsquid manifest builder and standalone PHP initial-data integration.",
             "support": {
                 "issues": "https://github.com/hsimah-services/elephentity-codegen-tsquid/issues",
-                "source": "https://github.com/hsimah-services/elephentity-codegen-tsquid/tree/v0.1.0"
+                "source": "https://github.com/hsimah-services/elephentity-codegen-tsquid/tree/v0.2.0"
             },
-            "time": "2026-10-10T23:33:32+00:00"
+            "time": "2026-10-18T22:33:51+00:00"
         },
         {
             "name": "elephentity/graphql",
-            "version": "v0.1.0-alpha.2",
+            "version": "v0.17.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-graphql-php.git",
-                "reference": "558719cdfe5dffa07c86e90dc53b97f9105a842c"
+                "reference": "75406fee6742c013122104e9b10f0e089d6618e1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-graphql-php/zipball/558719cdfe5dffa07c86e90dc53b97f9105a842c",
-                "reference": "558719cdfe5dffa07c86e90dc53b97f9105a842c",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-graphql-php/zipball/75406fee6742c013122104e9b10f0e089d6618e1",
+                "reference": "75406fee6742c013122104e9b10f0e089d6618e1",
                 "shasum": ""
             },
             "require": {
-                "elephentity/runtime": "^0.10 || ^0.11",
+                "elephentity/runtime": "^0.17",
                 "php": ">=8.3",
                 "webonyx/graphql-php": "^15.0"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "0.17.x-dev"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Eleph\\GraphQL\\": "src/"
@@ -70,27 +75,27 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "Apache-2.0"
+                "MIT"
             ],
             "description": "Experimental Framework-independent GraphQL integration for the Elephentity PHP runtime.",
             "support": {
                 "issues": "https://github.com/hsimah-services/elephentity-graphql-php/issues",
-                "source": "https://github.com/hsimah-services/elephentity-graphql-php/tree/v0.1.0-alpha.2"
+                "source": "https://github.com/hsimah-services/elephentity-graphql-php/tree/v0.17.0"
             },
-            "time": "2026-09-27T19:27:52+00:00"
+            "time": "2026-10-21T23:48:15+00:00"
         },
         {
             "name": "elephentity/runtime",
-            "version": "v0.11.1",
+            "version": "v0.17.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-runtime.git",
-                "reference": "4f38126164dd38a5ac82c0ba59f3bb9a15919772"
+                "reference": "399619b88c28590b4ac1bec6bef6e5ac4592c2b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-runtime/zipball/4f38126164dd38a5ac82c0ba59f3bb9a15919772",
-                "reference": "4f38126164dd38a5ac82c0ba59f3bb9a15919772",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-runtime/zipball/399619b88c28590b4ac1bec6bef6e5ac4592c2b4",
+                "reference": "399619b88c28590b4ac1bec6bef6e5ac4592c2b4",
                 "shasum": ""
             },
             "require": {
@@ -111,37 +116,42 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "Apache-2.0"
+                "MIT"
             ],
             "description": "Elephentity runtime contracts: storage port, unit of work, verification, loaders.",
             "support": {
                 "issues": "https://github.com/hsimah-services/elephentity-runtime/issues",
-                "source": "https://github.com/hsimah-services/elephentity-runtime/tree/v0.11.1"
+                "source": "https://github.com/hsimah-services/elephentity-runtime/tree/v0.17.0"
             },
-            "time": "2026-09-27T20:02:56+00:00"
+            "time": "2026-10-18T22:32:08+00:00"
         },
         {
             "name": "elephentity/sqlite",
-            "version": "v0.1.0-alpha.2",
+            "version": "v0.17.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-sqlite.git",
-                "reference": "3617cef3b75dc277d1d1a87abc22bfd8eff4e71f"
+                "reference": "412155d26106a0f4d55ea83e3909e3e28b351370"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-sqlite/zipball/3617cef3b75dc277d1d1a87abc22bfd8eff4e71f",
-                "reference": "3617cef3b75dc277d1d1a87abc22bfd8eff4e71f",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-sqlite/zipball/412155d26106a0f4d55ea83e3909e3e28b351370",
+                "reference": "412155d26106a0f4d55ea83e3909e3e28b351370",
                 "shasum": ""
             },
             "require": {
-                "elephentity/runtime": "^0.10 || ^0.11",
+                "elephentity/runtime": "^0.17",
                 "ext-mbstring": "*",
                 "ext-pdo": "*",
                 "ext-pdo_sqlite": "*",
                 "php": ">=8.3"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "0.17.x-dev"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Eleph\\SQLite\\": "src/"
@@ -149,14 +159,14 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "Apache-2.0"
+                "MIT"
             ],
             "description": "Experimental SQLite storage adaptor for the Elephentity PHP runtime.",
             "support": {
                 "issues": "https://github.com/hsimah-services/elephentity-sqlite/issues",
-                "source": "https://github.com/hsimah-services/elephentity-sqlite/tree/v0.1.0-alpha.2"
+                "source": "https://github.com/hsimah-services/elephentity-sqlite/tree/v0.17.0"
             },
-            "time": "2026-09-27T19:27:49+00:00"
+            "time": "2026-10-21T23:48:01+00:00"
         },
         {
             "name": "psr/container",
@@ -263,16 +273,16 @@
         },
         {
             "name": "webonyx/graphql-php",
-            "version": "v15.37.2",
+            "version": "v15.38.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webonyx/graphql-php.git",
-                "reference": "f2a5d802213eb231d17a21badbda22b01435f177"
+                "reference": "32edc67af119b709d020f93447729afd503fe56a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webonyx/graphql-php/zipball/f2a5d802213eb231d17a21badbda22b01435f177",
-                "reference": "f2a5d802213eb231d17a21badbda22b01435f177",
+                "url": "https://api.github.com/repos/webonyx/graphql-php/zipball/32edc67af119b709d020f93447729afd503fe56a",
+                "reference": "32edc67af119b709d020f93447729afd503fe56a",
                 "shasum": ""
             },
             "require": {
@@ -285,13 +295,13 @@
                 "amphp/http-server": "^2.1 || ^3",
                 "dms/phpunit-arraysubset-asserts": "dev-master",
                 "ergebnis/composer-normalize": "^2.28",
-                "friendsofphp/php-cs-fixer": "3.95.18",
+                "friendsofphp/php-cs-fixer": "3.95.27",
                 "mll-lab/php-cs-fixer-config": "5.13.0",
                 "nyholm/psr7": "^1.5",
                 "phpbench/phpbench": "^1.2",
                 "phpstan/extension-installer": "^1.1",
-                "phpstan/phpstan": "2.2.8",
-                "phpstan/phpstan-phpunit": "2.0.18",
+                "phpstan/phpstan": "2.2.17",
+                "phpstan/phpstan-phpunit": "2.0.21",
                 "phpstan/phpstan-strict-rules": "2.0.12",
                 "phpunit/phpunit": "^9.5 || ^10.5.21 || ^11",
                 "psr/http-message": "^1 || ^2",
@@ -327,7 +337,7 @@
             ],
             "support": {
                 "issues": "https://github.com/webonyx/graphql-php/issues",
-                "source": "https://github.com/webonyx/graphql-php/tree/v15.37.2"
+                "source": "https://github.com/webonyx/graphql-php/tree/v15.38.1"
             },
             "funding": [
                 {
@@ -339,68 +349,22 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2026-08-14T06:29:42+00:00"
+            "time": "2026-10-12T14:31:33+00:00"
         }
     ],
     "packages-dev": [
         {
-            "name": "elephentity/cli",
-            "version": "v0.11.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/hsimah-services/elephentity-cli.git",
-                "reference": "be6d341fb8d7e209f89cf3326f10ab7ae0d8ca73"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-cli/zipball/be6d341fb8d7e209f89cf3326f10ab7ae0d8ca73",
-                "reference": "be6d341fb8d7e209f89cf3326f10ab7ae0d8ca73",
-                "shasum": ""
-            },
-            "require": {
-                "elephentity/codegen": "^0.6",
-                "elephentity/runtime": "^0.10 || ^0.11",
-                "elephentity/schema": "^0.11",
-                "php": ">=8.3",
-                "symfony/console": "^7.0 || ^8.0"
-            },
-            "require-dev": {
-                "elephentity/codegen-php": "^0.6",
-                "phpunit/phpunit": "^11.0 || ^12.0"
-            },
-            "bin": [
-                "bin/eleph",
-                "bin/eleph-gen-memory"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Eleph\\Cli\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "description": "The eleph command: validate, generate, check, fmt. Build-time only.",
-            "support": {
-                "issues": "https://github.com/hsimah-services/elephentity-cli/issues",
-                "source": "https://github.com/hsimah-services/elephentity-cli/tree/v0.11.0"
-            },
-            "time": "2026-09-22T01:37:11+00:00"
-        },
-        {
             "name": "elephentity/codegen",
-            "version": "v0.6.0",
+            "version": "v0.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-codegen.git",
-                "reference": "12dac3296ca0c3a2aed108751efa9f23ae7c20bc"
+                "reference": "09c760cbb060d8c0dd0c3e863323e6dd17208851"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen/zipball/12dac3296ca0c3a2aed108751efa9f23ae7c20bc",
-                "reference": "12dac3296ca0c3a2aed108751efa9f23ae7c20bc",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen/zipball/09c760cbb060d8c0dd0c3e863323e6dd17208851",
+                "reference": "09c760cbb060d8c0dd0c3e863323e6dd17208851",
                 "shasum": ""
             },
             "require": {
@@ -423,27 +387,27 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "Apache-2.0"
+                "MIT"
             ],
             "description": "The Elephentity code generator: runs a project's language builders, then signs and writes what they return.",
             "support": {
                 "issues": "https://github.com/hsimah-services/elephentity-codegen/issues",
-                "source": "https://github.com/hsimah-services/elephentity-codegen/tree/v0.6.0"
+                "source": "https://github.com/hsimah-services/elephentity-codegen/tree/v0.7.0"
             },
-            "time": "2026-09-21T18:50:00+00:00"
+            "time": "2026-10-18T20:05:19+00:00"
         },
         {
             "name": "elephentity/codegen-graphql-php",
-            "version": "v0.1.0-alpha.1",
+            "version": "v0.1.0-alpha.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-codegen-graphql-php.git",
-                "reference": "cc56d57e6ea6ed8edeaf0e4cdbd01195e8857ea9"
+                "reference": "9f6de91ae532f6e4b984348f190376309d49fdca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen-graphql-php/zipball/cc56d57e6ea6ed8edeaf0e4cdbd01195e8857ea9",
-                "reference": "cc56d57e6ea6ed8edeaf0e4cdbd01195e8857ea9",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen-graphql-php/zipball/9f6de91ae532f6e4b984348f190376309d49fdca",
+                "reference": "9f6de91ae532f6e4b984348f190376309d49fdca",
                 "shasum": ""
             },
             "require": {
@@ -455,41 +419,46 @@
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "Apache-2.0"
+                "MIT"
             ],
             "description": "Standalone GraphQL PHP manifest generator for Elephentity. Build-time only.",
             "support": {
                 "issues": "https://github.com/hsimah-services/elephentity-codegen-graphql-php/issues",
-                "source": "https://github.com/hsimah-services/elephentity-codegen-graphql-php/tree/v0.1.0-alpha.1"
+                "source": "https://github.com/hsimah-services/elephentity-codegen-graphql-php/tree/v0.1.0-alpha.4"
             },
-            "time": "2026-09-27T16:40:29+00:00"
+            "time": "2026-10-12T02:08:48+00:00"
         },
         {
             "name": "elephentity/codegen-php",
-            "version": "v0.6.0",
+            "version": "v0.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-codegen-php.git",
-                "reference": "3c9d4d7d1a29b961f44f898d9d4ba6df56261977"
+                "reference": "50bc0373954079da402f21ba7e5912acf04796af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen-php/zipball/3c9d4d7d1a29b961f44f898d9d4ba6df56261977",
-                "reference": "3c9d4d7d1a29b961f44f898d9d4ba6df56261977",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen-php/zipball/50bc0373954079da402f21ba7e5912acf04796af",
+                "reference": "50bc0373954079da402f21ba7e5912acf04796af",
                 "shasum": ""
             },
             "require": {
+                "elephentity/runtime": "^0.17",
                 "nette/php-generator": "^4.1",
                 "php": ">=8.3",
                 "psr/container": "^2.0"
             },
             "require-dev": {
+                "elephentity/graphql": "^0.17",
+                "elephentity/memory": "^0.17",
+                "elephentity/sqlite": "^0.17",
                 "friendsofphp/php-cs-fixer": "^3.64",
                 "phpstan/phpstan": "^2.0",
                 "phpunit/phpunit": "^11.0 || ^12.0"
             },
             "bin": [
-                "bin/eleph-gen-php"
+                "bin/eleph-gen-php",
+                "bin/eleph-check-php"
             ],
             "type": "library",
             "autoload": {
@@ -499,27 +468,27 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "Apache-2.0"
+                "MIT"
             ],
             "description": "The PHP builder for Elephentity: compiles the IR into locked PHP. Build-time only.",
             "support": {
                 "issues": "https://github.com/hsimah-services/elephentity-codegen-php/issues",
-                "source": "https://github.com/hsimah-services/elephentity-codegen-php/tree/v0.6.0"
+                "source": "https://github.com/hsimah-services/elephentity-codegen-php/tree/v0.9.0"
             },
-            "time": "2026-09-21T18:50:05+00:00"
+            "time": "2026-10-22T00:12:52+00:00"
         },
         {
             "name": "elephentity/codegen-sqlite",
-            "version": "v0.1.0-alpha.1",
+            "version": "v0.1.0-alpha.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-codegen-sqlite.git",
-                "reference": "95681fb7dbf081b39e4f75953aa47aa5ff3a541b"
+                "reference": "919e1cf6ee6c3445a6967a470926269784788c4c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen-sqlite/zipball/95681fb7dbf081b39e4f75953aa47aa5ff3a541b",
-                "reference": "95681fb7dbf081b39e4f75953aa47aa5ff3a541b",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen-sqlite/zipball/919e1cf6ee6c3445a6967a470926269784788c4c",
+                "reference": "919e1cf6ee6c3445a6967a470926269784788c4c",
                 "shasum": ""
             },
             "require": {
@@ -531,53 +500,14 @@
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "Apache-2.0"
+                "MIT"
             ],
             "description": "SQLite storage manifest and schema generator for Elephentity. Build-time only.",
             "support": {
                 "issues": "https://github.com/hsimah-services/elephentity-codegen-sqlite/issues",
-                "source": "https://github.com/hsimah-services/elephentity-codegen-sqlite/tree/v0.1.0-alpha.1"
+                "source": "https://github.com/hsimah-services/elephentity-codegen-sqlite/tree/v0.1.0-alpha.5"
             },
-            "time": "2026-09-27T16:40:29+00:00"
-        },
-        {
-            "name": "elephentity/schema",
-            "version": "v0.11.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/hsimah-services/elephentity-schema.git",
-                "reference": "429a73e2d03994914bd410e6efb055b0eaf7f908"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-schema/zipball/429a73e2d03994914bd410e6efb055b0eaf7f908",
-                "reference": "429a73e2d03994914bd410e6efb055b0eaf7f908",
-                "shasum": ""
-            },
-            "require": {
-                "opis/json-schema": "^2.3",
-                "php": ">=8.3",
-                "symfony/yaml": "^7.0 || ^8.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^11.0 || ^12.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Eleph\\Schema\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "description": "Spec parser, JSON Schema, pattern resolution and IR for Elephentity. Build-time only.",
-            "support": {
-                "issues": "https://github.com/hsimah-services/elephentity-schema/issues",
-                "source": "https://github.com/hsimah-services/elephentity-schema/tree/v0.11.0"
-            },
-            "time": "2026-09-22T01:29:07+00:00"
+            "time": "2026-10-21T16:41:28+00:00"
         },
         {
             "name": "nette/php-generator",
@@ -655,20 +585,20 @@
         },
         {
             "name": "nette/utils",
-            "version": "v4.1.5",
+            "version": "v4.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/utils.git",
-                "reference": "b043439dbdf954e6c28b5ea7e34b0100f83165e0"
+                "reference": "6bf24518accf32cf845bca305e0b92078700fd01"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/utils/zipball/b043439dbdf954e6c28b5ea7e34b0100f83165e0",
-                "reference": "b043439dbdf954e6c28b5ea7e34b0100f83165e0",
+                "url": "https://api.github.com/repos/nette/utils/zipball/6bf24518accf32cf845bca305e0b92078700fd01",
+                "reference": "6bf24518accf32cf845bca305e0b92078700fd01",
                 "shasum": ""
             },
             "require": {
-                "php": "8.2 - 8.5"
+                "php": "8.2 - 8.6"
             },
             "conflict": {
                 "nette/finder": "<3",
@@ -740,212 +670,22 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/utils/issues",
-                "source": "https://github.com/nette/utils/tree/v4.1.5"
+                "source": "https://github.com/nette/utils/tree/v4.1.6"
             },
-            "time": "2026-07-17T23:02:45+00:00"
-        },
-        {
-            "name": "opis/json-schema",
-            "version": "2.6.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/opis/json-schema.git",
-                "reference": "8458763e0dd0b6baa310e04f1829fc73da4e8c8a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/opis/json-schema/zipball/8458763e0dd0b6baa310e04f1829fc73da4e8c8a",
-                "reference": "8458763e0dd0b6baa310e04f1829fc73da4e8c8a",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "opis/string": "^2.1",
-                "opis/uri": "^1.0",
-                "php": "^7.4 || ^8.0"
-            },
-            "require-dev": {
-                "ext-bcmath": "*",
-                "ext-intl": "*",
-                "phpunit/phpunit": "^9.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Opis\\JsonSchema\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Sorin Sarca",
-                    "email": "sarca_sorin@hotmail.com"
-                },
-                {
-                    "name": "Marius Sarca",
-                    "email": "marius.sarca@gmail.com"
-                }
-            ],
-            "description": "Json Schema Validator for PHP",
-            "homepage": "https://opis.io/json-schema",
-            "keywords": [
-                "json",
-                "json-schema",
-                "schema",
-                "validation",
-                "validator"
-            ],
-            "support": {
-                "issues": "https://github.com/opis/json-schema/issues",
-                "source": "https://github.com/opis/json-schema/tree/2.6.0"
-            },
-            "time": "2025-10-17T12:46:48+00:00"
-        },
-        {
-            "name": "opis/string",
-            "version": "2.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/opis/string.git",
-                "reference": "3e4d2aaff518ac518530b89bb26ed40f4503635e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/opis/string/zipball/3e4d2aaff518ac518530b89bb26ed40f4503635e",
-                "reference": "3e4d2aaff518ac518530b89bb26ed40f4503635e",
-                "shasum": ""
-            },
-            "require": {
-                "ext-iconv": "*",
-                "ext-json": "*",
-                "php": "^7.4 || ^8.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^9.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Opis\\String\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Marius Sarca",
-                    "email": "marius.sarca@gmail.com"
-                },
-                {
-                    "name": "Sorin Sarca",
-                    "email": "sarca_sorin@hotmail.com"
-                }
-            ],
-            "description": "Multibyte strings as objects",
-            "homepage": "https://opis.io/string",
-            "keywords": [
-                "multi-byte",
-                "opis",
-                "string",
-                "string manipulation",
-                "utf-8"
-            ],
-            "support": {
-                "issues": "https://github.com/opis/string/issues",
-                "source": "https://github.com/opis/string/tree/2.1.0"
-            },
-            "time": "2025-10-17T12:38:41+00:00"
-        },
-        {
-            "name": "opis/uri",
-            "version": "1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/opis/uri.git",
-                "reference": "0f3ca49ab1a5e4a6681c286e0b2cc081b93a7d5a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/opis/uri/zipball/0f3ca49ab1a5e4a6681c286e0b2cc081b93a7d5a",
-                "reference": "0f3ca49ab1a5e4a6681c286e0b2cc081b93a7d5a",
-                "shasum": ""
-            },
-            "require": {
-                "opis/string": "^2.0",
-                "php": "^7.4 || ^8.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^9"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Opis\\Uri\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Marius Sarca",
-                    "email": "marius.sarca@gmail.com"
-                },
-                {
-                    "name": "Sorin Sarca",
-                    "email": "sarca_sorin@hotmail.com"
-                }
-            ],
-            "description": "Build, parse and validate URIs and URI-templates",
-            "homepage": "https://opis.io",
-            "keywords": [
-                "URI Template",
-                "parse url",
-                "punycode",
-                "uri",
-                "uri components",
-                "url",
-                "validate uri"
-            ],
-            "support": {
-                "issues": "https://github.com/opis/uri/issues",
-                "source": "https://github.com/opis/uri/tree/1.1.0"
-            },
-            "time": "2021-05-22T15:57:08+00:00"
+            "time": "2026-10-20T17:07:56+00:00"
         },
         {
             "name": "symfony/console",
-            "version": "v7.4.19",
+            "version": "v7.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "3a1973458b153f566a8d7499bc06ece323d60063"
+                "reference": "21f1bc2296f7ff6043241a8dcbc09559b3732820"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/3a1973458b153f566a8d7499bc06ece323d60063",
-                "reference": "3a1973458b153f566a8d7499bc06ece323d60063",
+                "url": "https://api.github.com/repos/symfony/console/zipball/21f1bc2296f7ff6043241a8dcbc09559b3732820",
+                "reference": "21f1bc2296f7ff6043241a8dcbc09559b3732820",
                 "shasum": ""
             },
             "require": {
@@ -1010,7 +750,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/v7.4.19"
+                "source": "https://github.com/symfony/console/tree/v7.4.21"
             },
             "funding": [
                 {
@@ -1030,7 +770,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-09-13T10:38:41+00:00"
+            "time": "2026-10-12T18:45:38+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -1188,16 +928,16 @@
         },
         {
             "name": "symfony/polyfill-intl-grapheme",
-            "version": "v1.41.0",
+            "version": "v1.43.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-grapheme.git",
-                "reference": "bb899c1db0aa8127dc3afe8cda4a67eb24915f8d"
+                "reference": "5cac8f4db97208823aa353f59a01faad2da52c75"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-intl-grapheme/zipball/bb899c1db0aa8127dc3afe8cda4a67eb24915f8d",
-                "reference": "bb899c1db0aa8127dc3afe8cda4a67eb24915f8d",
+                "url": "https://api.github.com/repos/symfony/polyfill-intl-grapheme/zipball/5cac8f4db97208823aa353f59a01faad2da52c75",
+                "reference": "5cac8f4db97208823aa353f59a01faad2da52c75",
                 "shasum": ""
             },
             "require": {
@@ -1246,7 +986,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-grapheme/tree/v1.41.0"
+                "source": "https://github.com/symfony/polyfill-intl-grapheme/tree/v1.43.0"
             },
             "funding": [
                 {
@@ -1266,20 +1006,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-07-28T08:25:59+00:00"
+            "time": "2026-09-25T15:46:47+00:00"
         },
         {
             "name": "symfony/polyfill-intl-normalizer",
-            "version": "v1.42.0",
+            "version": "v1.43.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-normalizer.git",
-                "reference": "aa20edea75bd9c48cfecc8360922e5a6e5c44502"
+                "reference": "ebd57ccc7edb93d632e184efbe7693d2517bab3b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-intl-normalizer/zipball/aa20edea75bd9c48cfecc8360922e5a6e5c44502",
-                "reference": "aa20edea75bd9c48cfecc8360922e5a6e5c44502",
+                "url": "https://api.github.com/repos/symfony/polyfill-intl-normalizer/zipball/ebd57ccc7edb93d632e184efbe7693d2517bab3b",
+                "reference": "ebd57ccc7edb93d632e184efbe7693d2517bab3b",
                 "shasum": ""
             },
             "require": {
@@ -1331,7 +1071,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.42.0"
+                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.43.0"
             },
             "funding": [
                 {
@@ -1351,20 +1091,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-08-07T06:33:24+00:00"
+            "time": "2026-09-23T22:02:09+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.38.2",
+            "version": "v1.43.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6"
+                "reference": "4d5d331bf731e0aedbc6b2f5e61135b7b7996a72"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6",
-                "reference": "d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/4d5d331bf731e0aedbc6b2f5e61135b7b7996a72",
+                "reference": "4d5d331bf731e0aedbc6b2f5e61135b7b7996a72",
                 "shasum": ""
             },
             "require": {
@@ -1416,7 +1156,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.38.2"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.43.0"
             },
             "funding": [
                 {
@@ -1436,7 +1176,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-05-27T06:59:30+00:00"
+            "time": "2026-09-24T15:19:04+00:00"
         },
         {
             "name": "symfony/service-contracts",
@@ -1527,16 +1267,16 @@
         },
         {
             "name": "symfony/string",
-            "version": "v7.4.19",
+            "version": "v7.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/string.git",
-                "reference": "02731ce2bd26514bec9efc0baef2cd0b0cf67f46"
+                "reference": "9bc35d074ad16a58c21cd52b18c5cacc4f4c3981"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/string/zipball/02731ce2bd26514bec9efc0baef2cd0b0cf67f46",
-                "reference": "02731ce2bd26514bec9efc0baef2cd0b0cf67f46",
+                "url": "https://api.github.com/repos/symfony/string/zipball/9bc35d074ad16a58c21cd52b18c5cacc4f4c3981",
+                "reference": "9bc35d074ad16a58c21cd52b18c5cacc4f4c3981",
                 "shasum": ""
             },
             "require": {
@@ -1594,7 +1334,7 @@
                 "utf8"
             ],
             "support": {
-                "source": "https://github.com/symfony/string/tree/v7.4.19"
+                "source": "https://github.com/symfony/string/tree/v7.4.21"
             },
             "funding": [
                 {
@@ -1614,92 +1354,14 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-09-11T14:46:58+00:00"
-        },
-        {
-            "name": "symfony/yaml",
-            "version": "v7.4.18",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/yaml.git",
-                "reference": "4cef939e55b8a21c5780418de0d98ab00d0736e1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/4cef939e55b8a21c5780418de0d98ab00d0736e1",
-                "reference": "4cef939e55b8a21c5780418de0d98ab00d0736e1",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.2",
-                "symfony/deprecation-contracts": "^2.5|^3",
-                "symfony/polyfill-ctype": "^1.8"
-            },
-            "conflict": {
-                "symfony/console": "<6.4"
-            },
-            "require-dev": {
-                "symfony/console": "^6.4|^7.0|^8.0"
-            },
-            "bin": [
-                "Resources/bin/yaml-lint"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Yaml\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Loads and dumps YAML files",
-            "homepage": "https://symfony.com",
-            "support": {
-                "source": "https://github.com/symfony/yaml/tree/v7.4.18"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/nicolas-grekas",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2026-08-30T00:47:26+00:00"
+            "time": "2026-10-03T15:15:30+00:00"
         }
     ],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
         "elephentity/codegen-graphql-php": 15,
-        "elephentity/codegen-sqlite": 15,
-        "elephentity/graphql": 15,
-        "elephentity/sqlite": 15
+        "elephentity/codegen-sqlite": 15
     },
     "prefer-stable": true,
     "prefer-lowest": false,

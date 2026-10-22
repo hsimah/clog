@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Location/LocationInput.php
- * digest: sha256:320f29e6b9e963ce3b21484d36792680c541a87dc5138c2ade524d2da7348921
+ * digest: sha256:2c7ffec37ee3ff1e6d773d1c40e2f405351b58be1869a27f70e49aaae0db3099
  */
 
 namespace Clog\Entity\Location;
@@ -35,13 +35,13 @@ final readonly class LocationInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->string($value, 'Location.name');
     }
 
     /**
-     * Only what the caller supplied. A key that is absent is left alone,
-     * which is what makes a partial update partial.
+     * Seeds declared defaults on create and applies explicit input.
+     * Absent update keys and existing pending values are not reset by defaults.
      *
      * @param array<string, mixed> $input
      */
@@ -63,7 +63,7 @@ final readonly class LocationInput
         array $args,
     ): array {
         return match ($action) {
-        
+
             default => throw new InvalidArgumentException(sprintf('Unknown action %s.', $action)),
         };
     }

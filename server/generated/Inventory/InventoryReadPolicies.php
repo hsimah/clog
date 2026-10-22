@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Inventory/InventoryReadPolicies.php
- * digest: sha256:5beb958140adace52d66bdeac7c9969cc6e9f151c4b2cd330de7e6ef058e6645
+ * digest: sha256:a2b37eda85daf4239d8f80de2a33b2ffc186c470705ce7680289252523a28650
  */
 
 namespace Clog\Entity\Inventory;
@@ -41,7 +41,7 @@ final readonly class InventoryReadPolicies implements EntityReadPolicies
         if (PolicyOutcome::Skip !== $decision->outcome) {
             return $decision->withPolicy('signedIn');
         }
-        
+
         return PolicyDecision::deny('No policy allowed this read.')->withPolicy('terminal');
     }
 }

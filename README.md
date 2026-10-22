@@ -64,7 +64,7 @@ After changing queries or routes, regenerate in this order and commit the output
 ```sh
 scripts/node.sh npm run relay
 scripts/node.sh npm run routes
-scripts/php.sh vendor/bin/eleph generate
+scripts/php.sh eleph generate
 scripts/node.sh npm run build
 ```
 

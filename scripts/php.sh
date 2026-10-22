@@ -4,7 +4,7 @@
 #
 #   scripts/php.sh composer install
 #   scripts/php.sh vendor/bin/eleph-codegen doctor --project .
-#   scripts/php.sh vendor/bin/eleph generate --project .
+#   scripts/php.sh eleph generate --project .
 #   scripts/php.sh bash                       # interactive shell
 #
 # There is no host PHP and generation needs 8.3, so this is how the eleph commands
@@ -18,7 +18,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-IMAGE="clog-php:8.3-rust"
+IMAGE="clog-php:8.3-rust-eleph0.16.1"
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/clog/composer"
 
 if command -v podman >/dev/null 2>&1; then

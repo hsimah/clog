@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Inventory/InventoryMutator.php
- * digest: sha256:9c96345fb9e2c279b8d73e0c799bd3fd62ec01e2697ae717cfcfc2ad8ae584b7
+ * digest: sha256:051f4d6cdebbcc01a20db6bba2ff2df7279640e6f37955e1279eb28576892abf
  */
 
 namespace Clog\Entity\Inventory;
@@ -36,7 +36,7 @@ final class InventoryMutator
         string $name,
     ): self {
         $this->buffer->set('name', $name);
-        
+
         return $this;
     }
 
@@ -44,7 +44,7 @@ final class InventoryMutator
         DateTimeImmutable $dateAdded,
     ): self {
         $this->buffer->set('dateAdded', $dateAdded);
-        
+
         return $this;
     }
 
@@ -55,7 +55,7 @@ final class InventoryMutator
         ?Identifier $item,
     ): self {
         $this->buffer->edge('item')->set(null === $item ? [] : [$item]);
-        
+
         return $this;
     }
 
@@ -66,7 +66,7 @@ final class InventoryMutator
         ?Identifier $location,
     ): self {
         $this->buffer->edge('location')->set(null === $location ? [] : [$location]);
-        
+
         return $this;
     }
 }

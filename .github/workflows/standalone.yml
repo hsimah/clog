@@ -18,6 +18,13 @@ jobs:
       - name: Install locked PHP dependencies
         working-directory: server
         run: composer validate --strict && composer install --no-interaction --prefer-dist
+      - name: Install the eleph compiler
+        env:
+          ELEPH_VERSION: 0.16.1
+          ELEPH_INSTALL_DIR: ${{ runner.temp }}/eleph
+        run: |
+          curl -fsSL "https://github.com/hsimah-services/elephentity/releases/download/v${ELEPH_VERSION}/install.sh" | sh
+          echo "$ELEPH_INSTALL_DIR" >> "$GITHUB_PATH"
       - name: Cache generator builds
         uses: actions/cache@v4
         with:
