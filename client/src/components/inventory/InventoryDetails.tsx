@@ -3,6 +3,7 @@ import { useWorkspaceContext } from "../../app/useWorkspaceContext";
 import { useEffect, useRef, useState } from "react";
 import { graphql, useFragment } from "react-relay";
 import { Button } from "@astryxdesign/core/Button";
+import { ButtonGroup } from "@astryxdesign/core/ButtonGroup";
 import { Link } from "@astryxdesign/core/Link";
 import { Stack } from "@astryxdesign/core/Stack";
 import { Text } from "@astryxdesign/core/Text";
@@ -66,21 +67,28 @@ export function InventoryDetails({
           href={inventoryRecordPath(inventory.id, true)}
           isDisabled={!canWrite || pending}
         />
-        <Button
-          label="Add one here"
-          isLoading={add.pending}
-          isDisabled={
-            !canWrite || pending || !inventory.item || !inventory.location
-          }
-          onClick={addUnit}
-        />
-        <Button
-          label="Delete"
-          variant="destructive"
-          isLoading={remove.pending}
-          isDisabled={!canWrite || pending}
-          onClick={deleteUnit}
-        />
+        <ButtonGroup label="Stocked units">
+          <Button
+            label="Remove this one"
+            tooltip="Remove this one stocked unit"
+            isLoading={remove.pending}
+            isDisabled={!canWrite || pending}
+            onClick={deleteUnit}
+          >
+            −
+          </Button>
+          <Button
+            label="Add one here"
+            tooltip="Add one stocked unit here"
+            isLoading={add.pending}
+            isDisabled={
+              !canWrite || pending || !inventory.item || !inventory.location
+            }
+            onClick={addUnit}
+          >
+            +
+          </Button>
+        </ButtonGroup>
         <Button
           label="Close"
           variant="ghost"
