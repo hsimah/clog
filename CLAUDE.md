@@ -11,13 +11,14 @@ in `server/standalone/`, using generated entities under `server/generated/`.
 - Production (`clog.hsimah.com`) is deployed by [the-loft](https://github.com/hsimah/the-loft),
   which owns its Compose services, networking, backups and rollback; see its
   `docs/services/clog.md`. Do not give production systemctl or `/opt/clog` steps.
-- Release handoff: merge to `main` and publish a GitHub release tagged `X.Y`;
-  `release.yml` re-verifies and attaches the archive. In the-loft, pin the version, URL
-  and attached asset's sha256 in `hosts/viking/clog-release.json`, then test the archive
-  with its `tests/clog-runtime.py`. The operator pulls on Viking and runs
-  `loft-ctl deploy clog --plan`, then `loft-ctl deploy clog`, which stops writes, backs
-  up, runs `install` and restarts. One-off CLI commands (`user:admin`, `backup`) use
-  the-loft's `clog-cli` Compose service.
+- Release handoff: merge to `main` and publish a GitHub release tagged `X.Y` (title per
+  `.claude/release.naming.md`); `release.yml` re-verifies and attaches the archive.
+  Nothing is pinned in the-loft's Git: `loft-ctl deploy clog [X.Y]` resolves the latest
+  (or given) release through the GitHub API and verifies the asset's digest. Test the
+  archive first with the-loft's `bash tests/clog-runtime.sh <archive>`. On Viking the
+  operator runs `loft-ctl deploy clog --plan`, then `loft-ctl deploy clog`, which stops
+  writes, backs up, runs `install` and restarts. One-off CLI commands (`user:admin`,
+  `backup`) use the-loft's `clog-cli` Compose service.
 - Build off-device. `scripts/package-standalone.sh` stages source and compiled assets,
   installs the production Composer lock in isolation, and produces
   `build/clog-standalone.tar.gz`. Never strip the working `server/vendor`.
