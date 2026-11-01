@@ -81,7 +81,7 @@ test('workspace pages groups and physical units beyond the first page, then edit
     await page.reload();
     await expect(panel.getByRole('heading', { name: 'Inventory Entry' })).toBeVisible();
     page.on('dialog', (dialog) => dialog.accept());
-    await panel.getByRole('button', { name: 'Delete', exact: true }).click();
+    await panel.getByRole('button', { name: 'Remove this one', exact: true }).click();
     await expect(page).not.toHaveURL(detail);
     await expect(page.getByRole('row').filter({ has: page.getByRole('link', { name: names[0], exact: true }) }).getByRole('cell', { name: '104', exact: true })).toBeVisible();
     await page.getByRole('link', { name: `Details for ${names[0]}`, exact: true }).click();
