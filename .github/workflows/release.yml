@@ -10,7 +10,7 @@ jobs:
     uses: ./.github/workflows/standalone.yml
 
   package:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [verify]
     permissions:
       contents: write
