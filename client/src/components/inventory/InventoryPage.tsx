@@ -72,7 +72,7 @@ export function InventoryPage({
               as="aside"
               aria-label="Inventory details"
               gap={4}
-              paddingBlockStart={4}
+              padding={4}
               xstyle={styles.panel}
             >
               {detail}
@@ -140,6 +140,10 @@ const styles = stylex.create({
   panel: {
     order: { default: -1, "@media (min-width: 1000px)": 1 },
     minWidth: 0,
-    borderTop: "1px solid var(--color-border)",
+    alignSelf: "start",
+    backgroundColor: "var(--color-background-surface)",
+    border: "1px solid var(--color-border)",
+    borderRadius: "var(--radius-container)",
+    boxShadow: "var(--shadow-low)",
   },
 });
